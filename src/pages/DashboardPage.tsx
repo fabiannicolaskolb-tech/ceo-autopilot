@@ -12,28 +12,10 @@ import { MeshBackground } from '@/components/MeshBackground';
 import CreatorScoreCard from '@/components/CreatorScoreCard';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { useAuth } from '@/hooks/useAuth';
+
 // Fictive sparkline trend data
 const DRAFT_TREND = [1, 2, 1, 3, 2, 4, 3, 5, 4, 3];
 const POSTED_TREND = [0, 1, 1, 2, 2, 3, 4, 3, 5, 6];
-
-// Creator Level System
-const CREATOR_LEVELS = [
-{ level: 1, name: 'Beobachter', emoji: '👀', min: 0, max: 2, color: 'hsl(var(--muted-foreground))', description: 'Willkommen! Veröffentlichen Sie Ihren ersten Post.' },
-{ level: 2, name: 'Einsteiger', emoji: '🌱', min: 3, max: 7, color: 'hsl(var(--success))', description: 'Sie haben den Anfang gemacht – bleiben Sie dran!' },
-{ level: 3, name: 'Creator', emoji: '✍️', min: 8, max: 15, color: 'hsl(40, 70%, 48%)', description: 'Sie bauen sich eine echte Präsenz auf.' },
-{ level: 4, name: 'Influencer', emoji: '🔥', min: 16, max: 30, color: 'hsl(20, 80%, 50%)', description: 'Ihr Content macht einen Unterschied!' },
-{ level: 5, name: 'Thought Leader', emoji: '👑', min: 31, max: Infinity, color: 'hsl(var(--primary))', description: 'Sie gehören zur LinkedIn-Elite.' }];
-
-
-function getCreatorLevel(postCount: number) {
-  const level = CREATOR_LEVELS.find((l) => postCount >= l.min && postCount <= l.max) || CREATOR_LEVELS[0];
-  const nextLevel = CREATOR_LEVELS.find((l) => l.level === level.level + 1);
-  const progressInLevel = nextLevel ?
-  (postCount - level.min) / (nextLevel.min - level.min) * 100 :
-  100;
-  return { ...level, nextLevel, progressInLevel: Math.min(100, Math.max(0, progressInLevel)), postsToNext: nextLevel ? nextLevel.min - postCount : 0 };
-}
 
 export default function DashboardPage() {
   const navigate = useNavigate();
