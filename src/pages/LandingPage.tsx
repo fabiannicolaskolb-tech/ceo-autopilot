@@ -8,6 +8,7 @@ import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { TypingAnimation } from '@/components/ui/typing-animation';
+import { HoverBorderGradient } from '@/components/ui/hover-border-gradient';
 import analyticsPreview from '@/assets/analytics-preview.jpg';
 
 const features = [
@@ -130,11 +131,8 @@ export default function LandingPage() {
       
         <div className="grid gap-6 sm:grid-cols-3">
           {features.map((f) =>
-          <Card
-            key={f.title}
-            className="border-border shadow-sm transition-shadow hover:shadow-md">
-            
-              <CardContent className="flex flex-col items-center p-8 text-center">
+            <HoverBorderGradient key={f.title} containerClassName="rounded-2xl">
+              <div className="flex flex-col items-center text-center">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                   <f.icon className="h-6 w-6 text-primary" />
                 </div>
@@ -142,8 +140,8 @@ export default function LandingPage() {
                   {f.headline}
                 </h3>
                 <p className="mt-2 text-sm text-muted-foreground">{f.description}</p>
-              </CardContent>
-            </Card>
+              </div>
+            </HoverBorderGradient>
           )}
         </div>
       </section>
