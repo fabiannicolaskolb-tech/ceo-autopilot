@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, TrendingUp, Users, Eye, CalendarDays } from 'lucide-react';
+import { FileText, TrendingUp, CalendarDays } from 'lucide-react';
+import { AnimatedGridPattern } from '@/components/ui/animated-grid-pattern';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -64,7 +65,13 @@ export default function DashboardPage() {
   const postCount = postedPosts.length;
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      <AnimatedGridPattern
+        numSquares={20}
+        maxOpacity={0.08}
+        duration={6}
+        className="absolute inset-0 -z-10 h-[calc(100%+48px)] -mt-6 -ml-4 w-[calc(100%+32px)] fill-primary/5 stroke-primary/10 [mask-image:radial-gradient(ellipse_at_top,white_30%,transparent_70%)]"
+      />
       <div>
         <h1 className="font-playfair text-2xl font-bold text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground">Ihr LinkedIn-Überblick auf einen Blick</p>
