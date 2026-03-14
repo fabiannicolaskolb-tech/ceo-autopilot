@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, TrendingUp, Users, Eye, CalendarDays } from 'lucide-react';
+import { FileText, TrendingUp, CalendarDays } from 'lucide-react';
+import { AnimatedGridPattern } from '@/components/ui/animated-grid-pattern';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
