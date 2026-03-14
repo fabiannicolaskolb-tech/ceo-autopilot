@@ -212,8 +212,9 @@ export default function IdeationPage() {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 bottom-3 p-2 rounded-sm bg-muted text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-                  title="Voice-to-Text (bald verfügbar)"
+                  onClick={toggleListening}
+                  className={`absolute right-3 bottom-3 p-2 rounded-sm transition-colors ${listening ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/40' : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-secondary'}`}
+                  title={listening ? 'Aufnahme stoppen' : 'Voice-to-Text starten'}
                 >
                   <Mic className="h-4 w-4" />
                 </button>
