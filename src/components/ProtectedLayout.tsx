@@ -27,7 +27,7 @@ function ProtectedLayout() {
 
   return (
     <div className="relative min-h-screen bg-background">
-      <Particles className="absolute inset-0 z-0" quantity={80} color="#1a2740" size={0.5} />
+      <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} />
       <div className="relative z-10">
         <FloatingHeader />
         <main className="mx-auto max-w-7xl px-4 py-6">
