@@ -80,9 +80,9 @@ export default function DashboardPage() {
                 : 'Keine offenen Entwürfe – erstellen Sie neue Ideen!'}
             </p>
           </div>
-          <Button size="sm" onClick={() => navigate(draftCount > 0 ? '/planner' : '/ideation')}>
+          <InteractiveHoverButton onClick={() => navigate(draftCount > 0 ? '/planner' : '/ideation')}>
             {draftCount > 0 ? 'Zum Planner' : 'Zum Ideation Lab'}
-          </Button>
+          </InteractiveHoverButton>
         </CardContent>
       </Card>
 

@@ -136,9 +136,9 @@ export default function AuthPage() {
                   <Label htmlFor="reg-password">Passwort</Label>
                   <Input id="reg-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required className="bg-card" />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <InteractiveHoverButton type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Wird registriert...' : 'Registrieren'}
-                </Button>
+                </InteractiveHoverButton>
               </form>
             </TabsContent>
           </Tabs>

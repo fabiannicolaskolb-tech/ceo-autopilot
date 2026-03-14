@@ -70,10 +70,9 @@ export default function IdeationPage() {
       <Card className="border-border shadow-sm">
         <CardContent className="p-5">
           <Textarea value={input} onChange={e => setInput(e.target.value)} placeholder="Was ist heute passiert? Was beschäftigt Sie gerade? Teilen Sie eine Beobachtung, ein Erlebnis oder eine Idee..." className="mb-4 min-h-[120px] bg-card" />
-          <Button onClick={generate} disabled={generating} className="gap-2">
-            <Sparkles className="h-4 w-4" />
+          <InteractiveHoverButton onClick={generate} disabled={generating}>
             {generating ? 'Ideen werden generiert...' : 'Ideen generieren'}
-          </Button>
+          </InteractiveHoverButton>
         </CardContent>
       </Card>
 

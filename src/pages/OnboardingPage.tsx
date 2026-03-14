@@ -267,11 +267,11 @@ export default function OnboardingPage() {
             Zurück
           </Button>
           {step < totalSteps ? (
-            <Button onClick={() => setStep(s => s + 1)}>Weiter</Button>
+            <InteractiveHoverButton onClick={() => setStep(s => s + 1)}>Weiter</InteractiveHoverButton>
           ) : (
-            <Button onClick={handleComplete} disabled={saving}>
+            <InteractiveHoverButton onClick={handleComplete} disabled={saving}>
               {saving ? 'Wird gespeichert...' : 'Abschließen'}
-            </Button>
+            </InteractiveHoverButton>
           )}
         </div>
       </div>
