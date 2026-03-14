@@ -27,17 +27,19 @@ const DAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 // ──── Empty State ────
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="rounded-full bg-muted p-6 mb-6">
-        <BarChart3 className="h-10 w-10 text-muted-foreground" />
+    <div className={cn(GLASS_CARD, 'p-8')}>
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="rounded-full bg-muted/60 p-4 mb-3">
+          <Rocket className="h-8 w-8 text-muted-foreground/50" />
+        </div>
+        <h2 className="font-playfair text-xl font-semibold text-foreground mb-2">
+          Sammle erste Daten…
+        </h2>
+        <p className="max-w-md text-sm text-muted-foreground">
+          Ihr erstes Performance-Update erscheint nach dem ersten Post.
+          Veröffentlichen Sie Ihren ersten Beitrag, um detaillierte Analysen freizuschalten.
+        </p>
       </div>
-      <h2 className="font-playfair text-xl font-semibold text-foreground mb-2">
-        Sammle erste Daten…
-      </h2>
-      <p className="max-w-md text-sm text-muted-foreground">
-        Ihr erstes Performance-Update erscheint nach dem ersten Post.
-        Veröffentlichen Sie Ihren ersten Beitrag, um detaillierte Analysen freizuschalten.
-      </p>
     </div>
   );
 }
