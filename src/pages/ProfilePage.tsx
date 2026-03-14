@@ -187,3 +187,101 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+const AVATAR_KEYS = ['avatar_url_1', 'avatar_url_2', 'avatar_url_3'] as const;
+const LABELS = ['Hauptprofilbild', 'Alternativbild 1', 'Alternativbild 2'];
+
+interface PhotoGridProps {
+  profile: any;
+  userId: string;
+  updateProfile: (data: any) => Promise<void>;
+  refreshProfile: () => Promise<void>;
+}
+
+function PhotoGrid({ profile, userId, updateProfile, refreshProfile }: PhotoGridProps) {
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+  const { toast } = useToast();
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDragIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setOverIndex(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    setOverIndex(null);
+    if (dragIndex === null || dragIndex === targetIndex) {
+      setDragIndex(null);
+      return;
+    }
+
+    // Swap the URLs
+    const sourceKey = AVATAR_KEYS[dragIndex];
+    const targetKey = AVATAR_KEYS[targetIndex];
+    const sourceUrl = profile?.[sourceKey] || null;
+    const targetUrl = profile?.[targetKey] || null;
+
+    try {
+      await updateProfile({ [sourceKey]: targetUrl, [targetKey]: sourceUrl });
+      await refreshProfile();
+      toast({ title: 'Reihenfolge aktualisiert' });
+    } catch {
+      toast({ title: 'Fehler beim Umsortieren', variant: 'destructive' });
+    }
+    setDragIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+    setOverIndex(null);
+  };
+
+  return (
+    <div className="flex flex-wrap gap-6">
+      {AVATAR_KEYS.map((key, i) => {
+        const hasImage = !!profile?.[key];
+        return (
+          <div
+            key={key}
+            draggable={hasImage}
+            onDragStart={(e) => handleDragStart(e, i)}
+            onDragOver={(e) => handleDragOver(e, i)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, i)}
+            onDragEnd={handleDragEnd}
+            className={cn(
+              'relative transition-all duration-200',
+              dragIndex === i && 'opacity-40 scale-95',
+              overIndex === i && dragIndex !== i && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-lg',
+            )}
+          >
+            {hasImage && (
+              <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 cursor-grab active:cursor-grabbing rounded-full bg-muted p-1 shadow-sm border border-border">
+                <GripVertical className="h-3 w-3 text-muted-foreground" />
+              </div>
+            )}
+            <PhotoUpload
+              label={LABELS[i]}
+              currentUrl={profile?.[key]}
+              userId={userId}
+              index={i + 1}
+              onUploaded={async (url) => { await updateProfile({ [key]: url }); await refreshProfile(); }}
+              onRemoved={async () => { await updateProfile({ [key]: null }); await refreshProfile(); }}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
