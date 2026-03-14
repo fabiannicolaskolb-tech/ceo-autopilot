@@ -78,7 +78,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Text */}
-      <AuroraBackground className="min-h-[70vh] px-4 py-20 sm:py-32">
+      <AuroraBackground className="px-4 pt-20 pb-0 sm:pt-32">
         <div className="relative z-10 mx-auto max-w-3xl text-center">
           <h1 className="font-playfair text-4xl font-bold leading-tight text-foreground sm:text-5xl lg:text-6xl">
             Ihre digitale Präsenz auf LinkedIn – Vollautomatisiert &amp; Authentisch.
@@ -96,26 +96,25 @@ export default function LandingPage() {
             </InteractiveHoverButton>
           </div>
         </div>
+        {/* Scroll Animation with Analytics Preview */}
+        <div className="relative z-10 w-full">
+          <ContainerScroll
+            titleComponent={
+              <h2 className="font-playfair text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl">
+                Datenbasierte Einblicke <br />
+                <span className="text-primary">in Echtzeit</span>
+              </h2>
+            }
+          >
+            <img
+              src={analyticsPreview}
+              alt="CEO Autopilot Analytics Tool Vorschau"
+              className="mx-auto rounded-2xl object-cover h-full w-full object-left-top"
+              draggable={false}
+            />
+          </ContainerScroll>
+        </div>
       </AuroraBackground>
-
-      {/* Scroll Animation with Analytics Preview */}
-      <section className="bg-background">
-        <ContainerScroll
-          titleComponent={
-            <h2 className="font-playfair text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl">
-              Datenbasierte Einblicke <br />
-              <span className="text-primary">in Echtzeit</span>
-            </h2>
-          }
-        >
-          <img
-            src={analyticsPreview}
-            alt="CEO Autopilot Analytics Tool Vorschau"
-            className="mx-auto rounded-2xl object-cover h-full w-full object-left-top"
-            draggable={false}
-          />
-        </ContainerScroll>
-      </section>
 
       {/* Features */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
