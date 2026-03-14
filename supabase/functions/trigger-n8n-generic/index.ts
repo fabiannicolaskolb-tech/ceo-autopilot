@@ -17,7 +17,10 @@ Deno.serve(async (req) => {
 
     const n8nResponse = await fetch(n8nWebhookUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Webhook-Secret": Deno.env.get("N8N_CALLBACK_SECRET") ?? "",
+      },
       body: JSON.stringify({ action: "generic-trigger", timestamp: new Date().toISOString() }),
     });
 
