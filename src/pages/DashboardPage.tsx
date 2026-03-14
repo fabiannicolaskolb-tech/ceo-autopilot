@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
+import { HoverBorderGradient } from '@/components/ui/hover-border-gradient';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 
