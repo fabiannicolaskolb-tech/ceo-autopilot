@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           angle: string | null
           content: string | null
+          content_category: string | null
           created_at: string
           hook: string | null
           id: string
@@ -33,6 +34,7 @@ export type Database = {
         Insert: {
           angle?: string | null
           content?: string | null
+          content_category?: string | null
           created_at?: string
           hook?: string | null
           id?: string
@@ -48,6 +50,7 @@ export type Database = {
         Update: {
           angle?: string | null
           content?: string | null
+          content_category?: string | null
           created_at?: string
           hook?: string | null
           id?: string
