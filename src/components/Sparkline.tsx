@@ -16,8 +16,8 @@ export function Sparkline({ data, color = 'hsl(var(--primary))', height = 40, wi
   const padding = 2;
 
   const points = data.map((val, i) => {
-    const x = (i / (data.length - 1)) * (width - padding * 2) + padding;
-    const y = height - padding - ((val - min) / range) * (height - padding * 2);
+    const x = (i / (data.length - 1)) * width;
+    const y = padding + ((max - val) / range) * (height - padding);
     return `${x},${y}`;
   });
 
