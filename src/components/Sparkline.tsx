@@ -25,7 +25,7 @@ export function Sparkline({ data, color = 'hsl(var(--primary))', height = 40, wi
   const areaPath = `${linePath} L${width - padding},${height} L${padding},${height} Z`;
 
   return (
-    <svg width={width} height={height} className="overflow-visible">
+    <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="overflow-visible">
       <defs>
         <linearGradient id={`sparkGrad-${color.replace(/[^a-z0-9]/gi, '')}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.3" />
