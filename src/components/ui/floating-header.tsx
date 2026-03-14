@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Lightbulb, GalleryHorizontalEnd, BarChart3, Zap, LogOut, MenuIcon, User, Settings, Sun, Moon,
+  LayoutDashboard, Lightbulb, GalleryHorizontalEnd, BarChart3, Zap, LogOut, MenuIcon, User, Settings, Sun, Moon, CheckSquare,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -16,8 +16,10 @@ import { cn } from '@/lib/utils';
 
 const navItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
+  { title: 'Profil', url: '/profile', icon: User },
   { title: 'Ideation Lab', url: '/ideation', icon: Lightbulb },
   { title: 'Gallery', url: '/planner', icon: GalleryHorizontalEnd },
+  { title: 'Post Queue', url: '/post-queue', icon: CheckSquare },
   { title: 'Analytics', url: '/analytics', icon: BarChart3 },
 ];
 
