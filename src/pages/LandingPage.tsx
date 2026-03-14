@@ -6,7 +6,6 @@ import { AuroraBackground } from '@/components/ui/aurora-background';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { TypingAnimation } from '@/components/ui/typing-animation';
 import analyticsPreview from '@/assets/analytics-preview.jpg';
 
