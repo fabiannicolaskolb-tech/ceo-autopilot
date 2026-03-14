@@ -175,7 +175,7 @@ export function useAnalytics() {
   const contentTypeData = useMemo((): ContentTypePoint[] => {
     const map = new Map<string, ContentTypePoint>();
     filteredPosts.forEach(p => {
-      const type = p.type || 'Sonstige';
+      const type = p.content_category || p.type || 'Sonstige';
       const existing = map.get(type) || { type, impressions: 0, engagement: 0, count: 0 };
       existing.impressions += p.metrics.impressions || 0;
       existing.engagement += weightedEngagement(p.metrics);
