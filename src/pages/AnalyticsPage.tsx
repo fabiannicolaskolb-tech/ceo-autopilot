@@ -113,54 +113,148 @@ function BestTimeHeatmap({ data }: { data: { day: number; hour: number; intensit
 }
 
 // ──── Post Compare ────
+interface CompareMetric {
+  label: string;
+  icon: React.ElementType;
+  getValue: (p: AnalyticsPost) => number;
+}
+
+const COMPARE_METRICS: CompareMetric[] = [
+  { label: 'Impressions', icon: Eye, getValue: (p) => p.metrics.impressions || 0 },
+  { label: 'Likes', icon: Heart, getValue: (p) => p.metrics.interactions?.likes || 0 },
+  { label: 'Kommentare', icon: MessageCircle, getValue: (p) => p.metrics.interactions?.comments || 0 },
+  { label: 'Shares', icon: Share2, getValue: (p) => p.metrics.interactions?.shares || 0 },
+  { label: 'CTR', icon: TrendingUp, getValue: (p) => p.metrics.ctr || 0 },
+];
+
 function PostCompare({ posts }: { posts: AnalyticsPost[] }) {
   const [idA, setIdA] = useState('');
   const [idB, setIdB] = useState('');
   const postA = posts.find(p => p.id === idA);
   const postB = posts.find(p => p.id === idB);
 
-  const renderMetrics = (p?: AnalyticsPost) => {
-    if (!p) return <p className="text-sm text-muted-foreground">Post auswählen</p>;
-    const m = p.metrics;
-    const i = m.interactions || {};
-    return (
-      <div className="space-y-2 text-sm">
-        <p className="font-playfair font-semibold text-foreground line-clamp-2">{p.hook || '—'}</p>
-        <div className="grid grid-cols-2 gap-2 text-muted-foreground">
-          <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{(m.impressions || 0).toLocaleString()}</span>
-          <span className="flex items-center gap-1"><Heart className="h-3 w-3" />{i.likes || 0}</span>
-          <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" />{i.comments || 0}</span>
-          <span className="flex items-center gap-1"><Share2 className="h-3 w-3" />{i.shares || 0}</span>
-        </div>
-        {m.ctr != null && <p className="text-xs">CTR: {m.ctr}%</p>}
-      </div>
-    );
-  };
+  const bothSelected = postA && postB;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      <div className="space-y-3">
-        <Select value={idA} onValueChange={setIdA}>
-          <SelectTrigger><SelectValue placeholder="Post A auswählen" /></SelectTrigger>
-          <SelectContent>
-            {posts.map(p => (
-              <SelectItem key={p.id} value={p.id}>{(p.hook || p.id).slice(0, 50)}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="rounded-[16px] bg-card/60 backdrop-blur-sm p-4">{renderMetrics(postA)}</div>
+    <div className="space-y-5">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-3">
+          <Select value={idA} onValueChange={setIdA}>
+            <SelectTrigger><SelectValue placeholder="Post A auswählen" /></SelectTrigger>
+            <SelectContent>
+              {posts.map(p => (
+                <SelectItem key={p.id} value={p.id}>{(p.hook || p.id).slice(0, 50)}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="rounded-[16px] bg-card/60 backdrop-blur-sm p-4">
+            {postA ? (
+              <p className="font-playfair font-semibold text-foreground text-sm line-clamp-2">{postA.hook || '—'}</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">Post auswählen</p>
+            )}
+          </div>
+        </div>
+        <div className="space-y-3">
+          <Select value={idB} onValueChange={setIdB}>
+            <SelectTrigger><SelectValue placeholder="Post B auswählen" /></SelectTrigger>
+            <SelectContent>
+              {posts.map(p => (
+                <SelectItem key={p.id} value={p.id}>{(p.hook || p.id).slice(0, 50)}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="rounded-[16px] bg-card/60 backdrop-blur-sm p-4">
+            {postB ? (
+              <p className="font-playfair font-semibold text-foreground text-sm line-clamp-2">{postB.hook || '—'}</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">Post auswählen</p>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="space-y-3">
-        <Select value={idB} onValueChange={setIdB}>
-          <SelectTrigger><SelectValue placeholder="Post B auswählen" /></SelectTrigger>
-          <SelectContent>
-            {posts.map(p => (
-              <SelectItem key={p.id} value={p.id}>{(p.hook || p.id).slice(0, 50)}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="rounded-[16px] bg-card/60 backdrop-blur-sm p-4">{renderMetrics(postB)}</div>
-      </div>
+
+      {/* Comparison breakdown */}
+      {bothSelected && (
+        <div className="space-y-2">
+          {COMPARE_METRICS.map((metric) => {
+            const valA = metric.getValue(postA);
+            const valB = metric.getValue(postB);
+            const maxVal = Math.max(valA, valB, 1);
+            const diff = maxVal > 0 ? Math.abs(valA - valB) / maxVal : 0;
+            const isSignificant = diff >= 0.3; // ≥30% difference
+            const winner = valA > valB ? 'A' : valB > valA ? 'B' : null;
+            const Icon = metric.icon;
+            const isCtr = metric.label === 'CTR';
+            const formatVal = (v: number) => isCtr ? `${v}%` : v.toLocaleString();
+
+            return (
+              <div
+                key={metric.label}
+                className={cn(
+                  'flex items-center gap-3 rounded-xl px-4 py-3 transition-all',
+                  isSignificant
+                    ? 'bg-primary/[0.06] ring-1 ring-primary/20'
+                    : 'bg-card/40'
+                )}
+              >
+                <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <span className="text-xs text-muted-foreground w-24 shrink-0">{metric.label}</span>
+
+                {/* Value A */}
+                <span className={cn(
+                  'text-sm font-semibold w-16 text-right shrink-0',
+                  isSignificant && winner === 'A' ? 'text-success' : 'text-foreground'
+                )}>
+                  {formatVal(valA)}
+                </span>
+
+                {/* Bar comparison */}
+                <div className="flex-1 flex items-center gap-1 min-w-0">
+                  <div className="flex-1 h-2 rounded-full bg-muted/40 overflow-hidden flex justify-end">
+                    <div
+                      className={cn(
+                        'h-full rounded-full transition-all duration-500',
+                        isSignificant && winner === 'A'
+                          ? 'bg-success'
+                          : 'bg-primary/40'
+                      )}
+                      style={{ width: `${maxVal > 0 ? (valA / maxVal) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <div className="w-px h-4 bg-border shrink-0" />
+                  <div className="flex-1 h-2 rounded-full bg-muted/40 overflow-hidden">
+                    <div
+                      className={cn(
+                        'h-full rounded-full transition-all duration-500',
+                        isSignificant && winner === 'B'
+                          ? 'bg-success'
+                          : 'bg-primary/40'
+                      )}
+                      style={{ width: `${maxVal > 0 ? (valB / maxVal) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Value B */}
+                <span className={cn(
+                  'text-sm font-semibold w-16 shrink-0',
+                  isSignificant && winner === 'B' ? 'text-success' : 'text-foreground'
+                )}>
+                  {formatVal(valB)}
+                </span>
+
+                {/* Difference badge */}
+                {isSignificant && (
+                  <Badge variant="default" className="text-[10px] px-1.5 py-0 shrink-0 rounded-full bg-success/15 text-success border-0 font-bold">
+                    {winner === 'A' ? '←' : '→'} +{Math.round(diff * 100)}%
+                  </Badge>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
