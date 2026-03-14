@@ -77,24 +77,37 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Hero */}
-      <AuroraBackground className="min-h-[70vh] px-4 py-20 sm:py-32">
-        <div className="relative z-10 mx-auto max-w-3xl text-center">
-          <h1 className="font-playfair text-4xl font-bold leading-tight text-foreground sm:text-5xl lg:text-6xl">
-            Ihre digitale Präsenz auf LinkedIn – Vollautomatisiert &amp; Authentisch.
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl font-inter text-lg text-muted-foreground sm:text-xl">
-            KI-gestütztes Personal Branding für Führungskräfte im Mittelstand.
-            Wir verwandeln Ihre Erfahrung in Reichweite.
-          </p>
-          <div className="mt-10">
-            <InteractiveHoverButton
-              onClick={() => navigate('/auth')}
-              className="text-base px-8 py-3"
-            >
-              Get Started
-            </InteractiveHoverButton>
-          </div>
+      {/* Hero with Scroll Animation */}
+      <AuroraBackground className="px-4 pt-10 pb-0 sm:pt-16">
+        <div className="relative z-10 w-full">
+          <ContainerScroll
+            titleComponent={
+              <div className="mx-auto max-w-3xl text-center">
+                <h1 className="font-playfair text-4xl font-bold leading-tight text-foreground sm:text-5xl lg:text-6xl">
+                  Ihre digitale Präsenz auf LinkedIn – Vollautomatisiert &amp; Authentisch.
+                </h1>
+                <p className="mx-auto mt-6 max-w-2xl font-inter text-lg text-muted-foreground sm:text-xl">
+                  KI-gestütztes Personal Branding für Führungskräfte im Mittelstand.
+                  Wir verwandeln Ihre Erfahrung in Reichweite.
+                </p>
+                <div className="mt-10">
+                  <InteractiveHoverButton
+                    onClick={() => navigate('/auth')}
+                    className="text-base px-8 py-3"
+                  >
+                    Get Started
+                  </InteractiveHoverButton>
+                </div>
+              </div>
+            }
+          >
+            <img
+              src={dashboardPreview}
+              alt="CEO Autopilot Dashboard Vorschau"
+              className="mx-auto rounded-2xl object-cover h-full w-full object-left-top"
+              draggable={false}
+            />
+          </ContainerScroll>
         </div>
       </AuroraBackground>
 
