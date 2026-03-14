@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, isSameMonth, addMonths, subMonths, isToday } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { CalendarIcon, Rocket, ChevronLeft, ChevronRight, List, CalendarDays } from 'lucide-react';
+import { CalendarIcon, Rocket, ChevronLeft, ChevronRight, List, CalendarDays, Send, Loader2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -196,6 +196,27 @@ export default function PlannerPage() {
     },
   });
 
+  const triggerN8nMutation = useMutation({
+    mutationFn: async (postId: string) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase.functions.invoke('trigger-n8n', {
+        body: { postId, action: 'publish' },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      setEditPost(null);
+      toast({ title: 'Workflow gestartet', description: 'Der Post wurde an n8n gesendet.' });
+    },
+    onError: (err: Error) => {
+      toast({ title: 'Fehler', description: err.message, variant: 'destructive' });
+    },
+  });
+
   const filtered = filter === 'all' ? posts : posts.filter(p => p.status === filter);
 
   const openEdit = (post: any) => {
@@ -315,9 +336,21 @@ export default function PlannerPage() {
               </Popover>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setEditPost(null)}>Abbrechen</Button>
             <Button onClick={saveEdit} disabled={updateMutation.isPending}>Speichern</Button>
+            <Button
+              onClick={() => editPost && triggerN8nMutation.mutate(editPost.id)}
+              disabled={triggerN8nMutation.isPending}
+              className="bg-[hsl(var(--status-posted))] hover:bg-[hsl(var(--status-posted))]/90 text-white gap-2"
+            >
+              {triggerN8nMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+              An n8n senden
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
