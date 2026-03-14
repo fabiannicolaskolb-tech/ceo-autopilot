@@ -54,6 +54,12 @@
     --chart-navy: 220 55% 20%;
     --chart-emerald: 160 60% 38%;
     --chart-gold: 40 70% 48%;
+
+    --feature-bg: 220 20% 96%;
+    --feature-card: 0 0% 100%;
+    --feature-accent: 220 55% 20%;
+    --feature-icon-bg: 216 85% 96%;
+    --feature-icon: 220 55% 25%;
   }
 }
 

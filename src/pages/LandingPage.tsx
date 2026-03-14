@@ -6,7 +6,6 @@ import { AuroraBackground } from '@/components/ui/aurora-background';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { TypingAnimation } from '@/components/ui/typing-animation';
 import analyticsPreview from '@/assets/analytics-preview.jpg';
 
@@ -118,33 +117,42 @@ export default function LandingPage() {
       </AuroraBackground>
 
       {/* Features */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="mb-12 text-center">
-          <TypingAnimation
-            text="Alles was Sie brauchen – Drei Module für Ihren Erfolg."
-            duration={53}
-            className="font-playfair text-3xl font-bold text-foreground sm:text-4xl"
-          />
-        </div>
+      <section className="bg-[hsl(var(--feature-bg))]">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
+          <div className="mb-14 text-center">
+            <TypingAnimation
+              text="Alles was Sie brauchen – Drei Module für Ihren Erfolg."
+              duration={53}
+              className="font-playfair text-3xl font-bold text-foreground sm:text-4xl"
+            />
+          </div>
 
-      
-        <div className="grid gap-6 sm:grid-cols-3">
-          {features.map((f) =>
-          <Card
-            key={f.title}
-            className="border-border shadow-sm transition-shadow hover:shadow-md">
-            
-              <CardContent className="flex flex-col items-center p-8 text-center">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <f.icon className="h-6 w-6 text-primary" />
+          <div className="grid gap-8 sm:grid-cols-3">
+            {features.map((f) => (
+              <div
+                key={f.title}
+                className="group relative overflow-hidden rounded-xl bg-[hsl(var(--feature-card))] shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-all duration-300 hover:-translate-y-[5px] hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)]"
+              >
+                {/* Top accent bar */}
+                <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
+
+                <div className="flex flex-col items-center p-8 pt-7 text-center">
+                  <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--feature-icon-bg))]">
+                    <f.icon className="h-7 w-7 text-[hsl(var(--feature-icon))]" />
+                  </div>
+                  <h3 className="font-playfair text-lg font-bold text-foreground">
+                    {f.headline}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {f.description}
+                  </p>
+                  <span className="mt-5 inline-block text-xs font-medium tracking-wide text-[hsl(var(--feature-accent))] transition-all group-hover:underline">
+                    Mehr erfahren →
+                  </span>
                 </div>
-                <h3 className="font-playfair text-lg font-semibold text-foreground">
-                  {f.headline}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">{f.description}</p>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
