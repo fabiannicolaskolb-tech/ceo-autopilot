@@ -172,6 +172,28 @@ export default function OnboardingPage() {
         {step === 3 && (
           <div className="space-y-6">
             <div className="text-center">
+              <h1 className="font-playfair text-2xl font-bold">Profilfotos</h1>
+              <p className="mt-1 text-muted-foreground">Laden Sie bis zu 3 professionelle Fotos hoch</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6">
+              {['Hauptprofilbild', 'Alternativbild 1', 'Alternativbild 2'].map((label, i) => (
+                <PhotoUpload
+                  key={i}
+                  label={label}
+                  currentUrl={avatarUrls[i]}
+                  userId={user?.id || ''}
+                  index={i + 1}
+                  onUploaded={(url) => setAvatarUrls(prev => { const u = [...prev]; u[i] = url; return u; })}
+                  onRemoved={() => setAvatarUrls(prev => { const u = [...prev]; u[i] = null; return u; })}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="space-y-6">
+            <div className="text-center">
               <h1 className="font-playfair text-2xl font-bold">Strategie</h1>
               <p className="mt-1 text-muted-foreground">Definieren Sie Ihre Kommunikationsstrategie</p>
             </div>
