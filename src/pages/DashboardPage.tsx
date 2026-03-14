@@ -1,8 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, TrendingUp, CalendarDays, Sparkles, PenLine, Rocket, Trophy, Star, Zap, Crown, Award } from 'lucide-react';
+import { FileText, TrendingUp, CalendarDays, Rocket } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { Badge } from '@/components/ui/badge';
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Sparkline } from '@/components/Sparkline';
+import { MeshBackground } from '@/components/MeshBackground';
+import CreatorScoreCard from '@/components/CreatorScoreCard';
+import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
 import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
