@@ -21,7 +21,7 @@ export default function AuthPage() {
 
   React.useEffect(() => {
     if (user && profile) {
-      navigate(profile.onboarding_completed ? '/' : '/onboarding', { replace: true });
+      navigate(profile.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
     }
   }, [user, profile, navigate]);
 

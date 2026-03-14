@@ -92,7 +92,7 @@ export default function OnboardingPage() {
       }
 
       toast({ title: 'Onboarding abgeschlossen!' });
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (err: any) {
       toast({ title: 'Fehler beim Speichern', description: err?.message, variant: 'destructive' });
     }
