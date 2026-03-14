@@ -19,8 +19,8 @@ export default function AuthPage() {
   const { toast } = useToast();
 
   React.useEffect(() => {
-    if (user) {
-      navigate(profile?.onboarding_completed ? '/' : '/onboarding', { replace: true });
+    if (user && profile) {
+      navigate(profile.onboarding_completed ? '/' : '/onboarding', { replace: true });
     }
   }, [user, profile, navigate]);
 
