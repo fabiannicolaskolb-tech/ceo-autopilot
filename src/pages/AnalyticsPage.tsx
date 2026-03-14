@@ -159,7 +159,7 @@ function PostCompare({ posts }: { posts: AnalyticsPost[] }) {
             ))}
           </SelectContent>
         </Select>
-        <div className="rounded-lg border border-border p-4">{renderMetrics(postB)}</div>
+        <div className="rounded-[16px] bg-card/60 backdrop-blur-sm p-4">{renderMetrics(postB)}</div>
       </div>
     </div>
   );
