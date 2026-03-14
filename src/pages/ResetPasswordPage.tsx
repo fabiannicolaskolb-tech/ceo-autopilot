@@ -44,7 +44,7 @@ export default function ResetPasswordPage() {
 
   if (!isRecovery) {
     return (
-      <div className="relative z-10 flex min-h-screen items-center justify-center bg-background/90 p-4">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md border-border shadow-sm">
           <CardContent className="p-8 text-center text-muted-foreground">
             Ungültiger oder abgelaufener Reset-Link. Bitte fordern Sie einen neuen an.
