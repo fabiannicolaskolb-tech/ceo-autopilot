@@ -43,7 +43,7 @@ const App = () => (
                 <Route path="/planner" element={<PlannerPage />} />
                 <Route path="/post-queue" element={<PostQueuePage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
+                
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
