@@ -68,14 +68,16 @@ export default function IdeationPage() {
         <p className="text-sm text-muted-foreground">Verwandeln Sie Ihre Gedanken in LinkedIn-Content</p>
       </div>
 
-      <Card className="border-border shadow-sm">
-        <CardContent className="p-5">
-          <Textarea value={input} onChange={e => setInput(e.target.value)} placeholder="Was ist heute passiert? Was beschäftigt Sie gerade? Teilen Sie eine Beobachtung, ein Erlebnis oder eine Idee..." className="mb-4 min-h-[120px] bg-card" />
-          <InteractiveHoverButton onClick={generate} disabled={generating}>
-            {generating ? 'Ideen werden generiert...' : 'Ideen generieren'}
-          </InteractiveHoverButton>
-        </CardContent>
-      </Card>
+      <HoverBorderGradient>
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-5">
+            <Textarea value={input} onChange={e => setInput(e.target.value)} placeholder="Was ist heute passiert? Was beschäftigt Sie gerade? Teilen Sie eine Beobachtung, ein Erlebnis oder eine Idee..." className="mb-4 min-h-[120px] bg-card" />
+            <InteractiveHoverButton onClick={generate} disabled={generating}>
+              {generating ? 'Ideen werden generiert...' : 'Ideen generieren'}
+            </InteractiveHoverButton>
+          </CardContent>
+        </Card>
+      </HoverBorderGradient>
 
       {concepts.length > 0 && (
         <div>
