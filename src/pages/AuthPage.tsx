@@ -107,7 +107,7 @@ export default function AuthPage() {
           <CardDescription className="font-inter text-xs uppercase tracking-widest text-muted-foreground">LinkedIn</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs defaultValue="login" className="w-full" onValueChange={() => setBurstKey(k => k + 1)}>
             <TabsList className="mb-4 grid w-full grid-cols-2">
               <TabsTrigger value="login">Anmelden</TabsTrigger>
               <TabsTrigger value="register">Registrieren</TabsTrigger>
