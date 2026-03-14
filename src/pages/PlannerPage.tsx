@@ -219,7 +219,14 @@ export default function PlannerPage() {
 
   const triggerGenericMutation = useMutation({
     mutationFn: async () => {
-      const { data, error } = await supabase.functions.invoke('trigger-n8n-generic');
+      const { data, error } = await supabase.functions.invoke('trigger-n8n-generic', {
+        body: {
+          user_id: user?.id,
+          request_id: crypto.randomUUID(),
+          command: 'orchestrate',
+          cycle_number: 1,
+        },
+      });
       if (error) throw error;
       return data;
     },
