@@ -3,6 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { FloatingHeader } from '@/components/ui/floating-header';
 import { Particles } from '@/components/ui/particles';
+import { useTheme } from '@/hooks/useTheme';
 
 function ProtectedLayout() {
   const { user, profile, loading } = useAuth();
