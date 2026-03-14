@@ -127,7 +127,7 @@ export default function OnboardingPage() {
             <div className="grid gap-4 sm:grid-cols-3">
               {[
                 { icon: Lightbulb, title: 'Ideation Lab', desc: 'KI-gestützte Content-Ideen aus Ihrem Alltag' },
-                { icon: CalendarDays, title: 'Content Planner', desc: 'Strategische Planung Ihres LinkedIn-Auftritts' },
+                { icon: CalendarDays, title: 'Content Gallery', desc: 'Strategische Planung Ihres LinkedIn-Auftritts' },
                 { icon: BarChart3, title: 'AI Analytics', desc: 'Datengetriebene Optimierung Ihrer Reichweite' },
               ].map(f => (
                 <Card key={f.title} className="border-border shadow-sm hover:shadow-md transition-shadow">

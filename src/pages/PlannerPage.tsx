@@ -263,7 +263,7 @@ export default function PlannerPage() {
       <div className={cn(GLASS_CARD, 'p-6 sm:p-8')}>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Content Planner</h1>
+            <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Content Gallery</h1>
             <p className="text-sm text-muted-foreground mt-0.5">Verwalten Sie Ihre LinkedIn-Posts</p>
           </div>
           <div className="flex items-center gap-3">
