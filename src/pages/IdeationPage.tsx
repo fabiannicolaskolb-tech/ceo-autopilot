@@ -150,7 +150,7 @@ export default function IdeationPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast({ title: 'Entwurf erstellt', description: 'Post wurde zum Planner hinzugefügt.' });
+      toast({ title: 'Entwurf erstellt', description: 'Post wurde zur Gallery hinzugefügt.' });
     },
     onError: (err: any) => {
       toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
