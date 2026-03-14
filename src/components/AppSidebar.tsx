@@ -10,6 +10,7 @@ import {
   SidebarMenuButton, SidebarMenuItem, SidebarFooter, useSidebar,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 const navItems = [
   { title: 'Dashboard', url: '/', icon: LayoutDashboard },
