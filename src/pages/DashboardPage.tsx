@@ -151,7 +151,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex-1 min-h-[60px]">
-            <Sparkline data={POSTED_TREND} color="hsl(160, 60%, 38%)" height={80} width={300} />
+            <Sparkline data={postedTrend} color="hsl(160, 60%, 38%)" height={80} width={300} />
           </div>
         </div>
 
