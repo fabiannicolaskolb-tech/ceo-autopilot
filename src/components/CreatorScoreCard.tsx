@@ -42,7 +42,7 @@ function RadialProgress({
         strokeDasharray={circumference}
         strokeDashoffset={offset}
         className="transition-all duration-1000 ease-out"
-        style={glowing ? { filter: 'drop-shadow(0 0 8px hsl(var(--score-glow) / 0.6))' } : {}}
+        filter={glowing ? 'url(#glowFilter)' : undefined}
       />
       <defs>
         <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
