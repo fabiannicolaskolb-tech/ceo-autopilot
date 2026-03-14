@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, TrendingUp, CalendarDays, Rocket } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
