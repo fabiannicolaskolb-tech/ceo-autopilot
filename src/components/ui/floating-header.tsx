@@ -14,7 +14,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { title: 'Dashboard', url: '/', icon: LayoutDashboard },
+  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Ideation Lab', url: '/ideation', icon: Lightbulb },
   { title: 'Planner', url: '/planner', icon: CalendarDays },
   { title: 'Analytics', url: '/analytics', icon: BarChart3 },
