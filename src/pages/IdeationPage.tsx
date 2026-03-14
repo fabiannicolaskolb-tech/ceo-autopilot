@@ -157,30 +157,52 @@ export default function IdeationPage() {
     },
   });
 
-  const generate = () => {
+  const generate = async () => {
     if (!input.trim()) {
       toast({ title: 'Bitte geben Sie einen Input ein', variant: 'destructive' });
       return;
     }
     setGenerating(true);
-    // Prepare payload for future webhook integration
-    const _payload = {
-      user_id: user?.id,
-      input,
-      profile: {
-        name: profile?.name,
-        company: profile?.company,
-        industry: profile?.industry,
-        role: profile?.role,
-        tone: profile?.tone,
-        target_audience: profile?.target_audience,
-      },
-    };
-    // Mock: simulate API call
-    setTimeout(() => {
-      setConcepts(MOCK_CONCEPTS);
+    try {
+      const payload = {
+        input,
+        profile: {
+          name: profile?.name,
+          company: profile?.company,
+          industry: profile?.industry,
+          role: profile?.role,
+          tone: profile?.tone,
+          target_audience: profile?.target_audience,
+        },
+      };
+
+      const { data, error } = await supabase.functions.invoke('generate-ideas', {
+        body: payload,
+      });
+
+      if (error) throw error;
+
+      // Map n8n response to Concept[] format
+      const raw = data?.concepts;
+      if (Array.isArray(raw) && raw.length > 0) {
+        const mapped: Concept[] = raw.map((c: any) => ({
+          hook: c.hook || '',
+          type: c.type || 'Insight',
+          angle: c.angle || '',
+          preview: c.preview || '',
+          score: typeof c.score === 'number' ? c.score : 75,
+          category: c.category || 'Allgemein',
+        }));
+        setConcepts(mapped);
+      } else {
+        toast({ title: 'Keine Ideen generiert', description: 'Der Workflow hat keine Konzepte zurückgegeben. Versuchen Sie es mit einem anderen Input.', variant: 'destructive' });
+      }
+    } catch (err: any) {
+      console.error('Generate ideas error:', err);
+      toast({ title: 'Fehler bei der Ideengenerierung', description: err?.message || 'Unbekannter Fehler', variant: 'destructive' });
+    } finally {
       setGenerating(false);
-    }, 4800);
+    }
   };
 
   const dismissConcept = (index: number) => {

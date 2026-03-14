@@ -349,7 +349,7 @@ export default function PlannerPage() {
               ) : (
                 <Send className="h-4 w-4" />
               )}
-              An n8n senden
+              Veröffentlichen
             </Button>
           </DialogFooter>
         </DialogContent>
