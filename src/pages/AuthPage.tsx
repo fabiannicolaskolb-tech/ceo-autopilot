@@ -145,6 +145,6 @@ export default function AuthPage() {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
+    </WarpBackground>
   );
 }
