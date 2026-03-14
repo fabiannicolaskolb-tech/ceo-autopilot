@@ -84,8 +84,6 @@ export default function DashboardPage() {
 
   const draftCount = drafts.length;
   const postCount = postedPosts.length;
-  const totalPostCount = allPosts.length;
-  const creatorLevel = getCreatorLevel(totalPostCount);
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] space-y-8">
