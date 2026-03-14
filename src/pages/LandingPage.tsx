@@ -101,7 +101,7 @@ export default function LandingPage() {
         <div className="relative z-10 w-full">
           <ContainerScroll
             titleComponent={
-            <h2 className="font-playfair text-3xl font-bold text-foreground sm:text-4xl mb-[90px] lg:text-6xl">
+            <h2 className="font-playfair text-3xl font-bold text-foreground sm:text-4xl mb-[90px] lg:text-6xl mt-16 sm:mt-0">
                 Datenbasierte Einblicke <br />
                 <span className="text-primary">in Echtzeit</span>
               </h2>
