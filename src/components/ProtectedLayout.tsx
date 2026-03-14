@@ -8,6 +8,12 @@ import { useTheme } from '@/hooks/useTheme';
 function ProtectedLayout() {
   const { user, profile, loading } = useAuth();
   const { theme } = useTheme();
+  const location = useLocation();
+  const [burstKey, setBurstKey] = useState(0);
+
+  useEffect(() => {
+    setBurstKey(k => k + 1);
+  }, [location.pathname]);
 
   if (loading) {
     return (
