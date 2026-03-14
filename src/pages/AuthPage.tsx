@@ -20,6 +20,7 @@ export default function AuthPage() {
   const [burstKey, setBurstKey] = useState(0);
   const { signIn, signUp, resetPassword, user, profile } = useAuth();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
 
   React.useEffect(() => {
