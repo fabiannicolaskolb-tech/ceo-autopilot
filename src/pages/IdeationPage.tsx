@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Mic, Loader2, X, ArrowRight, Sparkles } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,8 +52,61 @@ export default function IdeationPage() {
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [generating, setGenerating] = useState(false);
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
+  const [listening, setListening] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
+  const recognitionRef = useRef<any>(null);
+
+  const toggleListening = useCallback(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast({ title: 'Nicht unterstützt', description: 'Ihr Browser unterstützt kein Voice-to-Text. Bitte nutzen Sie Chrome, Edge oder Safari.', variant: 'destructive' });
+      return;
+    }
+
+    if (listening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'de-DE';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    let finalTranscript = '';
+
+    recognition.onresult = (event: any) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+          setInput(prev => prev + transcript + ' ');
+        } else {
+          interim = transcript;
+        }
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setListening(false);
+      if (event.error === 'not-allowed') {
+        toast({ title: 'Mikrofon blockiert', description: 'Bitte erlauben Sie den Zugriff auf Ihr Mikrofon in den Browser-Einstellungen.', variant: 'destructive' });
+      }
+    };
+
+    recognition.onend = () => {
+      setListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setListening(true);
+  }, [listening, toast]);
 
   const { data: topics = [] } = useQuery({
     queryKey: ['topics', user?.id],
@@ -159,8 +212,9 @@ export default function IdeationPage() {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 bottom-3 p-2 rounded-sm bg-muted text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-                  title="Voice-to-Text (bald verfügbar)"
+                  onClick={toggleListening}
+                  className={`absolute right-3 bottom-3 p-2 rounded-sm transition-colors ${listening ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/40' : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-secondary'}`}
+                  title={listening ? 'Aufnahme stoppen' : 'Voice-to-Text starten'}
                 >
                   <Mic className="h-4 w-4" />
                 </button>
@@ -274,8 +328,9 @@ export default function IdeationPage() {
           />
           <button
             type="button"
-            className="absolute right-3 bottom-3 p-2 rounded-sm bg-muted text-muted-foreground"
-            title="Voice-to-Text"
+            onClick={toggleListening}
+            className={`absolute right-3 bottom-3 p-2 rounded-sm transition-colors ${listening ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/40' : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-secondary'}`}
+            title={listening ? 'Aufnahme stoppen' : 'Voice-to-Text starten'}
           >
             <Mic className="h-4 w-4" />
           </button>
