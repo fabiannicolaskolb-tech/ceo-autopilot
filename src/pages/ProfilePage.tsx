@@ -22,7 +22,7 @@ const TONES = [
 ];
 
 export default function ProfilePage() {
-  const { profile, user, updateProfile } = useAuth();
+  const { profile, user, updateProfile, refreshProfile } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
