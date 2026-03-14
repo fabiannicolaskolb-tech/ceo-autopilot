@@ -133,7 +133,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex-1 min-h-[60px]">
-            <Sparkline data={DRAFT_TREND} color="hsl(220, 55%, 20%)" height={80} width={300} />
+            <Sparkline data={draftTrend} color="hsl(220, 55%, 20%)" height={80} width={300} />
           </div>
         </div>
 
