@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap } from 'lucide-react';
+import { Zap, Sun, Moon } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from '@/hooks/useTheme';
 import { Particles } from '@/components/ui/particles';
 
 export default function AuthPage() {
@@ -19,6 +20,7 @@ export default function AuthPage() {
   const [burstKey, setBurstKey] = useState(0);
   const { signIn, signUp, resetPassword, user, profile } = useAuth();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
 
   React.useEffect(() => {
@@ -67,7 +69,10 @@ export default function AuthPage() {
   if (showReset) {
     return (
       <div className="relative flex min-h-screen items-center justify-center bg-background p-4">
-        <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} />
+        <Button variant="ghost" size="icon" onClick={toggleTheme} className="absolute top-4 right-4 z-20 h-9 w-9">
+          {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+        </Button>
+        <Particles className="absolute inset-0 z-0" quantity={150} color={theme === 'dark' ? '#8899bb' : '#1a2740'} size={0.5} />
         <Card className="relative z-10 w-full max-w-md border-border shadow-sm">
           <CardHeader className="text-center">
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
@@ -97,7 +102,10 @@ export default function AuthPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background p-4">
-      <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} burst={burstKey} />
+      <Button variant="ghost" size="icon" onClick={toggleTheme} className="absolute top-4 right-4 z-20 h-9 w-9">
+        {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+      </Button>
+      <Particles className="absolute inset-0 z-0" quantity={150} color={theme === 'dark' ? '#8899bb' : '#1a2740'} size={0.5} burst={burstKey} />
       <Card className="relative z-10 w-full max-w-md border-border shadow-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">

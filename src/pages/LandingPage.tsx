@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Zap, Lightbulb, CalendarDays, BarChart3, Shield, Lock, UserCheck, ArrowUp } from 'lucide-react';
+import { Zap, Lightbulb, CalendarDays, BarChart3, Shield, Lock, UserCheck, ArrowUp, Sun, Moon } from 'lucide-react';
 import { Particles } from '@/components/ui/particles';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/hooks/useTheme';
 import { AuroraBackground } from '@/components/ui/aurora-background';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
@@ -51,6 +52,7 @@ const trustItems = [
 
 export default function LandingPage() {
   const { user, profile, loading } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,7 +63,7 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen bg-background">
-      <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} />
+      <Particles className="absolute inset-0 z-0" quantity={150} color={theme === 'dark' ? '#8899bb' : '#1a2740'} size={0.5} />
       {/* Sticky Nav */}
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
@@ -73,9 +75,14 @@ export default function LandingPage() {
               CEO Autopilot
             </span>
           </div>
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/auth">Anmelden</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
+              {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/auth">Anmelden</Link>
+            </Button>
+          </div>
         </div>
       </header>
 

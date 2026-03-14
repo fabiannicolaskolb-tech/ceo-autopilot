@@ -71,6 +71,71 @@
     --status-scheduled: 270 55% 52%;
     --status-posted: 160 60% 38%;
   }
+
+  .dark {
+    --background: 224 25% 10%;
+    --foreground: 220 15% 90%;
+
+    --card: 224 22% 14%;
+    --card-foreground: 220 15% 90%;
+
+    --popover: 224 22% 14%;
+    --popover-foreground: 220 15% 90%;
+
+    --primary: 220 50% 60%;
+    --primary-foreground: 224 25% 10%;
+
+    --secondary: 224 20% 18%;
+    --secondary-foreground: 220 15% 85%;
+
+    --muted: 224 15% 20%;
+    --muted-foreground: 220 10% 55%;
+
+    --accent: 224 20% 18%;
+    --accent-foreground: 220 15% 90%;
+
+    --destructive: 0 62% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 50% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 40 60% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 224 15% 22%;
+    --input: 224 15% 22%;
+    --ring: 220 50% 60%;
+
+    --sidebar-background: 224 30% 8%;
+    --sidebar-foreground: 220 15% 75%;
+    --sidebar-primary: 220 50% 65%;
+    --sidebar-primary-foreground: 224 25% 10%;
+    --sidebar-accent: 224 25% 15%;
+    --sidebar-accent-foreground: 220 15% 85%;
+    --sidebar-border: 224 20% 16%;
+    --sidebar-ring: 220 50% 50%;
+
+    --chart-navy: 220 50% 60%;
+    --chart-emerald: 160 50% 45%;
+    --chart-gold: 40 60% 55%;
+
+    --feature-bg: 224 22% 12%;
+    --feature-card: 224 22% 16%;
+    --feature-accent: 220 50% 60%;
+    --feature-icon-bg: 220 40% 18%;
+    --feature-icon: 220 50% 65%;
+
+    --score-deep-blue: 225 55% 50%;
+    --score-electric-purple: 270 60% 60%;
+    --score-gold: 42 80% 60%;
+    --score-glow: 270 75% 70%;
+
+    --status-draft: 220 15% 50%;
+    --status-approved: 200 60% 55%;
+    --status-scheduled: 270 50% 58%;
+    --status-posted: 160 50% 45%;
+  }
 }
 
 @layer base {
