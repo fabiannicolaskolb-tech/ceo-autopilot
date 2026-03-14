@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { Particles } from '@/components/ui/particles';
 
 export default function AuthPage() {
   const [email, setEmail] = useState('');
@@ -64,8 +65,9 @@ export default function AuthPage() {
 
   if (showReset) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md border-border shadow-sm">
+      <div className="relative flex min-h-screen items-center justify-center bg-background p-4">
+        <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} />
+        <Card className="relative z-10 w-full max-w-md border-border shadow-sm">
           <CardHeader className="text-center">
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
               <Zap className="h-6 w-6 text-primary-foreground" />
@@ -93,8 +95,9 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md border-border shadow-sm">
+    <div className="relative flex min-h-screen items-center justify-center bg-background p-4">
+      <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} />
+      <Card className="relative z-10 w-full max-w-md border-border shadow-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
             <Zap className="h-6 w-6 text-primary-foreground" />
