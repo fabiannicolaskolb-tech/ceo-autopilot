@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import {
   Eye, TrendingUp, TrendingDown, Users, ArrowUpRight, ArrowDownRight,
-  BarChart3, Clock, MessageCircle, Heart, Share2, Lightbulb, Minus,
+  BarChart3, Clock, MessageCircle, Heart, Share2, Lightbulb, Minus, Rocket,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -17,6 +16,11 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { useAnalytics, type TimeRange, type AnalyticsPost } from '@/hooks/useAnalytics';
+import { MeshBackground } from '@/components/MeshBackground';
+import { cn } from '@/lib/utils';
+
+const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
+const GLASS_CARD_HOVER = `${GLASS_CARD} transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]`;
 
 const DAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 
