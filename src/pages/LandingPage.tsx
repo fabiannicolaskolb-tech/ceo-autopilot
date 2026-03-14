@@ -121,36 +121,18 @@ export default function LandingPage() {
         </div>
       </AuroraBackground>
 
-      {/* Features */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="mb-12 text-center">
-          <TypingAnimation
-            text="Alles was Sie brauchen – Drei Module für Ihren Erfolg."
-            duration={80}
-            className="font-playfair text-3xl font-bold text-foreground sm:text-4xl"
-          />
-        </div>
-
-      
-        <div className="grid gap-6 sm:grid-cols-3">
-          {features.map((f) =>
-          <Card
-            key={f.title}
-            className="border-border shadow-sm transition-shadow hover:shadow-md">
-            
-              <CardContent className="flex flex-col items-center p-8 text-center">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <f.icon className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-playfair text-lg font-semibold text-foreground">
-                  {f.headline}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">{f.description}</p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </section>
+      {/* Features Gallery */}
+      <div className="text-center pt-20 sm:pt-28">
+        <TypingAnimation
+          text="Alles was Sie brauchen – Drei Module für Ihren Erfolg."
+          duration={80}
+          className="font-playfair text-3xl font-bold text-foreground sm:text-4xl"
+        />
+      </div>
+      <Gallery6
+        heading="Unsere Module"
+        items={galleryItems}
+      />
 
       {/* Trust */}
       <section className="border-t border-border bg-card">
