@@ -25,7 +25,7 @@ function ProtectedLayout() {
   if (!profile.onboarding_completed) return <Navigate to="/onboarding" replace />;
 
   return (
-    <div className="relative z-10 min-h-screen bg-background">
+    <div className="relative z-10 min-h-screen bg-background/90">
       <FloatingHeader />
       <main className="mx-auto max-w-7xl px-4 py-6">
         <Outlet />

@@ -59,7 +59,7 @@ export default function LandingPage() {
   }, [user, profile, loading, navigate]);
 
   return (
-    <div className="relative z-10 min-h-screen bg-background">
+    <div className="relative z-10 min-h-screen bg-background/90">
       {/* Sticky Nav */}
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">

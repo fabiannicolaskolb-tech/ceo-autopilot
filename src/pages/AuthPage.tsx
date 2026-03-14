@@ -93,7 +93,7 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="relative z-10 flex min-h-screen items-center justify-center bg-background/90 p-4">
       <Card className="w-full max-w-md border-border shadow-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
