@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, isSameMonth, addMonths, subMonths, isToday } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { CalendarIcon, Rocket, ChevronLeft, ChevronRight, List, CalendarDays, Send, Loader2 } from 'lucide-react';
+import { CalendarIcon, Rocket, ChevronLeft, ChevronRight, List, CalendarDays, Send, Loader2, Zap } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -217,6 +217,20 @@ export default function PlannerPage() {
     },
   });
 
+  const triggerGenericMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('trigger-n8n-generic');
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({ title: 'Workflow gestartet', description: 'n8n wurde erfolgreich getriggert.' });
+    },
+    onError: (err: Error) => {
+      toast({ title: 'Fehler', description: err.message, variant: 'destructive' });
+    },
+  });
+
   const filtered = filter === 'all' ? posts : posts.filter(p => p.status === filter);
 
   const openEdit = (post: any) => {
@@ -246,6 +260,19 @@ export default function PlannerPage() {
             <p className="text-sm text-muted-foreground mt-0.5">Verwalten Sie Ihre LinkedIn-Posts</p>
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              onClick={() => triggerGenericMutation.mutate()}
+              disabled={triggerGenericMutation.isPending}
+              variant="outline"
+              className="gap-2 rounded-xl"
+            >
+              {triggerGenericMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Zap className="h-4 w-4" />
+              )}
+              n8n starten
+            </Button>
             <Tabs value={view} onValueChange={v => setView(v as 'list' | 'calendar')}>
               <TabsList>
                 <TabsTrigger value="list" className="gap-1.5">
