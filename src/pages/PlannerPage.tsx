@@ -99,27 +99,33 @@ export default function PlannerPage() {
 
       <div className="space-y-3">
         {filtered.length === 0 && (
-          <Card className="border-border shadow-sm"><CardContent className="p-8 text-center text-muted-foreground">Keine Posts gefunden</CardContent></Card>
+          <HoverBorderGradient>
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-8 text-center text-muted-foreground">Keine Posts gefunden</CardContent>
+            </Card>
+          </HoverBorderGradient>
         )}
         {filtered.map(post => {
           const cfg = STATUS_CONFIG[post.status] || STATUS_CONFIG.draft;
           return (
-            <Card key={post.id} className="border-border shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => openEdit(post)}>
-              <CardContent className="p-5">
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <Badge variant={cfg.variant} className="text-xs">{cfg.label}</Badge>
-                  {post.type && <Badge variant="outline" className="text-xs">{post.type}</Badge>}
-                  {post.angle && <Badge variant="outline" className="text-xs">{post.angle}</Badge>}
-                </div>
-                {post.hook && <p className="font-playfair text-sm font-semibold text-foreground">{post.hook}</p>}
-                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{post.content}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {post.scheduled_at
-                    ? `Geplant: ${format(new Date(post.scheduled_at), 'dd. MMMM yyyy, HH:mm', { locale: de })} Uhr`
-                    : `Erstellt: ${format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}`}
-                </p>
-              </CardContent>
-            </Card>
+            <HoverBorderGradient key={post.id}>
+              <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => openEdit(post)}>
+                <CardContent className="p-5">
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <Badge variant={cfg.variant} className="text-xs">{cfg.label}</Badge>
+                    {post.type && <Badge variant="outline" className="text-xs">{post.type}</Badge>}
+                    {post.angle && <Badge variant="outline" className="text-xs">{post.angle}</Badge>}
+                  </div>
+                  {post.hook && <p className="font-playfair text-sm font-semibold text-foreground">{post.hook}</p>}
+                  <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{post.content}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {post.scheduled_at
+                      ? `Geplant: ${format(new Date(post.scheduled_at), 'dd. MMMM yyyy, HH:mm', { locale: de })} Uhr`
+                      : `Erstellt: ${format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}`}
+                  </p>
+                </CardContent>
+              </Card>
+            </HoverBorderGradient>
           );
         })}
       </div>

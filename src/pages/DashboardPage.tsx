@@ -115,31 +115,33 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <Card className="border-border shadow-sm hover:shadow-md transition-shadow">
-        <CardHeader className="pb-3">
-          <CardTitle className="font-playfair text-lg">Nächster geplanter Post</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {nextScheduled ? (
-            <div className="flex items-start gap-3">
-              <CalendarDays className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
-              <div className="min-w-0 flex-1">
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <Badge variant="default" className="text-xs">Geplant</Badge>
-                  {nextScheduled.type && <Badge variant="outline" className="text-xs">{nextScheduled.type}</Badge>}
-                  {nextScheduled.angle && <Badge variant="outline" className="text-xs">{nextScheduled.angle}</Badge>}
+      <HoverBorderGradient>
+        <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-playfair text-lg">Nächster geplanter Post</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {nextScheduled ? (
+              <div className="flex items-start gap-3">
+                <CalendarDays className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                <div className="min-w-0 flex-1">
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <Badge variant="default" className="text-xs">Geplant</Badge>
+                    {nextScheduled.type && <Badge variant="outline" className="text-xs">{nextScheduled.type}</Badge>}
+                    {nextScheduled.angle && <Badge variant="outline" className="text-xs">{nextScheduled.angle}</Badge>}
+                  </div>
+                  <p className="text-sm text-foreground line-clamp-2">{nextScheduled.content}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Geplant für {format(new Date(nextScheduled.scheduled_at!), 'EEEE, HH:mm', { locale: de })} Uhr
+                  </p>
                 </div>
-                <p className="text-sm text-foreground line-clamp-2">{nextScheduled.content}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Geplant für {format(new Date(nextScheduled.scheduled_at!), 'EEEE, HH:mm', { locale: de })} Uhr
-                </p>
               </div>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">Kein Post geplant. Planen Sie Ihren nächsten Beitrag im Planner.</p>
-          )}
-        </CardContent>
-      </Card>
+            ) : (
+              <p className="text-sm text-muted-foreground">Kein Post geplant. Planen Sie Ihren nächsten Beitrag im Planner.</p>
+            )}
+          </CardContent>
+        </Card>
+      </HoverBorderGradient>
     </div>
   );
 }

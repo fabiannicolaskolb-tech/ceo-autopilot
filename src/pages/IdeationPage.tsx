@@ -84,22 +84,24 @@ export default function IdeationPage() {
           <h2 className="font-playfair text-lg font-semibold text-foreground mb-4">Generierte Konzepte</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {concepts.map((c, i) => (
-              <Card key={i} className="border-border shadow-sm hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <CardTitle className="font-playfair text-base">{c.hook}</CardTitle>
-                  <div className="flex gap-2">
-                    <Badge variant="secondary" className="text-xs">{c.type}</Badge>
-                    <Badge variant="outline" className="text-xs">{c.angle}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="mb-4 text-sm text-muted-foreground line-clamp-3">{c.preview}</p>
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => saveMutation.mutate(c)} disabled={saveMutation.isPending}>Auswählen</Button>
-                    <Button size="sm" variant="outline">Bearbeiten</Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <HoverBorderGradient key={i}>
+                <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="font-playfair text-base">{c.hook}</CardTitle>
+                    <div className="flex gap-2">
+                      <Badge variant="secondary" className="text-xs">{c.type}</Badge>
+                      <Badge variant="outline" className="text-xs">{c.angle}</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="mb-4 text-sm text-muted-foreground line-clamp-3">{c.preview}</p>
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={() => saveMutation.mutate(c)} disabled={saveMutation.isPending}>Auswählen</Button>
+                      <Button size="sm" variant="outline">Bearbeiten</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </HoverBorderGradient>
             ))}
           </div>
         </div>
