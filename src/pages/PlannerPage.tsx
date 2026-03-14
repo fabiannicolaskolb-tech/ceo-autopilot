@@ -260,6 +260,19 @@ export default function PlannerPage() {
             <p className="text-sm text-muted-foreground mt-0.5">Verwalten Sie Ihre LinkedIn-Posts</p>
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              onClick={() => triggerGenericMutation.mutate()}
+              disabled={triggerGenericMutation.isPending}
+              variant="outline"
+              className="gap-2 rounded-xl"
+            >
+              {triggerGenericMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Zap className="h-4 w-4" />
+              )}
+              n8n starten
+            </Button>
             <Tabs value={view} onValueChange={v => setView(v as 'list' | 'calendar')}>
               <TabsList>
                 <TabsTrigger value="list" className="gap-1.5">
