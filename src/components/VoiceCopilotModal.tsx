@@ -65,13 +65,8 @@ export function VoiceCopilotModal({ open, onClose, onInsightsSaved }: VoiceCopil
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
-      const { data, error } = await supabase.functions.invoke('voice-copilot-token');
-      if (error || !data?.token) {
-        throw new Error(error?.message || 'Kein Token erhalten');
-      }
-
       await conversation.startSession({
-        conversationToken: data.token,
+        agentId: AGENT_ID,
         connectionType: 'webrtc',
       });
     } catch (err: any) {
