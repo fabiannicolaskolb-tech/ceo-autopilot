@@ -59,7 +59,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Sticky Nav */}
-      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-lg">
+      <header className="sticky top-0 z-50 border-b border-border/20 bg-transparent backdrop-blur-lg">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
