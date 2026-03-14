@@ -167,25 +167,17 @@ export default function ProfilePage() {
       </Card>
 
       <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-playfair text-base">Profilfotos</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="font-playfair text-base">Profilfotos</CardTitle>
+          <p className="text-xs text-muted-foreground">Drag & Drop zum Umsortieren — das erste Bild ist Ihr Hauptprofilbild</p>
+        </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-6">
-            {[
-              { label: 'Hauptprofilbild', key: 'avatar_url_1' as const },
-              { label: 'Alternativbild 1', key: 'avatar_url_2' as const },
-              { label: 'Alternativbild 2', key: 'avatar_url_3' as const },
-            ].map((item, i) => (
-              <PhotoUpload
-                key={item.key}
-                label={item.label}
-                currentUrl={profile?.[item.key]}
-                userId={user?.id || ''}
-                index={i + 1}
-                onUploaded={async (url) => { await updateProfile({ [item.key]: url }); await refreshProfile(); }}
-                onRemoved={async () => { await updateProfile({ [item.key]: null }); await refreshProfile(); }}
-              />
-            ))}
-          </div>
+          <PhotoGrid
+            profile={profile}
+            userId={user?.id || ''}
+            updateProfile={updateProfile}
+            refreshProfile={refreshProfile}
+          />
         </CardContent>
       </Card>
 
