@@ -69,7 +69,10 @@ export default function AuthPage() {
   if (showReset) {
     return (
       <div className="relative flex min-h-screen items-center justify-center bg-background p-4">
-        <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} />
+        <Button variant="ghost" size="icon" onClick={toggleTheme} className="absolute top-4 right-4 z-20 h-9 w-9">
+          {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+        </Button>
+        <Particles className="absolute inset-0 z-0" quantity={150} color={theme === 'dark' ? '#8899bb' : '#1a2740'} size={0.5} />
         <Card className="relative z-10 w-full max-w-md border-border shadow-sm">
           <CardHeader className="text-center">
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
