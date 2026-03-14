@@ -74,9 +74,15 @@ export default function DashboardPage() {
         duration={6}
         className="absolute inset-0 -z-10 h-[calc(100%+48px)] -mt-6 -ml-4 w-[calc(100%+32px)] fill-primary/5 stroke-primary/10 [mask-image:radial-gradient(ellipse_at_top,white_30%,transparent_70%)]"
       />
-      <div>
-        <h1 className="font-playfair text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Ihr LinkedIn-Überblick auf einen Blick</p>
+      <div className="flex items-center gap-3">
+        <Avatar className="h-10 w-10">
+          {profile?.avatar_url_1 && <AvatarImage src={profile.avatar_url_1} alt="Avatar" />}
+          <AvatarFallback className="bg-primary/10 text-sm font-medium text-primary">{initials}</AvatarFallback>
+        </Avatar>
+        <div>
+          <h1 className="font-playfair text-2xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Ihr LinkedIn-Überblick auf einen Blick</p>
+        </div>
       </div>
 
       <Card className="border-border shadow-sm hover:shadow-md transition-shadow">

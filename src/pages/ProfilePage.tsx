@@ -165,6 +165,29 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
 
+      <Card className="border-border shadow-sm">
+        <CardHeader><CardTitle className="font-playfair text-base">Profilfotos</CardTitle></CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-6">
+            {[
+              { label: 'Hauptprofilbild', key: 'avatar_url_1' as const },
+              { label: 'Alternativbild 1', key: 'avatar_url_2' as const },
+              { label: 'Alternativbild 2', key: 'avatar_url_3' as const },
+            ].map((item, i) => (
+              <PhotoUpload
+                key={item.key}
+                label={item.label}
+                currentUrl={profile?.[item.key]}
+                userId={user?.id || ''}
+                index={i + 1}
+                onUploaded={(url) => updateProfile({ [item.key]: url })}
+                onRemoved={() => updateProfile({ [item.key]: null })}
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="flex justify-end">
         <Button onClick={save}>Profil speichern</Button>
       </div>

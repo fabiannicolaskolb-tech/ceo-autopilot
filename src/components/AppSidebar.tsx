@@ -71,9 +71,18 @@ export default function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-3">
-        {!collapsed && user && (
-          <div className="mb-2 truncate text-xs text-sidebar-foreground/70">{user.email}</div>
-        )}
+        <div className="flex items-center gap-2">
+          <Avatar className="h-8 w-8 shrink-0">
+            {profile?.avatar_url_1 && <AvatarImage src={profile.avatar_url_1} alt="Avatar" />}
+            <AvatarFallback className="bg-sidebar-accent text-xs text-sidebar-accent-foreground">{initials}</AvatarFallback>
+          </Avatar>
+          {!collapsed && user && (
+            <div className="min-w-0 flex-1">
+              {profile?.name && <div className="truncate text-xs font-medium text-sidebar-foreground">{profile.name}</div>}
+              <div className="truncate text-[10px] text-sidebar-foreground/60">{user.email}</div>
+            </div>
+          )}
+        </div>
         <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" onClick={signOut}>
           <LogOut className="h-4 w-4" />
           {!collapsed && <span className="text-xs">Abmelden</span>}
