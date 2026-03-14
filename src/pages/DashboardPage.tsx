@@ -103,7 +103,7 @@ export default function DashboardPage() {
       {/* Bento Grid Stats */}
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {/* Drafts Widget */}
-        <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]">
+        <div className="relative overflow-hidden rounded-[24px] bg-card/80 backdrop-blur-xl p-6 pb-12 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]">
           <div className="flex items-start justify-between">
             <div className="rounded-[12px] bg-primary/8 p-2.5">
               <FileText className="h-5 w-5 text-primary" />
