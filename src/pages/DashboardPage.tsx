@@ -69,18 +69,6 @@ export default function DashboardPage() {
     enabled: !!user
   });
 
-  const { data: allPosts = [] } = useQuery({
-    queryKey: ['posts', 'all', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase.
-      from('posts').
-      select('id').
-      eq('user_id', user!.id);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user
-  });
 
   const draftCount = drafts.length;
   const postCount = postedPosts.length;
