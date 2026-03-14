@@ -65,6 +65,11 @@
     --score-electric-purple: 270 65% 55%;
     --score-gold: 42 85% 55%;
     --score-glow: 270 80% 65%;
+
+    --status-draft: 220 15% 55%;
+    --status-approved: 200 70% 48%;
+    --status-scheduled: 270 55% 52%;
+    --status-posted: 160 60% 38%;
   }
 }
 
