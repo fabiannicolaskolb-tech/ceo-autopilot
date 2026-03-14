@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Lightbulb, GalleryHorizontalEnd, BarChart3, Zap, LogOut, MenuIcon, User, Settings,
+  LayoutDashboard, Lightbulb, GalleryHorizontalEnd, BarChart3, Zap, LogOut, MenuIcon, User, Settings, Sun, Moon,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils';
 
 const navItems = [
