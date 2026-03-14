@@ -100,13 +100,7 @@ export function FloatingHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center gap-2">
                     <User className="h-3.5 w-3.5" strokeWidth={2} />
-                    Profil Setup
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/settings" className="flex items-center gap-2">
-                    <Settings className="h-3.5 w-3.5" strokeWidth={2} />
-                    Einstellungen
+                    Profil
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
