@@ -266,11 +266,6 @@ function PhotoGrid({ profile, userId, updateProfile, refreshProfile }: PhotoGrid
               overIndex === i && dragIndex !== i && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-lg',
             )}
           >
-            {hasImage && (
-              <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 cursor-grab active:cursor-grabbing rounded-full bg-muted p-1 shadow-sm border border-border">
-                <GripVertical className="h-3 w-3 text-muted-foreground" />
-              </div>
-            )}
             <PhotoUpload
               label={LABELS[i]}
               currentUrl={profile?.[key]}
@@ -279,6 +274,13 @@ function PhotoGrid({ profile, userId, updateProfile, refreshProfile }: PhotoGrid
               onUploaded={async (url) => { await updateProfile({ [key]: url }); await refreshProfile(); }}
               onRemoved={async () => { await updateProfile({ [key]: null }); await refreshProfile(); }}
             />
+            {hasImage && (
+              <div className="flex justify-center mt-1 cursor-grab active:cursor-grabbing">
+                <div className="rounded-full bg-muted p-1 shadow-sm border border-border">
+                  <GripVertical className="h-3 w-3 text-muted-foreground" />
+                </div>
+              </div>
+            )}
           </div>
         );
       })}
