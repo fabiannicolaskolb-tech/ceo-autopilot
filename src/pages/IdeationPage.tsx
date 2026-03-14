@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Sparkles } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,7 +27,28 @@ export default function IdeationPage() {
   const [input, setInput] = useState('');
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [generating, setGenerating] = useState(false);
+  const { user } = useAuth();
   const { toast } = useToast();
+
+  const saveMutation = useMutation({
+    mutationFn: async (concept: Concept) => {
+      const { error } = await supabase.from('posts').insert({
+        user_id: user!.id,
+        content: concept.preview,
+        hook: concept.hook,
+        angle: concept.angle,
+        type: concept.type,
+        status: 'draft',
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: 'Entwurf erstellt', description: 'Post wurde zum Planner hinzugefügt.' });
+    },
+    onError: (err: any) => {
+      toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
+    },
+  });
 
   const generate = () => {
     if (!input.trim()) { toast({ title: 'Bitte geben Sie einen Input ein', variant: 'destructive' }); return; }
@@ -33,21 +57,6 @@ export default function IdeationPage() {
       setConcepts(MOCK_CONCEPTS);
       setGenerating(false);
     }, 1500);
-  };
-
-  const selectConcept = (concept: Concept) => {
-    const posts = JSON.parse(localStorage.getItem('ceo-autopilot-posts') || '[]');
-    posts.push({
-      id: crypto.randomUUID(),
-      content: concept.preview,
-      hook: concept.hook,
-      angle: concept.angle,
-      type: concept.type,
-      status: 'draft',
-      created_at: new Date().toISOString(),
-    });
-    localStorage.setItem('ceo-autopilot-posts', JSON.stringify(posts));
-    toast({ title: 'Entwurf erstellt', description: `"${concept.hook}" wurde zum Planner hinzugefügt.` });
   };
 
   return (
@@ -83,7 +92,7 @@ export default function IdeationPage() {
                 <CardContent>
                   <p className="mb-4 text-sm text-muted-foreground line-clamp-3">{c.preview}</p>
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={() => selectConcept(c)}>Auswählen</Button>
+                    <Button size="sm" onClick={() => saveMutation.mutate(c)} disabled={saveMutation.isPending}>Auswählen</Button>
                     <Button size="sm" variant="outline">Bearbeiten</Button>
                   </div>
                 </CardContent>

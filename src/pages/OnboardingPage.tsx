@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,7 +36,7 @@ export default function OnboardingPage() {
   const [voiceSamples, setVoiceSamples] = useState<string[]>(['', '', '']);
   const [saving, setSaving] = useState(false);
 
-  const { updateProfile } = useAuth();
+  const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -61,25 +62,38 @@ export default function OnboardingPage() {
   const addVoiceSample = () => setVoiceSamples(prev => [...prev, '']);
 
   const handleComplete = async () => {
+    if (!user) return;
     setSaving(true);
     try {
-      // Save to localStorage (will be Supabase later)
-      const topics = [
-        ...focusTopics.map(t => ({ name: t, type: 'focus' })),
-        ...noGoTopics.map(t => ({ name: t, type: 'no-go' })),
-      ];
-      const samples = voiceSamples.filter(s => s.trim());
-      localStorage.setItem('ceo-autopilot-topics', JSON.stringify(topics));
-      localStorage.setItem('ceo-autopilot-voice-samples', JSON.stringify(samples));
-      
+      // Update profile
       await updateProfile({
         name, company, role, industry, target_audience: targetAudience, tone,
         onboarding_completed: true,
       });
+
+      // Insert voice samples
+      const samples = voiceSamples.filter(s => s.trim());
+      if (samples.length > 0) {
+        const { error: samplesErr } = await supabase.from('voice_samples').insert(
+          samples.map(content => ({ user_id: user.id, content }))
+        );
+        if (samplesErr) throw samplesErr;
+      }
+
+      // Insert topics
+      const allTopics = [
+        ...focusTopics.map(t => ({ user_id: user.id, name: t, type: 'focus' as const })),
+        ...noGoTopics.map(t => ({ user_id: user.id, name: t, type: 'no-go' as const })),
+      ];
+      if (allTopics.length > 0) {
+        const { error: topicsErr } = await supabase.from('topics').insert(allTopics);
+        if (topicsErr) throw topicsErr;
+      }
+
       toast({ title: 'Onboarding abgeschlossen!' });
       navigate('/', { replace: true });
-    } catch {
-      toast({ title: 'Fehler beim Speichern', variant: 'destructive' });
+    } catch (err: any) {
+      toast({ title: 'Fehler beim Speichern', description: err?.message, variant: 'destructive' });
     }
     setSaving(false);
   };

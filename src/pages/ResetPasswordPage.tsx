@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Zap } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,9 +12,18 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isRecovery, setIsRecovery] = useState(false);
   const { updatePassword } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Check for recovery token in URL hash
+    const hash = window.location.hash;
+    if (hash.includes('type=recovery')) {
+      setIsRecovery(true);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,11 +36,24 @@ export default function ResetPasswordPage() {
       await updatePassword(password);
       toast({ title: 'Passwort aktualisiert' });
       navigate('/auth');
-    } catch {
-      toast({ title: 'Fehler', variant: 'destructive' });
+    } catch (err: any) {
+      toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
     }
     setLoading(false);
   };
+
+  if (!isRecovery) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md border-border shadow-sm">
+          <CardContent className="p-8 text-center text-muted-foreground">
+            Ungültiger oder abgelaufener Reset-Link. Bitte fordern Sie einen neuen an.
+            <Button variant="link" className="mt-4" onClick={() => navigate('/auth')}>Zur Anmeldung</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
