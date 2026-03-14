@@ -16,16 +16,16 @@ export function Sparkline({ data, color = 'hsl(var(--primary))', height = 40, wi
   const padding = 2;
 
   const points = data.map((val, i) => {
-    const x = (i / (data.length - 1)) * (width - padding * 2) + padding;
-    const y = height - padding - ((val - min) / range) * (height - padding * 2);
+    const x = (i / (data.length - 1)) * width;
+    const y = padding + ((max - val) / range) * (height - padding);
     return `${x},${y}`;
   });
 
   const linePath = `M${points.join(' L')}`;
-  const areaPath = `${linePath} L${width - padding},${height} L${padding},${height} Z`;
+  const areaPath = `${linePath} L${width},${height} L0,${height} Z`;
 
   return (
-    <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="overflow-visible">
+    <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="block">
       <defs>
         <linearGradient id={`sparkGrad-${color.replace(/[^a-z0-9]/gi, '')}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.3" />
