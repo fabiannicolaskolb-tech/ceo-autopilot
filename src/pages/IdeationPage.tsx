@@ -10,6 +10,7 @@ import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+import { MeshBackground } from '@/components/MeshBackground';
 
 interface Concept {
   hook: string;
