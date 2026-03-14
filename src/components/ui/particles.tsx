@@ -112,6 +112,30 @@ const Particles: React.FC<ParticlesProps> = ({
     initCanvas()
   }, [refresh])
 
+  useEffect(() => {
+    if (burst > 0) {
+      circles.current.forEach((circle) => {
+        const angle = Math.random() * Math.PI * 2
+        const force = 3 + Math.random() * 5
+        circle.dx += Math.cos(angle) * force
+        circle.dy += Math.sin(angle) * force
+      })
+      // Gradually restore normal speed
+      const decay = setInterval(() => {
+        let settled = true
+        circles.current.forEach((circle) => {
+          circle.dx *= 0.92
+          circle.dy *= 0.92
+          if (Math.abs(circle.dx) > 0.15 || Math.abs(circle.dy) > 0.15) {
+            settled = false
+          }
+        })
+        if (settled) clearInterval(decay)
+      }, 30)
+      return () => clearInterval(decay)
+    }
+  }, [burst])
+
   const initCanvas = () => {
     resizeCanvas()
     drawParticles()
