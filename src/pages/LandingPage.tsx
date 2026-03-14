@@ -10,43 +10,43 @@ import { Card, CardContent } from '@/components/ui/card';
 import analyticsPreview from '@/assets/analytics-preview.jpg';
 
 const features = [
-  {
-    icon: Lightbulb,
-    title: 'Ideation',
-    headline: 'Wir finden Ihre Themen.',
-    description: 'KI-gestützte Content-Ideen, die zu Ihrer Expertise und Zielgruppe passen.',
-  },
-  {
-    icon: CalendarDays,
-    title: 'Planning',
-    headline: 'Volle Kontrolle über Ihren Zeitplan.',
-    description: 'Strategische Planung und Freigabe – Sie behalten immer das letzte Wort.',
-  },
-  {
-    icon: BarChart3,
-    title: 'Analytics',
-    headline: 'Datenbasierte Optimierung.',
-    description: 'Verstehen Sie, was funktioniert, und steigern Sie Ihre Reichweite systematisch.',
-  },
-];
+{
+  icon: Lightbulb,
+  title: 'Ideation',
+  headline: 'Wir finden Ihre Themen.',
+  description: 'KI-gestützte Content-Ideen, die zu Ihrer Expertise und Zielgruppe passen.'
+},
+{
+  icon: CalendarDays,
+  title: 'Planning',
+  headline: 'Volle Kontrolle über Ihren Zeitplan.',
+  description: 'Strategische Planung und Freigabe – Sie behalten immer das letzte Wort.'
+},
+{
+  icon: BarChart3,
+  title: 'Analytics',
+  headline: 'Datenbasierte Optimierung.',
+  description: 'Verstehen Sie, was funktioniert, und steigern Sie Ihre Reichweite systematisch.'
+}];
+
 
 const trustItems = [
-  {
-    icon: Shield,
-    title: 'DSGVO-konform',
-    description: 'Alle Daten werden in der EU gespeichert und verarbeitet.',
-  },
-  {
-    icon: Lock,
-    title: 'Ende-zu-Ende verschlüsselt',
-    description: 'Ihre Inhalte und Strategien sind vollständig geschützt.',
-  },
-  {
-    icon: UserCheck,
-    title: 'Exklusiver Zugang',
-    description: 'Nur für verifizierte Führungskräfte – Qualität vor Quantität.',
-  },
-];
+{
+  icon: Shield,
+  title: 'DSGVO-konform',
+  description: 'Alle Daten werden in der EU gespeichert und verarbeitet.'
+},
+{
+  icon: Lock,
+  title: 'Ende-zu-Ende verschlüsselt',
+  description: 'Ihre Inhalte und Strategien sind vollständig geschützt.'
+},
+{
+  icon: UserCheck,
+  title: 'Exklusiver Zugang',
+  description: 'Nur für verifizierte Führungskräfte – Qualität vor Quantität.'
+}];
+
 
 export default function LandingPage() {
   const { user, profile, loading } = useAuth();
@@ -90,8 +90,8 @@ export default function LandingPage() {
           <div className="mt-10">
             <InteractiveHoverButton
               onClick={() => navigate('/auth')}
-              className="text-base px-8 py-3"
-            >
+              className="text-base px-8 py-3">
+              
               Get Started
             </InteractiveHoverButton>
           </div>
@@ -100,18 +100,18 @@ export default function LandingPage() {
         <div className="relative z-10 w-full">
           <ContainerScroll
             titleComponent={
-              <h2 className="font-playfair text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl">
+            <h2 className="font-playfair text-3xl font-bold text-foreground sm:text-4xl mb-[90px] lg:text-6xl">
                 Datenbasierte Einblicke <br />
                 <span className="text-primary">in Echtzeit</span>
               </h2>
-            }
-          >
+            }>
+            
             <img
               src={analyticsPreview}
               alt="CEO Autopilot Analytics Tool Vorschau"
               className="mx-auto rounded-2xl object-cover h-full w-full object-left-top"
-              draggable={false}
-            />
+              draggable={false} />
+            
           </ContainerScroll>
         </div>
       </AuroraBackground>
@@ -127,11 +127,11 @@ export default function LandingPage() {
           </p>
         </div>
         <div className="grid gap-6 sm:grid-cols-3">
-          {features.map((f) => (
-            <Card
-              key={f.title}
-              className="border-border shadow-sm transition-shadow hover:shadow-md"
-            >
+          {features.map((f) =>
+          <Card
+            key={f.title}
+            className="border-border shadow-sm transition-shadow hover:shadow-md">
+            
               <CardContent className="flex flex-col items-center p-8 text-center">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                   <f.icon className="h-6 w-6 text-primary" />
@@ -142,7 +142,7 @@ export default function LandingPage() {
                 <p className="mt-2 text-sm text-muted-foreground">{f.description}</p>
               </CardContent>
             </Card>
-          ))}
+          )}
         </div>
       </section>
 
@@ -158,8 +158,8 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-3">
-            {trustItems.map((item) => (
-              <div key={item.title} className="flex flex-col items-center text-center">
+            {trustItems.map((item) =>
+            <div key={item.title} className="flex flex-col items-center text-center">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <item.icon className="h-6 w-6 text-primary" />
                 </div>
@@ -168,7 +168,7 @@ export default function LandingPage() {
                 </h3>
                 <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -185,6 +185,6 @@ export default function LandingPage() {
           <span className="text-xs text-muted-foreground">DSGVO-konform · Made in Germany</span>
         </div>
       </footer>
-    </div>
-  );
+    </div>);
+
 }
