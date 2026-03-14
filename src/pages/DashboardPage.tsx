@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 
@@ -80,9 +80,9 @@ export default function DashboardPage() {
                 : 'Keine offenen Entwürfe – erstellen Sie neue Ideen!'}
             </p>
           </div>
-          <Button size="sm" onClick={() => navigate(draftCount > 0 ? '/planner' : '/ideation')}>
+          <InteractiveHoverButton onClick={() => navigate(draftCount > 0 ? '/planner' : '/ideation')}>
             {draftCount > 0 ? 'Zum Planner' : 'Zum Ideation Lab'}
-          </Button>
+          </InteractiveHoverButton>
         </CardContent>
       </Card>
 

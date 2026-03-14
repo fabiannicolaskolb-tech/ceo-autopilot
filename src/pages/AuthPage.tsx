@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Zap } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
+import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -117,9 +118,9 @@ export default function AuthPage() {
                   <Label htmlFor="login-password">Passwort</Label>
                   <Input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required className="bg-card" />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <InteractiveHoverButton type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Wird angemeldet...' : 'Anmelden'}
-                </Button>
+                </InteractiveHoverButton>
                 <button type="button" onClick={() => setShowReset(true)} className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Passwort vergessen?
                 </button>
@@ -135,9 +136,9 @@ export default function AuthPage() {
                   <Label htmlFor="reg-password">Passwort</Label>
                   <Input id="reg-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required className="bg-card" />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <InteractiveHoverButton type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Wird registriert...' : 'Registrieren'}
-                </Button>
+                </InteractiveHoverButton>
               </form>
             </TabsContent>
           </Tabs>
