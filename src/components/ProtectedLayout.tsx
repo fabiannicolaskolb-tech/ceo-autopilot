@@ -7,6 +7,7 @@ import { useTheme } from '@/hooks/useTheme';
 
 function ProtectedLayout() {
   const { user, profile, loading } = useAuth();
+  const { theme } = useTheme();
 
   if (loading) {
     return (
