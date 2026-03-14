@@ -122,7 +122,7 @@ export default function LandingPage() {
         <div className="mb-12 text-center">
           <TypingAnimation
             text="Alles was Sie brauchen – Drei Module für Ihren Erfolg."
-            duration={40}
+            duration={53}
             className="font-playfair text-3xl font-bold text-foreground sm:text-4xl"
           />
         </div>
