@@ -118,9 +118,9 @@ export default function AuthPage() {
                   <Label htmlFor="login-password">Passwort</Label>
                   <Input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required className="bg-card" />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <InteractiveHoverButton type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Wird angemeldet...' : 'Anmelden'}
-                </Button>
+                </InteractiveHoverButton>
                 <button type="button" onClick={() => setShowReset(true)} className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Passwort vergessen?
                 </button>
