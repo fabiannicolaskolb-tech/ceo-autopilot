@@ -14,7 +14,8 @@ import { de } from 'date-fns/locale';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const initials = profile?.name ? profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : '?';
 
   const { data: drafts = [] } = useQuery({
     queryKey: ['posts', 'drafts', user?.id],
