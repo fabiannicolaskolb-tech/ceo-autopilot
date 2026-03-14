@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Plus, X, GripVertical } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, X, GripVertical, Wifi, WifiOff } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PhotoUpload from '@/components/PhotoUpload';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { MeshBackground } from '@/components/MeshBackground';
 import { cn } from '@/lib/utils';
@@ -25,10 +26,11 @@ const TONES = [
 ];
 
 export default function ProfilePage() {
-  const { profile, user, updateProfile, refreshProfile } = useAuth();
+  const { profile, user, updateProfile, refreshProfile, signOut, resetPassword } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
+  const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
   const [industry, setIndustry] = useState('');
   const [targetAudience, setTargetAudience] = useState('');
@@ -39,6 +41,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (profile) {
       setName(profile.name || '');
+      setCompany(profile.company || '');
       setRole(profile.role || '');
       setIndustry(profile.industry || '');
       setTargetAudience(profile.target_audience || '');
@@ -101,7 +104,7 @@ export default function ProfilePage() {
 
   const save = async () => {
     try {
-      await updateProfile({ name, role, industry, target_audience: targetAudience, tone });
+      await updateProfile({ name, company, role, industry, target_audience: targetAudience, tone });
 
       await supabase.from('voice_samples').delete().eq('user_id', user!.id);
       const newSamples = sampleTexts.filter(s => s.trim());
@@ -115,22 +118,42 @@ export default function ProfilePage() {
     }
   };
 
+  const handleResetPassword = async () => {
+    if (user?.email) {
+      try {
+        await resetPassword(user.email);
+        toast({ title: 'Passwort-Reset E-Mail gesendet' });
+      } catch (err: any) {
+        toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
+      }
+    }
+  };
+
   return (
-    <div className="relative space-y-6">
+    <div className="relative space-y-6 pb-20">
       <MeshBackground />
 
       {/* Header */}
       <div className={cn(GLASS_CARD, 'p-6 sm:p-8')}>
-        <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Profil Setup</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Optimieren Sie Ihre LinkedIn-Strategie</p>
+        <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Profil</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Verwalten Sie Ihr Profil und Ihre LinkedIn-Strategie</p>
       </div>
 
+      {/* Grundinformationen */}
       <div className={cn(GLASS_CARD, 'p-6')}>
         <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Grundinformationen</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2"><Label>Name</Label><Input value={name} onChange={e => setName(e.target.value)} className="bg-card/60" /></div>
+          <div className="space-y-2"><Label>Unternehmen</Label><Input value={company} onChange={e => setCompany(e.target.value)} className="bg-card/60" /></div>
           <div className="space-y-2"><Label>Position</Label><Input value={role} onChange={e => setRole(e.target.value)} className="bg-card/60" /></div>
           <div className="space-y-2"><Label>Branche</Label><Input value={industry} onChange={e => setIndustry(e.target.value)} className="bg-card/60" /></div>
+        </div>
+      </div>
+
+      {/* KI-Konfiguration */}
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">KI-Konfiguration</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>Kommunikations-Tonfall</Label>
             <Select value={tone} onValueChange={setTone}><SelectTrigger className="bg-card/60"><SelectValue /></SelectTrigger><SelectContent>{TONES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent></Select>
@@ -139,17 +162,9 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* Content-Steuerung / Topics */}
       <div className={cn(GLASS_CARD, 'p-6')}>
-        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Voice Samples</h2>
-        <div className="space-y-3">
-          {sampleTexts.map((s, i) => (
-            <Textarea key={i} value={s} onChange={e => { const u = [...sampleTexts]; u[i] = e.target.value; setSampleTexts(u); }} placeholder={`Sample ${i + 1}`} className="min-h-[80px] bg-card/60" />
-          ))}
-        </div>
-      </div>
-
-      <div className={cn(GLASS_CARD, 'p-6')}>
-        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Themen</h2>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Content-Steuerung</h2>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Fokus-Themen</Label>
@@ -170,6 +185,17 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* Voice Samples */}
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Voice Library</h2>
+        <div className="space-y-3">
+          {sampleTexts.map((s, i) => (
+            <Textarea key={i} value={s} onChange={e => { const u = [...sampleTexts]; u[i] = e.target.value; setSampleTexts(u); }} placeholder={`Voice Sample ${i + 1}`} className="min-h-[80px] bg-card/60" />
+          ))}
+        </div>
+      </div>
+
+      {/* Profilfotos */}
       <div className={cn(GLASS_CARD, 'p-6')}>
         <h2 className="font-playfair text-base font-semibold text-foreground mb-2">Profilfotos</h2>
         <p className="text-xs text-muted-foreground mb-4">Drag & Drop zum Umsortieren — das erste Bild ist Ihr Hauptprofilbild</p>
@@ -181,8 +207,44 @@ export default function ProfilePage() {
         />
       </div>
 
-      <div className="flex justify-end">
-        <Button onClick={save} className="rounded-full shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.15)] px-6">Profil speichern</Button>
+      {/* LinkedIn Verbindung */}
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">LinkedIn Verbindung</h2>
+        <div className="flex items-center gap-3">
+          {profile?.linkedin_connected ? (
+            <>
+              <Wifi className="h-5 w-5 text-success" />
+              <span className="text-sm text-foreground">Verbunden</span>
+            </>
+          ) : (
+            <>
+              <WifiOff className="h-5 w-5 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Nicht verbunden</span>
+              <Button size="sm" variant="outline" disabled>Verbinden (in Kürze verfügbar)</Button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Account & Sicherheit */}
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Account & Sicherheit</h2>
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <Label>E-Mail</Label>
+            <p className="text-sm text-muted-foreground">{user?.email || '—'}</p>
+          </div>
+          <Separator />
+          <div className="flex gap-3">
+            <Button variant="outline" size="sm" onClick={handleResetPassword}>Passwort zurücksetzen</Button>
+            <Button variant="outline" size="sm" onClick={signOut}>Abmelden</Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Sticky Save Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <Button onClick={save} className="rounded-full shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.15)] px-6">Alle Änderungen speichern</Button>
       </div>
     </div>
   );
