@@ -188,7 +188,7 @@ export default function CreatorScoreCard() {
                       <div
                         className={`relative h-10 w-10 rounded-full flex items-center justify-center text-lg transition-all duration-300 ${
                           isCurrent
-                            ? 'ring-[3px] ring-offset-2 ring-offset-card scale-110'
+                            ? 'scale-110'
                             : ''
                         } ${isLocked ? 'bg-muted/40' : ''}`}
                         style={{
