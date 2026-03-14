@@ -10,6 +10,7 @@ import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+import { MeshBackground } from '@/components/MeshBackground';
 
 interface Concept {
   hook: string;
@@ -189,10 +190,12 @@ export default function IdeationPage() {
   const primaryTopic = matchedTopics.length > 0 ? matchedTopics[0].name : (topics.length > 0 ? topics[0].name : 'Leadership');
 
   return (
-    <div className="space-y-8">
+    <div className="relative space-y-8">
+      <MeshBackground />
+
       {/* Split View */}
       <div className="hidden md:block">
-        <ResizablePanelGroup direction="horizontal" className="min-h-[420px] rounded-sm border border-border">
+        <ResizablePanelGroup direction="horizontal" className="min-h-[420px] rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
           {/* Left: Brain Dump */}
           <ResizablePanel defaultSize={75} minSize={60}>
             <div className="p-8 h-full flex flex-col">
@@ -361,7 +364,7 @@ export default function IdeationPage() {
           <h2 className="font-playfair text-xl font-semibold text-foreground">Generierte Ideen</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {concepts.map((c, i) => (
-              <Card key={i} className="rounded-sm border-border hover:shadow-md transition-shadow">
+              <Card key={i} className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)] transition-all duration-300">
                 <CardHeader className="pb-3 space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <Badge variant="secondary" className="text-xs rounded-sm">{c.type}</Badge>
