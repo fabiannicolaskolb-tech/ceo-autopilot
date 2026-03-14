@@ -91,7 +91,7 @@ export function useAnalytics() {
       setLoading(true);
       const { data, error } = await supabase
         .from('posts')
-        .select('id, hook, type, posted_at, metrics')
+        .select('id, hook, type, content_category, posted_at, metrics')
         .eq('user_id', user!.id)
         .eq('status', 'posted')
         .not('metrics', 'is', null)
