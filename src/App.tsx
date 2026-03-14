@@ -41,6 +41,7 @@ const App = () => (
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/ideation" element={<IdeationPage />} />
                 <Route path="/planner" element={<PlannerPage />} />
+                <Route path="/post-queue" element={<PostQueuePage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
               </Route>
