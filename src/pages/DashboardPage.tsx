@@ -78,21 +78,23 @@ export default function DashboardPage() {
         <p className="text-sm text-muted-foreground">Ihr LinkedIn-Überblick auf einen Blick</p>
       </div>
 
-      <Card className="border-border shadow-sm hover:shadow-md transition-shadow">
-        <CardContent className="flex items-center justify-between p-5">
-          <div>
-            <p className="text-sm font-medium text-foreground">Nächste Aktion</p>
-            <p className="text-sm text-muted-foreground">
-              {draftCount > 0
-                ? `${draftCount} offene Entwürfe warten auf Ihre Freigabe`
-                : 'Keine offenen Entwürfe – erstellen Sie neue Ideen!'}
-            </p>
-          </div>
-          <InteractiveHoverButton onClick={() => navigate(draftCount > 0 ? '/planner' : '/ideation')}>
-            {draftCount > 0 ? 'Zum Planner' : 'Zum Ideation Lab'}
-          </InteractiveHoverButton>
-        </CardContent>
-      </Card>
+      <HoverBorderGradient>
+        <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="flex items-center justify-between p-5">
+            <div>
+              <p className="text-sm font-medium text-foreground">Nächste Aktion</p>
+              <p className="text-sm text-muted-foreground">
+                {draftCount > 0
+                  ? `${draftCount} offene Entwürfe warten auf Ihre Freigabe`
+                  : 'Keine offenen Entwürfe – erstellen Sie neue Ideen!'}
+              </p>
+            </div>
+            <InteractiveHoverButton onClick={() => navigate(draftCount > 0 ? '/planner' : '/ideation')}>
+              {draftCount > 0 ? 'Zum Planner' : 'Zum Ideation Lab'}
+            </InteractiveHoverButton>
+          </CardContent>
+        </Card>
+      </HoverBorderGradient>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
