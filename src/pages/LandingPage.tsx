@@ -1,38 +1,34 @@
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Zap, Shield, Lock, UserCheck } from 'lucide-react';
+import { Zap, Lightbulb, CalendarDays, BarChart3, Shield, Lock, UserCheck } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuroraBackground } from '@/components/ui/aurora-background';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { Button } from '@/components/ui/button';
-import { Gallery6 } from '@/components/ui/gallery6';
+import { Card, CardContent } from '@/components/ui/card';
 import { TypingAnimation } from '@/components/ui/typing-animation';
 import analyticsPreview from '@/assets/analytics-preview.jpg';
-import featureIdeation from '@/assets/feature-ideation.jpg';
-import featurePlanning from '@/assets/feature-planning.jpg';
-import featureAnalytics from '@/assets/feature-analytics.jpg';
 
-const galleryItems = [
-  {
-    id: 'ideation',
-    title: 'Wir finden Ihre Themen.',
-    summary: 'KI-gestützte Content-Ideen, die zu Ihrer Expertise und Zielgruppe passen.',
-    image: featureIdeation,
-  },
-  {
-    id: 'planning',
-    title: 'Volle Kontrolle über Ihren Zeitplan.',
-    summary: 'Strategische Planung und Freigabe – Sie behalten immer das letzte Wort.',
-    image: featurePlanning,
-  },
-  {
-    id: 'analytics',
-    title: 'Datenbasierte Optimierung.',
-    summary: 'Verstehen Sie, was funktioniert, und steigern Sie Ihre Reichweite systematisch.',
-    image: featureAnalytics,
-  },
-];
+const features = [
+{
+  icon: Lightbulb,
+  title: 'Ideation',
+  headline: 'Wir finden Ihre Themen.',
+  description: 'KI-gestützte Content-Ideen, die zu Ihrer Expertise und Zielgruppe passen.'
+},
+{
+  icon: CalendarDays,
+  title: 'Planning',
+  headline: 'Volle Kontrolle über Ihren Zeitplan.',
+  description: 'Strategische Planung und Freigabe – Sie behalten immer das letzte Wort.'
+},
+{
+  icon: BarChart3,
+  title: 'Analytics',
+  headline: 'Datenbasierte Optimierung.',
+  description: 'Verstehen Sie, was funktioniert, und steigern Sie Ihre Reichweite systematisch.'
+}];
 
 
 const trustItems = [
@@ -121,18 +117,36 @@ export default function LandingPage() {
         </div>
       </AuroraBackground>
 
-      {/* Features Gallery */}
-      <div className="text-center pt-20 sm:pt-28">
-        <TypingAnimation
-          text="Alles was Sie brauchen – Drei Module für Ihren Erfolg."
-          duration={80}
-          className="font-playfair text-3xl font-bold text-foreground sm:text-4xl"
-        />
-      </div>
-      <Gallery6
-        heading="Unsere Module"
-        items={galleryItems}
-      />
+      {/* Features */}
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
+        <div className="mb-12 text-center">
+          <TypingAnimation
+            text="Alles was Sie brauchen – Drei Module für Ihren Erfolg."
+            duration={80}
+            className="font-playfair text-3xl font-bold text-foreground sm:text-4xl"
+          />
+        </div>
+
+      
+        <div className="grid gap-6 sm:grid-cols-3">
+          {features.map((f) =>
+          <Card
+            key={f.title}
+            className="border-border shadow-sm transition-shadow hover:shadow-md">
+            
+              <CardContent className="flex flex-col items-center p-8 text-center">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                  <f.icon className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-playfair text-lg font-semibold text-foreground">
+                  {f.headline}
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">{f.description}</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </section>
 
       {/* Trust */}
       <section className="border-t border-border bg-card">
