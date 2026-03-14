@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Mic, Loader2, X, ArrowRight, Sparkles } from 'lucide-react';
+import { Mic, Loader2, X, ArrowRight, Sparkles, MessageSquare } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { MeshBackground } from '@/components/MeshBackground';
+import { VoiceCopilotModal } from '@/components/VoiceCopilotModal';
 
 interface Concept {
   hook: string;
@@ -20,14 +21,6 @@ interface Concept {
   score: number;
   category: string;
 }
-
-const MOCK_CONCEPTS: Concept[] = [
-  { hook: 'Die unbequeme Wahrheit über Führung', type: 'Story', angle: 'Authentische Führungsgeschichte, die Ihre Glaubwürdigkeit stärkt und Diskussionen anregt.', preview: 'Als ich vor 10 Jahren mein erstes Team leitete, dachte ich, Führung bedeutet, alle Antworten zu haben. Heute weiß ich: Die besten Leader stellen die richtigen Fragen...', score: 92, category: 'Personal Branding' },
-  { hook: '3 Dinge, die jeder CEO wissen sollte', type: 'Insight', angle: 'Kompakte Thought-Leadership-Liste, die hohe Speicherraten und Shares erzielt.', preview: '1. Kultur schlägt Strategie – immer. 2. Ihre besten Mitarbeiter brauchen keine Kontrolle, sondern Vertrauen. 3. Innovation beginnt mit Zuhören...', score: 87, category: 'Thought Leadership' },
-  { hook: 'Warum ich montags keine Meetings mache', type: 'Contrarian', angle: 'Polarisierende These, die Aufmerksamkeit durch Gegenposition erzeugt.', preview: 'Vor zwei Jahren habe ich eine radikale Entscheidung getroffen: Keine Meetings am Montag. Das Ergebnis? 40% mehr strategische Arbeit in der Woche...', score: 85, category: 'Productivity' },
-  { hook: 'Unser größter Kunde kam durch einen LinkedIn-Post', type: 'Case Study', angle: 'Datengetriebene Erfolgsgeschichte, die Kompetenz und ROI demonstriert.', preview: 'Letzten März veröffentlichte ich einen Post über unsere Fehler bei der Skalierung. 48 Stunden später hatte ich 3 Anfragen von Enterprise-Kunden im Postfach...', score: 78, category: 'Social Selling' },
-  { hook: 'Was würden Sie tun, wenn Ihr bester Mitarbeiter kündigt?', type: 'Question', angle: 'Engagement-Frage, die Kommentare und Algorithmus-Reichweite maximiert.', preview: 'Letzte Woche stand ich vor genau dieser Situation. Statt in Panik zu verfallen, habe ich drei Fragen gestellt, die alles verändert haben...', score: 73, category: 'Leadership' },
-];
 
 const TEMPLATES = [
   { emoji: '🚀', label: 'Kundenerfolg teilen', prompt: 'Wir haben kürzlich einem Kunden geholfen, [Ergebnis] zu erreichen. Der Schlüssel war [Ansatz]. Was mich dabei am meisten überrascht hat...' },
@@ -54,6 +47,7 @@ export default function IdeationPage() {
   const [generating, setGenerating] = useState(false);
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
   const [listening, setListening] = useState(false);
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const recognitionRef = useRef<any>(null);
@@ -120,6 +114,23 @@ export default function IdeationPage() {
     enabled: !!user,
   });
 
+  // Voice insights query
+  const { data: voiceInsights = [], refetch: refetchInsights } = useQuery({
+    queryKey: ['voice_insights', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('voice_insights' as any)
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!user,
+  });
+
   const matchedTopics = useMemo(() => {
     if (!input.trim() || topics.length === 0) return [];
     const lower = input.toLowerCase();
@@ -157,6 +168,25 @@ export default function IdeationPage() {
     },
   });
 
+  const saveInsightAsPost = useMutation({
+    mutationFn: async (keyPoint: string) => {
+      const { error } = await supabase.from('posts').insert({
+        user_id: user!.id,
+        content: keyPoint,
+        status: 'draft',
+        type: 'Voice Insight',
+        content_category: 'Voice Copilot',
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: 'Post-Entwurf erstellt', description: 'Erkenntnis wurde als Draft gespeichert.' });
+    },
+    onError: (err: any) => {
+      toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
+    },
+  });
+
   const generate = async () => {
     if (!input.trim()) {
       toast({ title: 'Bitte geben Sie einen Input ein', variant: 'destructive' });
@@ -182,7 +212,6 @@ export default function IdeationPage() {
 
       if (error) throw error;
 
-      // Map n8n response to Concept[] format
       const raw = data?.concepts;
       if (Array.isArray(raw) && raw.length > 0) {
         const mapped: Concept[] = raw.map((c: any) => ({
@@ -214,6 +243,13 @@ export default function IdeationPage() {
   return (
     <div className="relative space-y-8">
       <MeshBackground />
+
+      {/* Voice Copilot Modal */}
+      <VoiceCopilotModal
+        open={voiceModalOpen}
+        onClose={() => setVoiceModalOpen(false)}
+        onInsightsSaved={() => refetchInsights()}
+      />
 
       {/* Split View */}
       <div className="hidden md:block">
@@ -257,19 +293,30 @@ export default function IdeationPage() {
                 </div>
               )}
 
-              {/* Generate button or loading */}
-              {generating ? (
-                <div className="flex items-center gap-3 py-3">
-                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                  <span className="text-sm text-muted-foreground animate-pulse">
-                    {LOADING_TEXTS[loadingTextIndex]}
-                  </span>
-                </div>
-              ) : (
-                <InteractiveHoverButton onClick={generate}>
-                  Ideen generieren
-                </InteractiveHoverButton>
-              )}
+              {/* Actions row */}
+              <div className="flex items-center gap-3">
+                {generating ? (
+                  <div className="flex items-center gap-3 py-3">
+                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                    <span className="text-sm text-muted-foreground animate-pulse">
+                      {LOADING_TEXTS[loadingTextIndex]}
+                    </span>
+                  </div>
+                ) : (
+                  <InteractiveHoverButton onClick={generate}>
+                    Ideen generieren
+                  </InteractiveHoverButton>
+                )}
+
+                <Button
+                  variant="outline"
+                  className="rounded-sm gap-2"
+                  onClick={() => setVoiceModalOpen(true)}
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  Gespräch starten
+                </Button>
+              </div>
             </div>
           </ResizablePanel>
 
@@ -370,17 +417,65 @@ export default function IdeationPage() {
           </div>
         )}
 
-        {generating ? (
-          <div className="flex items-center gap-3 py-3">
-            <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            <span className="text-sm text-muted-foreground animate-pulse">{LOADING_TEXTS[loadingTextIndex]}</span>
-          </div>
-        ) : (
-          <InteractiveHoverButton onClick={generate}>Ideen generieren</InteractiveHoverButton>
-        )}
+        <div className="flex items-center gap-3">
+          {generating ? (
+            <div className="flex items-center gap-3 py-3">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              <span className="text-sm text-muted-foreground animate-pulse">{LOADING_TEXTS[loadingTextIndex]}</span>
+            </div>
+          ) : (
+            <InteractiveHoverButton onClick={generate}>Ideen generieren</InteractiveHoverButton>
+          )}
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-sm gap-2"
+            onClick={() => setVoiceModalOpen(true)}
+          >
+            <MessageSquare className="h-4 w-4" />
+            Gespräch
+          </Button>
+        </div>
       </div>
 
-      {/* Results */}
+      {/* Voice Insights */}
+      {voiceInsights.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="font-playfair text-xl font-semibold text-foreground flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-primary" />
+            Erkenntnisse aus Ihren Gesprächen
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {voiceInsights.flatMap((insight: any) =>
+              (insight.key_points as string[])?.map((point: string, pi: number) => (
+                <Card key={`${insight.id}-${pi}`} className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)]">
+                  <CardContent className="p-5 space-y-3">
+                    <p className="text-sm text-foreground leading-relaxed">{point}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(insight.created_at).toLocaleDateString('de-DE')}
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-sm text-xs"
+                        onClick={() => saveInsightAsPost.mutate(point)}
+                        disabled={saveInsightAsPost.isPending}
+                      >
+                        Als Post übernehmen
+                        <ArrowRight className="h-3 w-3 ml-1" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )) ?? []
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Generated Results */}
       {concepts.length > 0 && (
         <div className="space-y-4">
           <h2 className="font-playfair text-xl font-semibold text-foreground">Generierte Ideen</h2>

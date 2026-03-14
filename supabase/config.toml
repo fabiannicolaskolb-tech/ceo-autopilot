@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.trigger-n8n-generic]
 verify_jwt = false
+
+[functions.voice-copilot-token]
+verify_jwt = false
