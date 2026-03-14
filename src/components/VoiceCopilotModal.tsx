@@ -6,6 +6,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 
+const AGENT_ID = 'agent_9101kkpxh6v2etjvksnsahfjeg0a';
+
 interface TranscriptEntry {
   role: 'user' | 'agent';
   text: string;
