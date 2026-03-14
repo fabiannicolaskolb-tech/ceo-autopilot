@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, TrendingUp, CalendarDays, Rocket } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -10,12 +10,25 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Sparkline } from '@/components/Sparkline';
 import { MeshBackground } from '@/components/MeshBackground';
 import CreatorScoreCard from '@/components/CreatorScoreCard';
-import { format } from 'date-fns';
+import { format, subDays, startOfDay } from 'date-fns';
 import { de } from 'date-fns/locale';
 
-// Fictive sparkline trend data
-const DRAFT_TREND = [1, 2, 1, 3, 2, 4, 3, 5, 4, 3];
-const POSTED_TREND = [0, 1, 1, 2, 2, 3, 4, 3, 5, 6];
+function buildTrend(posts: any[], status: string, days = 30): number[] {
+  const now = new Date();
+  const buckets: number[] = [];
+  const bucketCount = 10;
+  const bucketSize = Math.ceil(days / bucketCount);
+  for (let i = bucketCount - 1; i >= 0; i--) {
+    const bucketEnd = subDays(now, i * bucketSize);
+    const bucketStart = subDays(now, (i + 1) * bucketSize);
+    const count = posts.filter(p => {
+      const d = new Date(status === 'draft' ? p.created_at : (p.posted_at || p.created_at));
+      return d >= startOfDay(bucketStart) && d < startOfDay(bucketEnd);
+    }).length;
+    buckets.push(count);
+  }
+  return buckets;
+}
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -69,6 +82,8 @@ export default function DashboardPage() {
     enabled: !!user
   });
 
+  const draftTrend = useMemo(() => buildTrend(drafts, 'draft'), [drafts]);
+  const postedTrend = useMemo(() => buildTrend(postedPosts, 'posted'), [postedPosts]);
 
   const draftCount = drafts.length;
   const postCount = postedPosts.length;
@@ -118,7 +133,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex-1 min-h-[60px]">
-            <Sparkline data={DRAFT_TREND} color="hsl(220, 55%, 20%)" height={80} width={300} />
+            <Sparkline data={draftTrend} color="hsl(220, 55%, 20%)" height={80} width={300} />
           </div>
         </div>
 
@@ -136,7 +151,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex-1 min-h-[60px]">
-            <Sparkline data={POSTED_TREND} color="hsl(160, 60%, 38%)" height={80} width={300} />
+            <Sparkline data={postedTrend} color="hsl(160, 60%, 38%)" height={80} width={300} />
           </div>
         </div>
 
