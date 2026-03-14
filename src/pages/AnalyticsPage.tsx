@@ -262,21 +262,25 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      <MeshBackground />
+
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-playfair text-2xl font-bold text-foreground">Analytics</h1>
-          <p className="text-sm text-muted-foreground">Performance-Übersicht Ihres LinkedIn-Auftritts</p>
+      <div className={cn(GLASS_CARD, 'p-6 sm:p-8')}>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Analytics</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Performance-Übersicht Ihres LinkedIn-Auftritts</p>
+          </div>
+          <Tabs value={timeRange} onValueChange={v => setTimeRange(v as TimeRange)}>
+            <TabsList>
+              <TabsTrigger value="7d">7T</TabsTrigger>
+              <TabsTrigger value="30d">30T</TabsTrigger>
+              <TabsTrigger value="90d">90T</TabsTrigger>
+              <TabsTrigger value="ytd">YTD</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
-        <Tabs value={timeRange} onValueChange={v => setTimeRange(v as TimeRange)}>
-          <TabsList>
-            <TabsTrigger value="7d">7T</TabsTrigger>
-            <TabsTrigger value="30d">30T</TabsTrigger>
-            <TabsTrigger value="90d">90T</TabsTrigger>
-            <TabsTrigger value="ytd">YTD</TabsTrigger>
-          </TabsList>
-        </Tabs>
       </div>
 
       {!hasData ? (
@@ -284,186 +288,109 @@ export default function AnalyticsPage() {
       ) : (
         <>
           {/* KPIs */}
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-3">
             {kpis.map((k, i) => (
               <KPICard key={k.label} {...k} icon={kpiIcons[i]} />
             ))}
           </div>
 
           {/* Performance Timeline */}
-          <Card className="border-border shadow-sm">
-            <CardHeader>
-              <CardTitle className="font-playfair text-base">Performance Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={280}>
-                <AreaChart data={timelineData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis
-                    dataKey="date"
-                    tick={{ fontSize: 11 }}
-                    stroke="hsl(var(--muted-foreground))"
-                    tickFormatter={v => new Date(v).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}
-                  />
-                  <YAxis yAxisId="left" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-                  <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                    }}
-                    labelFormatter={v => new Date(v).toLocaleDateString('de-DE')}
-                  />
-                  <Area
-                    yAxisId="left"
-                    type="monotone"
-                    dataKey="impressions"
-                    name="Impressions"
-                    stroke="hsl(var(--primary))"
-                    fill="hsl(var(--primary))"
-                    fillOpacity={0.1}
-                    strokeWidth={2}
-                  />
-                  <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="engagement"
-                    name="Engagement"
-                    stroke="hsl(var(--success))"
-                    strokeWidth={2}
-                    dot={{ r: 3, fill: 'hsl(var(--success))' }}
-                  />
-                  <Legend />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <div className={cn(GLASS_CARD, 'p-6')}>
+            <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Performance Timeline</h2>
+            <ResponsiveContainer width="100%" height={280}>
+              <AreaChart data={timelineData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" tickFormatter={v => new Date(v).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} />
+                <YAxis yAxisId="left" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }} labelFormatter={v => new Date(v).toLocaleDateString('de-DE')} />
+                <Area yAxisId="left" type="monotone" dataKey="impressions" name="Impressions" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.1} strokeWidth={2} />
+                <Line yAxisId="right" type="monotone" dataKey="engagement" name="Engagement" stroke="hsl(var(--success))" strokeWidth={2} dot={{ r: 3, fill: 'hsl(var(--success))' }} />
+                <Legend />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
 
           {/* Content Type + Sentiment */}
-          <div className="grid gap-4 lg:grid-cols-2">
-            <Card className="border-border shadow-sm">
-              <CardHeader>
-                <CardTitle className="font-playfair text-base">Content Type Efficiency</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={contentTypeData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="type" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-                    <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                        fontSize: '12px',
-                      }}
-                    />
-                    <Bar dataKey="impressions" name="Impressions" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="engagement" name="Engagement" fill="hsl(var(--success))" radius={[4, 4, 0, 0]} />
-                    <Legend />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div className={cn(GLASS_CARD, 'p-6')}>
+              <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Content Type Efficiency</h2>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={contentTypeData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="type" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                  <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }} />
+                  <Bar dataKey="impressions" name="Impressions" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="engagement" name="Engagement" fill="hsl(var(--success))" radius={[4, 4, 0, 0]} />
+                  <Legend />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
 
-            <Card className="border-border shadow-sm">
-              <CardHeader>
-                <CardTitle className="font-playfair text-base">Sentiment Analyse</CardTitle>
-              </CardHeader>
-              <CardContent className="flex items-center justify-center">
+            <div className={cn(GLASS_CARD, 'p-6')}>
+              <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Sentiment Analyse</h2>
+              <div className="flex items-center justify-center">
                 {sentimentData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
-                      <Pie
-                        data={sentimentData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={90}
-                        paddingAngle={4}
-                        dataKey="value"
-                        nameKey="name"
-                      >
+                      <Pie data={sentimentData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value" nameKey="name">
                         {sentimentData.map((_, idx) => (
                           <Cell key={idx} fill={SENTIMENT_COLORS[idx]} />
                         ))}
                       </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                          fontSize: '12px',
-                        }}
-                      />
+                      <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }} />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
                   <p className="text-sm text-muted-foreground py-12">Keine Sentiment-Daten vorhanden</p>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Best Time to Post */}
-          <Card className="border-border shadow-sm">
-            <CardHeader>
-              <CardTitle className="font-playfair text-base flex items-center gap-2">
-                <Clock className="h-4 w-4" /> Beste Posting-Zeiten
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <BestTimeHeatmap data={bestTimeData} />
-            </CardContent>
-          </Card>
+          <div className={cn(GLASS_CARD, 'p-6')}>
+            <h2 className="font-playfair text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Clock className="h-4 w-4" /> Beste Posting-Zeiten
+            </h2>
+            <BestTimeHeatmap data={bestTimeData} />
+          </div>
 
           {/* Top Posts Table */}
-          <Card className="border-border shadow-sm">
-            <CardHeader>
-              <CardTitle className="font-playfair text-base">Top Performing Posts</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <TopPostsTable posts={posts} />
-            </CardContent>
-          </Card>
+          <div className={cn(GLASS_CARD, 'p-6')}>
+            <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Top Performing Posts</h2>
+            <TopPostsTable posts={posts} />
+          </div>
 
           {/* Post Compare */}
-          <Card className="border-border shadow-sm">
-            <CardHeader>
-              <CardTitle className="font-playfair text-base flex items-center gap-2">
-                <Minus className="h-4 w-4 rotate-90" /> Post-Vergleich
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PostCompare posts={posts} />
-            </CardContent>
-          </Card>
+          <div className={cn(GLASS_CARD, 'p-6')}>
+            <h2 className="font-playfair text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Minus className="h-4 w-4 rotate-90" /> Post-Vergleich
+            </h2>
+            <PostCompare posts={posts} />
+          </div>
 
           {/* AI Insights */}
-          <Card className="border-border shadow-sm">
-            <CardHeader>
-              <CardTitle className="font-playfair text-base flex items-center gap-2">
-                <Lightbulb className="h-4 w-4" /> KI-Optimierungsvorschläge
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <div className={cn(GLASS_CARD, 'p-6')}>
+            <h2 className="font-playfair text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Lightbulb className="h-4 w-4" /> KI-Optimierungsvorschläge
+            </h2>
+            <div className="space-y-3">
               {[
                 'Story-Posts erzielen 2.3× mehr Engagement als reine Tipps-Posts.',
                 'Ihre beste Posting-Zeit ist Dienstag zwischen 8:00 und 10:00 Uhr.',
                 'Posts mit einer provokanten Frage als Hook erhalten 45% mehr Kommentare.',
                 'Ihre Beiträge über Unternehmenskultur erhalten 40% mehr Shares von Entscheidern.',
               ].map((tip, i) => (
-                <div key={i} className="flex items-start gap-3 rounded-md bg-muted/50 p-3">
+                <div key={i} className="flex items-start gap-3 rounded-[12px] bg-muted/40 backdrop-blur-sm p-3">
                   <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <p className="text-sm text-foreground">{tip}</p>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </>
       )}
     </div>
