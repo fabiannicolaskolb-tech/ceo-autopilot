@@ -16,7 +16,7 @@ const navItems = [
   { title: 'Dashboard', url: '/', icon: LayoutDashboard },
   { title: 'Profil Setup', url: '/profile', icon: User },
   { title: 'Ideation Lab', url: '/ideation', icon: Lightbulb },
-  { title: 'Content Gallery', url: '/planner', icon: CalendarDays },
+  { title: 'Content Gallery', url: '/planner', icon: GalleryHorizontalEnd },
   { title: 'Analytics', url: '/analytics', icon: BarChart3 },
   { title: 'Einstellungen', url: '/settings', icon: Settings },
 ];
