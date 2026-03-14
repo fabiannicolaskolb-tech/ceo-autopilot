@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Sparkline } from '@/components/Sparkline';
+import { MeshBackground } from '@/components/MeshBackground';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 
