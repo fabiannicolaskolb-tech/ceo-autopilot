@@ -16,6 +16,7 @@ import PlannerPage from "@/pages/PlannerPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 import SettingsPage from "@/pages/SettingsPage";
 import NotFound from "@/pages/NotFound";
+import { Particles } from "@/components/ui/particles";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <Particles className="fixed inset-0 z-0" quantity={80} color="#1a2740" size={0.5} />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
