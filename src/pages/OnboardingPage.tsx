@@ -256,7 +256,7 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {step === 5 && (
+        {step === 6 && (
           <div className="space-y-6">
             <div className="text-center">
               <h1 className="font-playfair text-2xl font-bold">Voice Training</h1>
