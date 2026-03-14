@@ -16,6 +16,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState('');
   const [showReset, setShowReset] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [burstKey, setBurstKey] = useState(0);
   const { signIn, signUp, resetPassword, user, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
