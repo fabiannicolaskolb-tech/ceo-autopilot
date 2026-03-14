@@ -3,9 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Zap, Lightbulb, CalendarDays, BarChart3, Shield, Lock, UserCheck } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuroraBackground } from '@/components/ui/aurora-background';
+import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import dashboardPreview from '@/assets/dashboard-preview.jpg';
 
 const features = [
   {
