@@ -22,7 +22,7 @@ export function Sparkline({ data, color = 'hsl(var(--primary))', height = 40, wi
   });
 
   const linePath = `M${points.join(' L')}`;
-  const areaPath = `${linePath} L${width - padding},${height} L${padding},${height} Z`;
+  const areaPath = `${linePath} L${width},${height} L0,${height} Z`;
 
   return (
     <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="overflow-visible">
