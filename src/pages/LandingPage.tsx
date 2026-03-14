@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Zap, Lightbulb, CalendarDays, BarChart3, Shield, Lock, UserCheck, ArrowUp } from 'lucide-react';
+import { Particles } from '@/components/ui/particles';
 import { useAuth } from '@/hooks/useAuth';
 import { AuroraBackground } from '@/components/ui/aurora-background';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
@@ -59,7 +60,8 @@ export default function LandingPage() {
   }, [user, profile, loading, navigate]);
 
   return (
-    <div className="relative z-10 min-h-screen bg-background/90">
+    <div className="relative min-h-screen bg-background">
+      <Particles className="absolute inset-0 z-0" quantity={80} color="#1a2740" size={0.5} />
       {/* Sticky Nav */}
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
