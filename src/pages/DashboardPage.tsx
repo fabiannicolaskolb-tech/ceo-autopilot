@@ -155,18 +155,20 @@ export default function DashboardPage() {
         </div>
 
         {/* Published Widget */}
-        <div className="relative overflow-hidden rounded-[24px] bg-card/80 backdrop-blur-xl p-6 pb-12 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]">
-          <div className="flex items-start justify-between">
-            <div className="rounded-[12px] bg-[hsl(160_60%_38%/0.1)] p-2.5">
-              <TrendingUp className="h-5 w-5 text-success" />
+        <div className="flex flex-col overflow-hidden rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]">
+          <div className="p-6 pb-2">
+            <div className="flex items-start justify-between">
+              <div className="rounded-[12px] bg-[hsl(160_60%_38%/0.1)] p-2.5">
+                <TrendingUp className="h-5 w-5 text-success" />
+              </div>
+            </div>
+            <div className="mt-4">
+              <p className="text-3xl font-bold text-foreground tracking-tight">{postCount}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Veröffentlicht</p>
             </div>
           </div>
-          <div className="mt-4">
-            <p className="text-3xl font-bold text-foreground tracking-tight">{postCount}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Veröffentlicht</p>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0">
-            <Sparkline data={POSTED_TREND} color="hsl(160, 60%, 38%)" height={48} width={300} />
+          <div className="flex-1 min-h-[60px]">
+            <Sparkline data={POSTED_TREND} color="hsl(160, 60%, 38%)" height={80} width={300} />
           </div>
         </div>
 
