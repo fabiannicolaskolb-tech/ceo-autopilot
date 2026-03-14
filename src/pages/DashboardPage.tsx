@@ -82,6 +82,8 @@ export default function DashboardPage() {
     enabled: !!user
   });
 
+  const draftTrend = useMemo(() => buildTrend(drafts, 'draft'), [drafts]);
+  const postedTrend = useMemo(() => buildTrend(postedPosts, 'posted'), [postedPosts]);
 
   const draftCount = drafts.length;
   const postCount = postedPosts.length;
