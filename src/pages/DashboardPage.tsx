@@ -111,8 +111,8 @@ export default function DashboardPage() {
               </p>
             </div>
           </div>
-          <InteractiveHoverButton onClick={() => navigate(draftCount > 0 ? '/planner' : '/ideation')}>
-            {draftCount > 0 ? 'Zur Gallery' : 'Zum Ideation Lab'}
+          <InteractiveHoverButton onClick={() => navigate('/profile')}>
+            Profil bearbeiten
           </InteractiveHoverButton>
         </div>
       </div>
