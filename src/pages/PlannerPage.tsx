@@ -217,6 +217,20 @@ export default function PlannerPage() {
     },
   });
 
+  const triggerGenericMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('trigger-n8n-generic');
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({ title: 'Workflow gestartet', description: 'n8n wurde erfolgreich getriggert.' });
+    },
+    onError: (err: Error) => {
+      toast({ title: 'Fehler', description: err.message, variant: 'destructive' });
+    },
+  });
+
   const filtered = filter === 'all' ? posts : posts.filter(p => p.status === filter);
 
   const openEdit = (post: any) => {
