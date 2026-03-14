@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, User, Lightbulb, CalendarDays, BarChart3, Settings, Zap, LogOut,
+  LayoutDashboard, User, Lightbulb, GalleryHorizontalEnd, BarChart3, Settings, Zap, LogOut,
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAuth } from '@/hooks/useAuth';
