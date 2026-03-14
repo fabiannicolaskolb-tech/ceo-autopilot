@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,17 +16,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
-interface Post {
-  id: string;
-  content: string;
-  hook?: string;
-  angle?: string;
-  type?: string;
-  status: string;
-  scheduled_at?: string;
-  created_at: string;
-}
-
 const STATUS_CONFIG: Record<string, { label: string; variant: 'secondary' | 'outline' | 'default' }> = {
   draft: { label: 'Entwurf', variant: 'secondary' },
   approved: { label: 'Freigegeben', variant: 'outline' },
@@ -31,42 +23,56 @@ const STATUS_CONFIG: Record<string, { label: string; variant: 'secondary' | 'out
   posted: { label: 'Veröffentlicht', variant: 'default' },
 };
 
-const MOCK_POSTS: Post[] = [
-  { id: '1', content: 'Die größte Lektion meiner Karriere? Scheitern ist nicht das Gegenteil von Erfolg – es ist ein Teil davon.', hook: 'Scheitern als Erfolgsrezept', angle: 'Personal Branding', type: 'Story Post', status: 'scheduled', scheduled_at: new Date(Date.now() + 86400000 * 2).toISOString(), created_at: new Date().toISOString() },
-  { id: '2', content: 'Warum die besten Teams keine Harmonie brauchen, sondern konstruktiven Konflikt.', hook: 'Konflikt als Stärke', angle: 'Leadership', type: 'Contrarian', status: 'draft', created_at: new Date().toISOString() },
-  { id: '3', content: '5 Bücher, die mein Denken als CEO nachhaltig verändert haben.', hook: 'CEO Reading List', angle: 'Thought Leadership', type: 'Listicle', status: 'approved', created_at: new Date().toISOString() },
-];
-
 export default function PlannerPage() {
-  const [posts, setPosts] = useState<Post[]>([]);
   const [filter, setFilter] = useState('all');
-  const [editPost, setEditPost] = useState<Post | null>(null);
+  const [editPost, setEditPost] = useState<any | null>(null);
   const [editContent, setEditContent] = useState('');
   const [editDate, setEditDate] = useState<Date | undefined>();
+  const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('ceo-autopilot-posts') || '[]');
-    setPosts(saved.length > 0 ? saved : MOCK_POSTS);
-  }, []);
+  const { data: posts = [] } = useQuery({
+    queryKey: ['posts', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('user_id', user!.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, content, scheduled_at }: { id: string; content: string; scheduled_at?: string }) => {
+      const { error } = await supabase.from('posts').update({ content, scheduled_at }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      setEditPost(null);
+      toast({ title: 'Post aktualisiert' });
+    },
+  });
 
   const filtered = filter === 'all' ? posts : posts.filter(p => p.status === filter);
 
-  const openEdit = (post: Post) => {
+  const openEdit = (post: any) => {
     setEditPost(post);
-    setEditContent(post.content);
+    setEditContent(post.content || '');
     setEditDate(post.scheduled_at ? new Date(post.scheduled_at) : undefined);
   };
 
   const saveEdit = () => {
     if (!editPost) return;
-    const updated = posts.map(p =>
-      p.id === editPost.id ? { ...p, content: editContent, scheduled_at: editDate?.toISOString() } : p
-    );
-    setPosts(updated);
-    localStorage.setItem('ceo-autopilot-posts', JSON.stringify(updated));
-    setEditPost(null);
-    toast({ title: 'Post aktualisiert' });
+    updateMutation.mutate({
+      id: editPost.id,
+      content: editContent,
+      scheduled_at: editDate?.toISOString(),
+    });
   };
 
   return (
@@ -141,7 +147,7 @@ export default function PlannerPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditPost(null)}>Abbrechen</Button>
-            <Button onClick={saveEdit}>Speichern</Button>
+            <Button onClick={saveEdit} disabled={updateMutation.isPending}>Speichern</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

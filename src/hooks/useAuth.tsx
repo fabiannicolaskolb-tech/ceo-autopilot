@@ -1,9 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-interface User {
-  id: string;
-  email: string;
-}
+import { supabase } from '@/integrations/supabase/client';
+import type { User, Session } from '@supabase/supabase-js';
 
 interface Profile {
   id: string;
@@ -33,21 +30,15 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// Mock user for demo - will be replaced with Supabase
-const MOCK_USER: User = { id: 'demo-user-1', email: 'ceo@example.com' };
-
-const DEFAULT_PROFILE: Profile = {
-  id: 'demo-user-1',
-  name: null,
-  company: null,
-  role: null,
-  industry: null,
-  target_audience: null,
-  tone: 'visionary',
-  bio: null,
-  linkedin_connected: false,
-  onboarding_completed: false,
-};
+async function fetchProfile(userId: string): Promise<Profile | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+  if (error || !data) return null;
+  return data as Profile;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -55,53 +46,83 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem('ceo-autopilot-auth');
-    if (saved) {
-      setUser(MOCK_USER);
-      const savedProfile = localStorage.getItem('ceo-autopilot-profile');
-      setProfile(savedProfile ? JSON.parse(savedProfile) : DEFAULT_PROFILE);
-    }
-    setLoading(false);
+    // Set up auth listener BEFORE getSession
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+          // Use setTimeout to avoid potential deadlock with Supabase client
+          setTimeout(async () => {
+            const p = await fetchProfile(session.user.id);
+            setProfile(p);
+            setLoading(false);
+          }, 0);
+        } else {
+          setUser(null);
+          setProfile(null);
+          setLoading(false);
+        }
+      }
+    );
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        setUser(session.user);
+        const p = await fetchProfile(session.user.id);
+        setProfile(p);
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (_email: string, _password: string) => {
-    setUser(MOCK_USER);
-    const savedProfile = localStorage.getItem('ceo-autopilot-profile');
-    const p = savedProfile ? JSON.parse(savedProfile) : DEFAULT_PROFILE;
-    setProfile(p);
-    localStorage.setItem('ceo-autopilot-auth', 'true');
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
   };
 
-  const signUp = async (_email: string, _password: string) => {
-    setUser(MOCK_USER);
-    setProfile(DEFAULT_PROFILE);
-    localStorage.setItem('ceo-autopilot-auth', 'true');
-    localStorage.setItem('ceo-autopilot-profile', JSON.stringify(DEFAULT_PROFILE));
+  const signUp = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    if (error) throw error;
   };
 
   const signOut = async () => {
-    setUser(null);
-    setProfile(null);
-    localStorage.removeItem('ceo-autopilot-auth');
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
   };
 
-  const resetPassword = async (_email: string) => {
-    // Will integrate with Supabase
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) throw error;
   };
 
-  const updatePassword = async (_password: string) => {
-    // Will integrate with Supabase
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
   };
 
   const refreshProfile = async () => {
-    const savedProfile = localStorage.getItem('ceo-autopilot-profile');
-    if (savedProfile) setProfile(JSON.parse(savedProfile));
+    if (user) {
+      const p = await fetchProfile(user.id);
+      setProfile(p);
+    }
   };
 
   const updateProfile = async (data: Partial<Profile>) => {
-    const updated = { ...profile, ...data } as Profile;
-    setProfile(updated);
-    localStorage.setItem('ceo-autopilot-profile', JSON.stringify(updated));
+    if (!user) throw new Error('Not authenticated');
+    const { error } = await supabase
+      .from('profiles')
+      .update(data)
+      .eq('id', user.id);
+    if (error) throw error;
+    setProfile(prev => prev ? { ...prev, ...data } as Profile : null);
   };
 
   return (

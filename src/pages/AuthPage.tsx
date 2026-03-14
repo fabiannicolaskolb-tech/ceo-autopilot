@@ -30,8 +30,8 @@ export default function AuthPage() {
     try {
       await signIn(email, password);
       toast({ title: 'Willkommen zurück!' });
-    } catch {
-      toast({ title: 'Anmeldung fehlgeschlagen', variant: 'destructive' });
+    } catch (err: any) {
+      toast({ title: 'Anmeldung fehlgeschlagen', description: err?.message, variant: 'destructive' });
     }
     setLoading(false);
   };
@@ -42,8 +42,8 @@ export default function AuthPage() {
     try {
       await signUp(email, password);
       toast({ title: 'Konto erstellt', description: 'Bitte bestätigen Sie Ihre E-Mail-Adresse.' });
-    } catch {
-      toast({ title: 'Registrierung fehlgeschlagen', variant: 'destructive' });
+    } catch (err: any) {
+      toast({ title: 'Registrierung fehlgeschlagen', description: err?.message, variant: 'destructive' });
     }
     setLoading(false);
   };
@@ -55,8 +55,8 @@ export default function AuthPage() {
       await resetPassword(email);
       toast({ title: 'E-Mail gesendet', description: 'Prüfen Sie Ihr Postfach für den Reset-Link.' });
       setShowReset(false);
-    } catch {
-      toast({ title: 'Fehler', variant: 'destructive' });
+    } catch (err: any) {
+      toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
     }
     setLoading(false);
   };

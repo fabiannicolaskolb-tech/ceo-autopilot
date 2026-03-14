@@ -14,7 +14,168 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      posts: {
+        Row: {
+          angle: string | null
+          content: string | null
+          created_at: string
+          hook: string | null
+          id: string
+          linkedin_post_id: string | null
+          metrics: Json | null
+          posted_at: string | null
+          scheduled_at: string | null
+          status: string
+          type: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          angle?: string | null
+          content?: string | null
+          created_at?: string
+          hook?: string | null
+          id?: string
+          linkedin_post_id?: string | null
+          metrics?: Json | null
+          posted_at?: string | null
+          scheduled_at?: string | null
+          status?: string
+          type?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          angle?: string | null
+          content?: string | null
+          created_at?: string
+          hook?: string | null
+          id?: string
+          linkedin_post_id?: string | null
+          metrics?: Json | null
+          posted_at?: string | null
+          scheduled_at?: string | null
+          status?: string
+          type?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          bio: string | null
+          company: string | null
+          created_at: string
+          id: string
+          industry: string | null
+          linkedin_connected: boolean
+          name: string | null
+          onboarding_completed: boolean
+          role: string | null
+          target_audience: string | null
+          tone: string
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          company?: string | null
+          created_at?: string
+          id: string
+          industry?: string | null
+          linkedin_connected?: boolean
+          name?: string | null
+          onboarding_completed?: boolean
+          role?: string | null
+          target_audience?: string | null
+          tone?: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          company?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          linkedin_connected?: boolean
+          name?: string | null
+          onboarding_completed?: boolean
+          role?: string | null
+          target_audience?: string | null
+          tone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      topics: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      voice_samples: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_samples_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, X } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,16 +21,14 @@ const TONES = [
 ];
 
 export default function ProfilePage() {
-  const { profile, updateProfile } = useAuth();
+  const { profile, user, updateProfile } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [industry, setIndustry] = useState('');
   const [targetAudience, setTargetAudience] = useState('');
   const [tone, setTone] = useState('visionary');
-  const [voiceSamples, setVoiceSamples] = useState<string[]>(['', '', '', '', '']);
-  const [focusTopics, setFocusTopics] = useState<string[]>([]);
-  const [noGoTopics, setNoGoTopics] = useState<string[]>([]);
   const [focusInput, setFocusInput] = useState('');
   const [noGoInput, setNoGoInput] = useState('');
 
@@ -40,30 +40,76 @@ export default function ProfilePage() {
       setTargetAudience(profile.target_audience || '');
       setTone(profile.tone || 'visionary');
     }
-    const saved = JSON.parse(localStorage.getItem('ceo-autopilot-voice-samples') || '[]');
-    if (saved.length > 0) setVoiceSamples([...saved, ...Array(5 - saved.length).fill('')].slice(0, 5));
-    const topics = JSON.parse(localStorage.getItem('ceo-autopilot-topics') || '[]');
-    setFocusTopics(topics.filter((t: any) => t.type === 'focus').map((t: any) => t.name));
-    setNoGoTopics(topics.filter((t: any) => t.type === 'no-go').map((t: any) => t.name));
   }, [profile]);
+
+  const { data: voiceSamples = [] } = useQuery({
+    queryKey: ['voice_samples', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('voice_samples').select('*').eq('user_id', user!.id).order('created_at');
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: topics = [] } = useQuery({
+    queryKey: ['topics', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('topics').select('*').eq('user_id', user!.id).order('created_at');
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const focusTopics = topics.filter(t => t.type === 'focus');
+  const noGoTopics = topics.filter(t => t.type === 'no-go');
+
+  const [sampleTexts, setSampleTexts] = useState<string[]>([]);
+  useEffect(() => {
+    const texts = voiceSamples.map(s => s.content);
+    while (texts.length < 5) texts.push('');
+    setSampleTexts(texts.slice(0, 5));
+  }, [voiceSamples]);
+
+  const addTopicMutation = useMutation({
+    mutationFn: async ({ name, type }: { name: string; type: string }) => {
+      const { error } = await supabase.from('topics').insert({ user_id: user!.id, name, type });
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['topics'] }),
+  });
+
+  const deleteTopicMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('topics').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['topics'] }),
+  });
 
   const addTopic = (type: 'focus' | 'nogo') => {
     const val = type === 'focus' ? focusInput : noGoInput;
     if (!val.trim()) return;
-    if (type === 'focus') { setFocusTopics(prev => [...prev, val.trim()]); setFocusInput(''); }
-    else { setNoGoTopics(prev => [...prev, val.trim()]); setNoGoInput(''); }
+    addTopicMutation.mutate({ name: val.trim(), type: type === 'nogo' ? 'no-go' : 'focus' });
+    if (type === 'focus') setFocusInput(''); else setNoGoInput('');
   };
 
   const save = async () => {
-    await updateProfile({ name, role, industry, target_audience: targetAudience, tone });
-    const samples = voiceSamples.filter(s => s.trim());
-    localStorage.setItem('ceo-autopilot-voice-samples', JSON.stringify(samples));
-    const topics = [
-      ...focusTopics.map(t => ({ name: t, type: 'focus' })),
-      ...noGoTopics.map(t => ({ name: t, type: 'no-go' })),
-    ];
-    localStorage.setItem('ceo-autopilot-topics', JSON.stringify(topics));
-    toast({ title: 'Profil gespeichert' });
+    try {
+      await updateProfile({ name, role, industry, target_audience: targetAudience, tone });
+
+      // Replace voice samples: delete old, insert new
+      await supabase.from('voice_samples').delete().eq('user_id', user!.id);
+      const newSamples = sampleTexts.filter(s => s.trim());
+      if (newSamples.length > 0) {
+        await supabase.from('voice_samples').insert(newSamples.map(content => ({ user_id: user!.id, content })));
+      }
+      queryClient.invalidateQueries({ queryKey: ['voice_samples'] });
+      toast({ title: 'Profil gespeichert' });
+    } catch (err: any) {
+      toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
+    }
   };
 
   return (
@@ -90,8 +136,8 @@ export default function ProfilePage() {
       <Card className="border-border shadow-sm">
         <CardHeader><CardTitle className="font-playfair text-base">Voice Samples</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          {voiceSamples.map((s, i) => (
-            <Textarea key={i} value={s} onChange={e => { const u = [...voiceSamples]; u[i] = e.target.value; setVoiceSamples(u); }} placeholder={`Sample ${i + 1}`} className="min-h-[80px] bg-card" />
+          {sampleTexts.map((s, i) => (
+            <Textarea key={i} value={s} onChange={e => { const u = [...sampleTexts]; u[i] = e.target.value; setSampleTexts(u); }} placeholder={`Sample ${i + 1}`} className="min-h-[80px] bg-card" />
           ))}
         </CardContent>
       </Card>
@@ -105,7 +151,7 @@ export default function ProfilePage() {
               <Input value={focusInput} onChange={e => setFocusInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('focus'))} className="bg-card" placeholder="Thema + Enter" />
               <Button size="icon" variant="outline" onClick={() => addTopic('focus')}><Plus className="h-4 w-4" /></Button>
             </div>
-            <div className="flex flex-wrap gap-2">{focusTopics.map((t, i) => <Badge key={i} variant="secondary" className="gap-1">{t}<X className="h-3 w-3 cursor-pointer" onClick={() => setFocusTopics(prev => prev.filter((_, idx) => idx !== i))} /></Badge>)}</div>
+            <div className="flex flex-wrap gap-2">{focusTopics.map(t => <Badge key={t.id} variant="secondary" className="gap-1">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
           </div>
           <div className="space-y-2">
             <Label>No-Go Themen</Label>
@@ -113,7 +159,7 @@ export default function ProfilePage() {
               <Input value={noGoInput} onChange={e => setNoGoInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('nogo'))} className="bg-card" placeholder="Thema + Enter" />
               <Button size="icon" variant="outline" onClick={() => addTopic('nogo')}><Plus className="h-4 w-4" /></Button>
             </div>
-            <div className="flex flex-wrap gap-2">{noGoTopics.map((t, i) => <Badge key={i} variant="destructive" className="gap-1">{t}<X className="h-3 w-3 cursor-pointer" onClick={() => setNoGoTopics(prev => prev.filter((_, idx) => idx !== i))} /></Badge>)}</div>
+            <div className="flex flex-wrap gap-2">{noGoTopics.map(t => <Badge key={t.id} variant="destructive" className="gap-1">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
           </div>
         </CardContent>
       </Card>
