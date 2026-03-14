@@ -72,6 +72,9 @@ export default function OnboardingPage() {
       await updateProfile({
         name, company, role, industry, target_audience: targetAudience, tone,
         onboarding_completed: true,
+        avatar_url_1: avatarUrls[0],
+        avatar_url_2: avatarUrls[1],
+        avatar_url_3: avatarUrls[2],
       });
 
       // Insert voice samples
