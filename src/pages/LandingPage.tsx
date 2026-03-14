@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Zap, Lightbulb, CalendarDays, BarChart3, Shield, Lock, UserCheck, ArrowUp } from 'lucide-react';
+import { Particles } from '@/components/ui/particles';
 import { useAuth } from '@/hooks/useAuth';
 import { AuroraBackground } from '@/components/ui/aurora-background';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
