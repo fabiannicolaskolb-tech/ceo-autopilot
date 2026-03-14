@@ -13,25 +13,26 @@ import featureIdeation from '@/assets/feature-ideation.jpg';
 import featurePlanning from '@/assets/feature-planning.jpg';
 import featureAnalytics from '@/assets/feature-analytics.jpg';
 
-const features = [
-{
-  icon: Lightbulb,
-  title: 'Ideation',
-  headline: 'Wir finden Ihre Themen.',
-  description: 'KI-gestützte Content-Ideen, die zu Ihrer Expertise und Zielgruppe passen.'
-},
-{
-  icon: CalendarDays,
-  title: 'Planning',
-  headline: 'Volle Kontrolle über Ihren Zeitplan.',
-  description: 'Strategische Planung und Freigabe – Sie behalten immer das letzte Wort.'
-},
-{
-  icon: BarChart3,
-  title: 'Analytics',
-  headline: 'Datenbasierte Optimierung.',
-  description: 'Verstehen Sie, was funktioniert, und steigern Sie Ihre Reichweite systematisch.'
-}];
+const galleryItems = [
+  {
+    id: 'ideation',
+    title: 'Wir finden Ihre Themen.',
+    summary: 'KI-gestützte Content-Ideen, die zu Ihrer Expertise und Zielgruppe passen.',
+    image: featureIdeation,
+  },
+  {
+    id: 'planning',
+    title: 'Volle Kontrolle über Ihren Zeitplan.',
+    summary: 'Strategische Planung und Freigabe – Sie behalten immer das letzte Wort.',
+    image: featurePlanning,
+  },
+  {
+    id: 'analytics',
+    title: 'Datenbasierte Optimierung.',
+    summary: 'Verstehen Sie, was funktioniert, und steigern Sie Ihre Reichweite systematisch.',
+    image: featureAnalytics,
+  },
+];
 
 
 const trustItems = [
