@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Zap, Lightbulb, CalendarDays, BarChart3, Shield, Lock, UserCheck, ArrowUp } from 'lucide-react';
+import { Zap, Lightbulb, CalendarDays, BarChart3, Shield, Lock, UserCheck, ArrowUp, Sun, Moon } from 'lucide-react';
 import { Particles } from '@/components/ui/particles';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/hooks/useTheme';
 import { AuroraBackground } from '@/components/ui/aurora-background';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
