@@ -72,8 +72,8 @@ export default function AppSidebar() {
 
       <SidebarFooter className="border-t border-sidebar-border p-3">
         <div className="flex items-center gap-2">
-          <Avatar className="h-8 w-8 shrink-0">
-            {profile?.avatar_url_1 && <AvatarImage src={profile.avatar_url_1} alt="Avatar" />}
+          <Avatar className="h-8 w-8 shrink-0" key={profile?.avatar_url_1 || 'no-avatar'}>
+            {profile?.avatar_url_1 && <AvatarImage src={profile.avatar_url_1} alt="Avatar" className="object-cover" />}
             <AvatarFallback className="bg-sidebar-accent text-xs text-sidebar-accent-foreground">{initials}</AvatarFallback>
           </Avatar>
           {!collapsed && user && (
