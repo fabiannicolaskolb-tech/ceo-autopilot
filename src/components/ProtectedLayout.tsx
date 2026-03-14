@@ -16,7 +16,14 @@ function ProtectedLayout() {
   }
 
   if (!user) return <Navigate to="/auth" replace />;
-  if (profile && !profile.onboarding_completed) return <Navigate to="/onboarding" replace />;
+  if (!profile) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="animate-pulse font-playfair text-xl text-muted-foreground">Laden...</div>
+      </div>
+    );
+  }
+  if (!profile.onboarding_completed) return <Navigate to="/onboarding" replace />;
 
   return (
     <SidebarProvider>
