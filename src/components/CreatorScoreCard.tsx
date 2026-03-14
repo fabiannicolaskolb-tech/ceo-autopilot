@@ -20,7 +20,7 @@ function RadialProgress({
   const offset = circumference - (percent / 100) * circumference;
 
   return (
-    <svg width={size} height={size} className="transform -rotate-90">
+    <svg width={size} height={size} className="transform -rotate-90" overflow="visible" style={{ overflow: 'visible' }}>
       {/* Track */}
       <circle
         cx={size / 2}
