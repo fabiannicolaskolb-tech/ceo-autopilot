@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, X } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import PhotoUpload from '@/components/PhotoUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -160,6 +161,29 @@ export default function ProfilePage() {
               <Button size="icon" variant="outline" onClick={() => addTopic('nogo')}><Plus className="h-4 w-4" /></Button>
             </div>
             <div className="flex flex-wrap gap-2">{noGoTopics.map(t => <Badge key={t.id} variant="destructive" className="gap-1">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border shadow-sm">
+        <CardHeader><CardTitle className="font-playfair text-base">Profilfotos</CardTitle></CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-6">
+            {[
+              { label: 'Hauptprofilbild', key: 'avatar_url_1' as const },
+              { label: 'Alternativbild 1', key: 'avatar_url_2' as const },
+              { label: 'Alternativbild 2', key: 'avatar_url_3' as const },
+            ].map((item, i) => (
+              <PhotoUpload
+                key={item.key}
+                label={item.label}
+                currentUrl={profile?.[item.key]}
+                userId={user?.id || ''}
+                index={i + 1}
+                onUploaded={(url) => updateProfile({ [item.key]: url })}
+                onRemoved={() => updateProfile({ [item.key]: null })}
+              />
+            ))}
           </div>
         </CardContent>
       </Card>

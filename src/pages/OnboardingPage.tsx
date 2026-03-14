@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import PhotoUpload from '@/components/PhotoUpload';
 import { Button } from '@/components/ui/button';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { Input } from '@/components/ui/input';
@@ -35,13 +36,14 @@ export default function OnboardingPage() {
   const [focusInput, setFocusInput] = useState('');
   const [noGoInput, setNoGoInput] = useState('');
   const [voiceSamples, setVoiceSamples] = useState<string[]>(['', '', '']);
+  const [avatarUrls, setAvatarUrls] = useState<(string | null)[]>([null, null, null]);
   const [saving, setSaving] = useState(false);
 
   const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const totalSteps = 5;
+  const totalSteps = 6;
   const progress = (step / totalSteps) * 100;
 
   const addTopic = (type: 'focus' | 'nogo') => {
@@ -70,6 +72,9 @@ export default function OnboardingPage() {
       await updateProfile({
         name, company, role, industry, target_audience: targetAudience, tone,
         onboarding_completed: true,
+        avatar_url_1: avatarUrls[0],
+        avatar_url_2: avatarUrls[1],
+        avatar_url_3: avatarUrls[2],
       });
 
       // Insert voice samples
@@ -167,6 +172,28 @@ export default function OnboardingPage() {
         {step === 3 && (
           <div className="space-y-6">
             <div className="text-center">
+              <h1 className="font-playfair text-2xl font-bold">Profilfotos</h1>
+              <p className="mt-1 text-muted-foreground">Laden Sie bis zu 3 professionelle Fotos hoch</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6">
+              {['Hauptprofilbild', 'Alternativbild 1', 'Alternativbild 2'].map((label, i) => (
+                <PhotoUpload
+                  key={i}
+                  label={label}
+                  currentUrl={avatarUrls[i]}
+                  userId={user?.id || ''}
+                  index={i + 1}
+                  onUploaded={(url) => setAvatarUrls(prev => { const u = [...prev]; u[i] = url; return u; })}
+                  onRemoved={() => setAvatarUrls(prev => { const u = [...prev]; u[i] = null; return u; })}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="space-y-6">
+            <div className="text-center">
               <h1 className="font-playfair text-2xl font-bold">Strategie</h1>
               <p className="mt-1 text-muted-foreground">Definieren Sie Ihre Kommunikationsstrategie</p>
             </div>
@@ -190,7 +217,7 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {step === 4 && (
+        {step === 5 && (
           <div className="space-y-6">
             <div className="text-center">
               <h1 className="font-playfair text-2xl font-bold">Themen-DNA</h1>
@@ -229,7 +256,7 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {step === 5 && (
+        {step === 6 && (
           <div className="space-y-6">
             <div className="text-center">
               <h1 className="font-playfair text-2xl font-bold">Voice Training</h1>
