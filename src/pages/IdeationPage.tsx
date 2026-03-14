@@ -189,10 +189,12 @@ export default function IdeationPage() {
   const primaryTopic = matchedTopics.length > 0 ? matchedTopics[0].name : (topics.length > 0 ? topics[0].name : 'Leadership');
 
   return (
-    <div className="space-y-8">
+    <div className="relative space-y-8">
+      <MeshBackground />
+
       {/* Split View */}
       <div className="hidden md:block">
-        <ResizablePanelGroup direction="horizontal" className="min-h-[420px] rounded-sm border border-border">
+        <ResizablePanelGroup direction="horizontal" className="min-h-[420px] rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
           {/* Left: Brain Dump */}
           <ResizablePanel defaultSize={75} minSize={60}>
             <div className="p-8 h-full flex flex-col">
