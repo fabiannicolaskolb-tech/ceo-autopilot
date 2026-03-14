@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Lightbulb, CalendarDays, BarChart3, Zap, LogOut, MenuIcon, User, Settings,
 } from 'lucide-react';
@@ -45,25 +46,64 @@ export function FloatingHeader() {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-0.5 lg:flex">
             {navItems.map((item) => {
               const active = location.pathname === item.url;
               return (
-                <Link
-                  key={item.title}
-                  to={item.url}
-                  className={cn(
-                    'relative flex items-center gap-1.5 px-3 py-2 text-[13px] transition-colors',
-                    active
-                      ? 'font-semibold text-foreground'
-                      : 'font-medium text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  <item.icon className="h-3.5 w-3.5" strokeWidth={2} />
-                  {item.title}
-                  {active && (
-                    <span className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary" />
-                  )}
+                <Link key={item.title} to={item.url} className="relative group">
+                  <motion.div
+                    className={cn(
+                      'relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] transition-colors',
+                      active
+                        ? 'font-semibold text-foreground'
+                        : 'font-medium text-muted-foreground hover:text-foreground'
+                    )}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  >
+                    <motion.div
+                      animate={active ? { scale: [1, 1.2, 1] } : {}}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <item.icon className="h-3.5 w-3.5" strokeWidth={2} />
+                    </motion.div>
+                    {item.title}
+                  </motion.div>
+
+                  {/* Active glow indicator */}
+                  <AnimatePresence>
+                    {active && (
+                      <motion.span
+                        layoutId="nav-active-indicator"
+                        className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full bg-primary"
+                        initial={{ opacity: 0, scaleX: 0 }}
+                        animate={{ opacity: 1, scaleX: 1 }}
+                        exit={{ opacity: 0, scaleX: 0 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  {/* Glow behind active indicator */}
+                  <AnimatePresence>
+                    {active && (
+                      <motion.span
+                        className="absolute bottom-[-2px] left-1/2 h-[6px] w-8 -translate-x-1/2 rounded-full bg-primary/30 blur-sm"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  {/* Tooltip */}
+                  <div className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="rounded-md bg-popover px-2.5 py-1 text-[11px] font-medium text-popover-foreground shadow-md border border-border/50 whitespace-nowrap">
+                      {item.title}
+                    </div>
+                  </div>
                 </Link>
               );
             })}
@@ -76,13 +116,15 @@ export function FloatingHeader() {
           <div className="hidden lg:block">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
-                      {getInitials(user?.email, profile?.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
+                        {getInitials(user?.email, profile?.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </motion.div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel className="font-normal">
@@ -113,9 +155,11 @@ export function FloatingHeader() {
           {/* Mobile hamburger */}
           <div className="lg:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
-              <Button variant="ghost" size="icon" onClick={() => setOpen(!open)} className="h-9 w-9">
-                <MenuIcon className="h-5 w-5" />
-              </Button>
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                <Button variant="ghost" size="icon" onClick={() => setOpen(!open)} className="h-9 w-9">
+                  <MenuIcon className="h-5 w-5" />
+                </Button>
+              </motion.div>
               <SheetContent side="right" className="flex w-72 flex-col bg-background">
                 <div className="flex items-center gap-2.5 px-1 pb-6 pt-2">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
@@ -127,23 +171,29 @@ export function FloatingHeader() {
                 </div>
 
                 <nav className="flex flex-1 flex-col gap-0.5">
-                  {navItems.map((item) => {
+                  {navItems.map((item, i) => {
                     const active = location.pathname === item.url;
                     return (
-                      <Link
+                      <motion.div
                         key={item.title}
-                        to={item.url}
-                        onClick={() => setOpen(false)}
-                        className={cn(
-                          'flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] transition-colors',
-                          active
-                            ? 'font-semibold text-foreground bg-primary/5'
-                            : 'font-medium text-muted-foreground hover:text-foreground hover:bg-accent'
-                        )}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.05, type: 'spring', stiffness: 300, damping: 25 }}
                       >
-                        <item.icon className="h-4 w-4" strokeWidth={2} />
-                        {item.title}
-                      </Link>
+                        <Link
+                          to={item.url}
+                          onClick={() => setOpen(false)}
+                          className={cn(
+                            'flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] transition-colors',
+                            active
+                              ? 'font-semibold text-foreground bg-primary/5'
+                              : 'font-medium text-muted-foreground hover:text-foreground hover:bg-accent'
+                          )}
+                        >
+                          <item.icon className="h-4 w-4" strokeWidth={2} />
+                          {item.title}
+                        </Link>
+                      </motion.div>
                     );
                   })}
                   <div className="my-2 h-px bg-border" />
