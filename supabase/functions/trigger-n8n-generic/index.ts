@@ -10,17 +10,9 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const n8nWebhookUrl = Deno.env.get("N8N_WEBHOOK_URL");
-    if (!n8nWebhookUrl) {
-      throw new Error("N8N_WEBHOOK_URL is not configured");
-    }
-
-    const n8nResponse = await fetch(n8nWebhookUrl, {
+    const n8nResponse = await fetch("https://n8n.thinc.de/webhook/orchestrate", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Webhook-Secret": Deno.env.get("N8N_CALLBACK_SECRET") ?? "",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "generic-trigger", timestamp: new Date().toISOString() }),
     });
 
