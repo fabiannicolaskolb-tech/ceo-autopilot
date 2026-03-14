@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Lightbulb, GalleryHorizontalEnd, BarChart3, Zap, LogOut, MenuIcon, User, Settings, Sun, Moon, CheckSquare,
+  LayoutDashboard, Lightbulb, GalleryHorizontalEnd, BarChart3, Zap, LogOut, MenuIcon, User, Sun, Moon, CheckSquare,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -100,13 +100,7 @@ export function FloatingHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center gap-2">
                     <User className="h-3.5 w-3.5" strokeWidth={2} />
-                    Profil Setup
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/settings" className="flex items-center gap-2">
-                    <Settings className="h-3.5 w-3.5" strokeWidth={2} />
-                    Einstellungen
+                    Profil
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -161,15 +155,7 @@ export function FloatingHeader() {
                     className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent"
                   >
                     <User className="h-4 w-4" strokeWidth={2} />
-                    Profil Setup
-                  </Link>
-                  <Link
-                    to="/settings"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent"
-                  >
-                    <Settings className="h-4 w-4" strokeWidth={2} />
-                    Einstellungen
+                    Profil
                   </Link>
                 </nav>
 

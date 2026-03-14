@@ -16,7 +16,7 @@ import IdeationPage from "@/pages/IdeationPage";
 import PlannerPage from "@/pages/PlannerPage";
 import PostQueuePage from "@/pages/PostQueuePage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
-import SettingsPage from "@/pages/SettingsPage";
+
 import NotFound from "@/pages/NotFound";
 import { Particles } from "@/components/ui/particles";
 
@@ -43,7 +43,7 @@ const App = () => (
                 <Route path="/planner" element={<PlannerPage />} />
                 <Route path="/post-queue" element={<PostQueuePage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
+                
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
