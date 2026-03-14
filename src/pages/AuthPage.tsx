@@ -16,6 +16,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState('');
   const [showReset, setShowReset] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [burstKey, setBurstKey] = useState(0);
   const { signIn, signUp, resetPassword, user, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -96,7 +97,7 @@ export default function AuthPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background p-4">
-      <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} />
+      <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} burst={burstKey} />
       <Card className="relative z-10 w-full max-w-md border-border shadow-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
@@ -106,7 +107,7 @@ export default function AuthPage() {
           <CardDescription className="font-inter text-xs uppercase tracking-widest text-muted-foreground">LinkedIn</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs defaultValue="login" className="w-full" onValueChange={() => setBurstKey(k => k + 1)}>
             <TabsList className="mb-4 grid w-full grid-cols-2">
               <TabsTrigger value="login">Anmelden</TabsTrigger>
               <TabsTrigger value="register">Registrieren</TabsTrigger>
