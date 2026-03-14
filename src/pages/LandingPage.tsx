@@ -120,13 +120,13 @@ export default function LandingPage() {
 
       {/* Features */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="mb-12 text-center">
+        <LampContainer className="min-h-[300px]">
           <TypingAnimation
             text="Alles was Sie brauchen – Drei Module für Ihren Erfolg."
             duration={80}
             className="font-playfair text-3xl font-bold text-foreground sm:text-4xl"
           />
-        </div>
+        </LampContainer>
 
       
         <div className="grid gap-6 sm:grid-cols-3">
