@@ -52,6 +52,7 @@ const trustItems = [
 
 export default function LandingPage() {
   const { user, profile, loading } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   useEffect(() => {
