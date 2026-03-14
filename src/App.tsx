@@ -14,6 +14,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
 import IdeationPage from "@/pages/IdeationPage";
 import PlannerPage from "@/pages/PlannerPage";
+import PostQueuePage from "@/pages/PostQueuePage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 import SettingsPage from "@/pages/SettingsPage";
 import NotFound from "@/pages/NotFound";
