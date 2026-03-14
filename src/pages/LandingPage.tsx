@@ -118,15 +118,13 @@ export default function LandingPage() {
       </AuroraBackground>
 
       {/* Features */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
-        <div className="mb-12 text-center">
-          <h2 className="font-playfair text-3xl font-bold text-foreground sm:text-4xl">
-            Alles, was Sie brauchen
-          </h2>
-          <p className="mt-3 text-muted-foreground">
-            Drei Module für Ihren LinkedIn-Erfolg
-          </p>
-        </div>
+      {/* Text Reveal */}
+      <TextRevealByWord
+        text="Alles, was Sie brauchen – Drei Module für Ihren LinkedIn-Erfolg."
+        className="h-[150vh]"
+      />
+
+      <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 sm:pb-28">
         <div className="grid gap-6 sm:grid-cols-3">
           {features.map((f) =>
           <Card
