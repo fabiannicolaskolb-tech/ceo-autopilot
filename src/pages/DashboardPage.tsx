@@ -113,8 +113,8 @@ export default function DashboardPage() {
             <p className="text-3xl font-bold text-foreground tracking-tight">{draftCount}</p>
             <p className="text-xs text-muted-foreground mt-0.5">Entwürfe</p>
           </div>
-          <div className="mt-3">
-            <Sparkline data={DRAFT_TREND} color="hsl(220, 55%, 20%)" height={36} width={140} />
+          <div className="absolute bottom-0 left-0 right-0">
+            <Sparkline data={DRAFT_TREND} color="hsl(220, 55%, 20%)" height={48} width={300} />
           </div>
         </div>
 
