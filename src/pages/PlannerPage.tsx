@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Rocket } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,7 +13,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
+import { MeshBackground } from '@/components/MeshBackground';
 import { cn } from '@/lib/utils';
+
+const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
+const GLASS_CARD_HOVER = `${GLASS_CARD} transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]`;
 
 const STATUS_CONFIG: Record<string, { label: string; variant: 'secondary' | 'outline' | 'default' }> = {
   draft: { label: 'Entwurf', variant: 'secondary' },
@@ -76,49 +79,62 @@ export default function PlannerPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-playfair text-2xl font-bold text-foreground">Content Planner</h1>
-          <p className="text-sm text-muted-foreground">Verwalten Sie Ihre LinkedIn-Posts</p>
+    <div className="relative space-y-6">
+      <MeshBackground />
+
+      {/* Header */}
+      <div className={cn(GLASS_CARD, 'p-6 sm:p-8')}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Content Planner</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Verwalten Sie Ihre LinkedIn-Posts</p>
+          </div>
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger className="w-[180px] bg-card/60 backdrop-blur-sm rounded-xl">
+              <SelectValue placeholder="Filter" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Alle</SelectItem>
+              <SelectItem value="draft">Entwürfe</SelectItem>
+              <SelectItem value="approved">Freigegeben</SelectItem>
+              <SelectItem value="scheduled">Geplant</SelectItem>
+              <SelectItem value="posted">Veröffentlicht</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-[180px] bg-card">
-            <SelectValue placeholder="Filter" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Alle</SelectItem>
-            <SelectItem value="draft">Entwürfe</SelectItem>
-            <SelectItem value="approved">Freigegeben</SelectItem>
-            <SelectItem value="scheduled">Geplant</SelectItem>
-            <SelectItem value="posted">Veröffentlicht</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {filtered.length === 0 && (
-          <Card className="border-border shadow-sm"><CardContent className="p-8 text-center text-muted-foreground">Keine Posts gefunden</CardContent></Card>
+          <div className={cn(GLASS_CARD, 'p-8')}>
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <div className="rounded-full bg-muted/60 p-4 mb-3">
+                <Rocket className="h-8 w-8 text-muted-foreground/50" />
+              </div>
+              <p className="text-sm font-medium text-foreground/70">Keine Posts gefunden</p>
+              <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">
+                Starten Sie im Ideation Lab, um Ihre ersten Post-Ideen zu generieren.
+              </p>
+            </div>
+          </div>
         )}
         {filtered.map(post => {
           const cfg = STATUS_CONFIG[post.status] || STATUS_CONFIG.draft;
           return (
-            <Card key={post.id} className="border-border shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => openEdit(post)}>
-              <CardContent className="p-5">
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <Badge variant={cfg.variant} className="text-xs">{cfg.label}</Badge>
-                  {post.type && <Badge variant="outline" className="text-xs">{post.type}</Badge>}
-                  {post.angle && <Badge variant="outline" className="text-xs">{post.angle}</Badge>}
-                </div>
-                {post.hook && <p className="font-playfair text-sm font-semibold text-foreground">{post.hook}</p>}
-                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{post.content}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {post.scheduled_at
-                    ? `Geplant: ${format(new Date(post.scheduled_at), 'dd. MMMM yyyy, HH:mm', { locale: de })} Uhr`
-                    : `Erstellt: ${format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}`}
-                </p>
-              </CardContent>
-            </Card>
+            <div key={post.id} className={cn(GLASS_CARD_HOVER, 'p-5 cursor-pointer')} onClick={() => openEdit(post)}>
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <Badge variant={cfg.variant} className="text-xs rounded-full">{cfg.label}</Badge>
+                {post.type && <Badge variant="outline" className="text-xs rounded-full">{post.type}</Badge>}
+                {post.angle && <Badge variant="outline" className="text-xs rounded-full">{post.angle}</Badge>}
+              </div>
+              {post.hook && <p className="font-playfair text-sm font-semibold text-foreground">{post.hook}</p>}
+              <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{post.content}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {post.scheduled_at
+                  ? `Geplant: ${format(new Date(post.scheduled_at), 'dd. MMMM yyyy, HH:mm', { locale: de })} Uhr`
+                  : `Erstellt: ${format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}`}
+              </p>
+            </div>
           );
         })}
       </div>

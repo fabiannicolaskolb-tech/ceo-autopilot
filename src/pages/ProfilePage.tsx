@@ -4,7 +4,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PhotoUpload from '@/components/PhotoUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +11,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { MeshBackground } from '@/components/MeshBackground';
 import { cn } from '@/lib/utils';
+
+const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
 
 const TONES = [
   { value: 'authoritative', label: 'Authoritative' },
@@ -101,7 +103,6 @@ export default function ProfilePage() {
     try {
       await updateProfile({ name, role, industry, target_audience: targetAudience, tone });
 
-      // Replace voice samples: delete old, insert new
       await supabase.from('voice_samples').delete().eq('user_id', user!.id);
       const newSamples = sampleTexts.filter(s => s.trim());
       if (newSamples.length > 0) {
@@ -115,74 +116,73 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-playfair text-2xl font-bold text-foreground">Profil Setup</h1>
-        <p className="text-sm text-muted-foreground">Optimieren Sie Ihre LinkedIn-Strategie</p>
+    <div className="relative space-y-6">
+      <MeshBackground />
+
+      {/* Header */}
+      <div className={cn(GLASS_CARD, 'p-6 sm:p-8')}>
+        <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Profil Setup</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Optimieren Sie Ihre LinkedIn-Strategie</p>
       </div>
 
-      <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-playfair text-base">Grundinformationen</CardTitle></CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2"><Label>Name</Label><Input value={name} onChange={e => setName(e.target.value)} className="bg-card" /></div>
-          <div className="space-y-2"><Label>Position</Label><Input value={role} onChange={e => setRole(e.target.value)} className="bg-card" /></div>
-          <div className="space-y-2"><Label>Branche</Label><Input value={industry} onChange={e => setIndustry(e.target.value)} className="bg-card" /></div>
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Grundinformationen</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2"><Label>Name</Label><Input value={name} onChange={e => setName(e.target.value)} className="bg-card/60" /></div>
+          <div className="space-y-2"><Label>Position</Label><Input value={role} onChange={e => setRole(e.target.value)} className="bg-card/60" /></div>
+          <div className="space-y-2"><Label>Branche</Label><Input value={industry} onChange={e => setIndustry(e.target.value)} className="bg-card/60" /></div>
           <div className="space-y-2">
             <Label>Kommunikations-Tonfall</Label>
-            <Select value={tone} onValueChange={setTone}><SelectTrigger className="bg-card"><SelectValue /></SelectTrigger><SelectContent>{TONES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent></Select>
+            <Select value={tone} onValueChange={setTone}><SelectTrigger className="bg-card/60"><SelectValue /></SelectTrigger><SelectContent>{TONES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent></Select>
           </div>
-          <div className="space-y-2 sm:col-span-2"><Label>Zielgruppe</Label><Textarea value={targetAudience} onChange={e => setTargetAudience(e.target.value)} className="bg-card" /></div>
-        </CardContent>
-      </Card>
+          <div className="space-y-2 sm:col-span-2"><Label>Zielgruppe</Label><Textarea value={targetAudience} onChange={e => setTargetAudience(e.target.value)} className="bg-card/60" /></div>
+        </div>
+      </div>
 
-      <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-playfair text-base">Voice Samples</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Voice Samples</h2>
+        <div className="space-y-3">
           {sampleTexts.map((s, i) => (
-            <Textarea key={i} value={s} onChange={e => { const u = [...sampleTexts]; u[i] = e.target.value; setSampleTexts(u); }} placeholder={`Sample ${i + 1}`} className="min-h-[80px] bg-card" />
+            <Textarea key={i} value={s} onChange={e => { const u = [...sampleTexts]; u[i] = e.target.value; setSampleTexts(u); }} placeholder={`Sample ${i + 1}`} className="min-h-[80px] bg-card/60" />
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-playfair text-base">Themen</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Themen</h2>
+        <div className="space-y-4">
           <div className="space-y-2">
             <Label>Fokus-Themen</Label>
             <div className="flex gap-2">
-              <Input value={focusInput} onChange={e => setFocusInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('focus'))} className="bg-card" placeholder="Thema + Enter" />
+              <Input value={focusInput} onChange={e => setFocusInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('focus'))} className="bg-card/60" placeholder="Thema + Enter" />
               <Button size="icon" variant="outline" onClick={() => addTopic('focus')}><Plus className="h-4 w-4" /></Button>
             </div>
-            <div className="flex flex-wrap gap-2">{focusTopics.map(t => <Badge key={t.id} variant="secondary" className="gap-1">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
+            <div className="flex flex-wrap gap-2">{focusTopics.map(t => <Badge key={t.id} variant="secondary" className="gap-1 rounded-full">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
           </div>
           <div className="space-y-2">
             <Label>No-Go Themen</Label>
             <div className="flex gap-2">
-              <Input value={noGoInput} onChange={e => setNoGoInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('nogo'))} className="bg-card" placeholder="Thema + Enter" />
+              <Input value={noGoInput} onChange={e => setNoGoInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('nogo'))} className="bg-card/60" placeholder="Thema + Enter" />
               <Button size="icon" variant="outline" onClick={() => addTopic('nogo')}><Plus className="h-4 w-4" /></Button>
             </div>
-            <div className="flex flex-wrap gap-2">{noGoTopics.map(t => <Badge key={t.id} variant="destructive" className="gap-1">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
+            <div className="flex flex-wrap gap-2">{noGoTopics.map(t => <Badge key={t.id} variant="destructive" className="gap-1 rounded-full">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card className="border-border shadow-sm">
-        <CardHeader>
-          <CardTitle className="font-playfair text-base">Profilfotos</CardTitle>
-          <p className="text-xs text-muted-foreground">Drag & Drop zum Umsortieren — das erste Bild ist Ihr Hauptprofilbild</p>
-        </CardHeader>
-        <CardContent>
-          <PhotoGrid
-            profile={profile}
-            userId={user?.id || ''}
-            updateProfile={updateProfile}
-            refreshProfile={refreshProfile}
-          />
-        </CardContent>
-      </Card>
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-2">Profilfotos</h2>
+        <p className="text-xs text-muted-foreground mb-4">Drag & Drop zum Umsortieren — das erste Bild ist Ihr Hauptprofilbild</p>
+        <PhotoGrid
+          profile={profile}
+          userId={user?.id || ''}
+          updateProfile={updateProfile}
+          refreshProfile={refreshProfile}
+        />
+      </div>
 
       <div className="flex justify-end">
-        <Button onClick={save}>Profil speichern</Button>
+        <Button onClick={save} className="rounded-full shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.15)] px-6">Profil speichern</Button>
       </div>
     </div>
   );
@@ -226,7 +226,6 @@ function PhotoGrid({ profile, userId, updateProfile, refreshProfile }: PhotoGrid
       return;
     }
 
-    // Swap the URLs
     const sourceKey = AVATAR_KEYS[dragIndex];
     const targetKey = AVATAR_KEYS[targetIndex];
     const sourceUrl = profile?.[sourceKey] || null;
@@ -276,7 +275,7 @@ function PhotoGrid({ profile, userId, updateProfile, refreshProfile }: PhotoGrid
             />
             {hasImage && (
               <div className="flex justify-center mt-1 cursor-grab active:cursor-grabbing">
-                <div className="rounded-full bg-muted p-1 shadow-sm border border-border">
+                <div className="rounded-full bg-muted/60 p-1 shadow-sm">
                   <GripVertical className="h-3 w-3 text-muted-foreground" />
                 </div>
               </div>

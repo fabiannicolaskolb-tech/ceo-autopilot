@@ -3,7 +3,6 @@ import { Plus, X, Wifi, WifiOff } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +11,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { MeshBackground } from '@/components/MeshBackground';
+import { cn } from '@/lib/utils';
+
+const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
 
 const TONES = [
   { value: 'authoritative', label: 'Authoritative' },
@@ -126,87 +129,88 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6 pb-20">
-      <div>
-        <h1 className="font-playfair text-2xl font-bold text-foreground">Einstellungen</h1>
-        <p className="text-sm text-muted-foreground">Verwalten Sie Ihre Einstellungen</p>
+    <div className="relative space-y-6 pb-20">
+      <MeshBackground />
+
+      {/* Header */}
+      <div className={cn(GLASS_CARD, 'p-6 sm:p-8')}>
+        <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Einstellungen</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Verwalten Sie Ihre Einstellungen</p>
       </div>
 
-      <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-playfair text-base">Persönliches Profil</CardTitle></CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2"><Label>Name</Label><Input value={name} onChange={e => setName(e.target.value)} className="bg-card" /></div>
-          <div className="space-y-2"><Label>Unternehmen</Label><Input value={company} onChange={e => setCompany(e.target.value)} className="bg-card" /></div>
-          <div className="space-y-2"><Label>Position</Label><Input value={role} onChange={e => setRole(e.target.value)} className="bg-card" /></div>
-          <div className="space-y-2"><Label>Branche</Label><Input value={industry} onChange={e => setIndustry(e.target.value)} className="bg-card" /></div>
-        </CardContent>
-      </Card>
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Persönliches Profil</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2"><Label>Name</Label><Input value={name} onChange={e => setName(e.target.value)} className="bg-card/60" /></div>
+          <div className="space-y-2"><Label>Unternehmen</Label><Input value={company} onChange={e => setCompany(e.target.value)} className="bg-card/60" /></div>
+          <div className="space-y-2"><Label>Position</Label><Input value={role} onChange={e => setRole(e.target.value)} className="bg-card/60" /></div>
+          <div className="space-y-2"><Label>Branche</Label><Input value={industry} onChange={e => setIndustry(e.target.value)} className="bg-card/60" /></div>
+        </div>
+      </div>
 
-      <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-playfair text-base">KI-Konfiguration</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">KI-Konfiguration</h2>
+        <div className="space-y-4">
           <div className="space-y-2">
             <Label>Kommunikations-Stil</Label>
-            <Select value={tone} onValueChange={setTone}><SelectTrigger className="bg-card"><SelectValue /></SelectTrigger><SelectContent>{TONES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent></Select>
+            <Select value={tone} onValueChange={setTone}><SelectTrigger className="bg-card/60"><SelectValue /></SelectTrigger><SelectContent>{TONES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent></Select>
           </div>
-          <div className="space-y-2"><Label>Zielgruppe</Label><Textarea value={targetAudience} onChange={e => setTargetAudience(e.target.value)} className="bg-card" /></div>
-        </CardContent>
-      </Card>
+          <div className="space-y-2"><Label>Zielgruppe</Label><Textarea value={targetAudience} onChange={e => setTargetAudience(e.target.value)} className="bg-card/60" /></div>
+        </div>
+      </div>
 
-      <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-playfair text-base">Content-Steuerung</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Content-Steuerung</h2>
+        <div className="space-y-4">
           <div className="space-y-2">
             <Label>Fokus-Themen</Label>
             <div className="flex gap-2">
-              <Input value={focusInput} onChange={e => setFocusInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('focus'))} className="bg-card" placeholder="Thema + Enter" />
+              <Input value={focusInput} onChange={e => setFocusInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('focus'))} className="bg-card/60" placeholder="Thema + Enter" />
               <Button size="icon" variant="outline" onClick={() => addTopic('focus')}><Plus className="h-4 w-4" /></Button>
             </div>
-            <div className="flex flex-wrap gap-2">{focusTopics.map(t => <Badge key={t.id} variant="secondary" className="gap-1">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
+            <div className="flex flex-wrap gap-2">{focusTopics.map(t => <Badge key={t.id} variant="secondary" className="gap-1 rounded-full">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
           </div>
           <div className="space-y-2">
             <Label>No-Go Themen</Label>
             <div className="flex gap-2">
-              <Input value={noGoInput} onChange={e => setNoGoInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('nogo'))} className="bg-card" placeholder="Thema + Enter" />
+              <Input value={noGoInput} onChange={e => setNoGoInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('nogo'))} className="bg-card/60" placeholder="Thema + Enter" />
               <Button size="icon" variant="outline" onClick={() => addTopic('nogo')}><Plus className="h-4 w-4" /></Button>
             </div>
-            <div className="flex flex-wrap gap-2">{noGoTopics.map(t => <Badge key={t.id} variant="destructive" className="gap-1">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
+            <div className="flex flex-wrap gap-2">{noGoTopics.map(t => <Badge key={t.id} variant="destructive" className="gap-1 rounded-full">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-playfair text-base">Voice Library</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Voice Library</h2>
+        <div className="space-y-3">
           {sampleTexts.map((s, i) => (
-            <Textarea key={i} value={s} onChange={e => { const u = [...sampleTexts]; u[i] = e.target.value; setSampleTexts(u); }} placeholder={`Voice Sample ${i + 1}`} className="min-h-[80px] bg-card" />
+            <Textarea key={i} value={s} onChange={e => { const u = [...sampleTexts]; u[i] = e.target.value; setSampleTexts(u); }} placeholder={`Voice Sample ${i + 1}`} className="min-h-[80px] bg-card/60" />
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-playfair text-base">LinkedIn Verbindung</CardTitle></CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-3">
-            {profile?.linkedin_connected ? (
-              <>
-                <Wifi className="h-5 w-5 text-success" />
-                <span className="text-sm text-foreground">Verbunden</span>
-              </>
-            ) : (
-              <>
-                <WifiOff className="h-5 w-5 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Nicht verbunden</span>
-                <Button size="sm" variant="outline" disabled>Verbinden (in Kürze verfügbar)</Button>
-              </>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">LinkedIn Verbindung</h2>
+        <div className="flex items-center gap-3">
+          {profile?.linkedin_connected ? (
+            <>
+              <Wifi className="h-5 w-5 text-success" />
+              <span className="text-sm text-foreground">Verbunden</span>
+            </>
+          ) : (
+            <>
+              <WifiOff className="h-5 w-5 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Nicht verbunden</span>
+              <Button size="sm" variant="outline" disabled>Verbinden (in Kürze verfügbar)</Button>
+            </>
+          )}
+        </div>
+      </div>
 
-      <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-playfair text-base">Account & Sicherheit</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
+      <div className={cn(GLASS_CARD, 'p-6')}>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Account & Sicherheit</h2>
+        <div className="space-y-4">
           <div className="space-y-1">
             <Label>E-Mail</Label>
             <p className="text-sm text-muted-foreground">{user?.email || '—'}</p>
@@ -216,11 +220,11 @@ export default function SettingsPage() {
             <Button variant="outline" size="sm" onClick={handleResetPassword}>Passwort zurücksetzen</Button>
             <Button variant="outline" size="sm" onClick={signOut}>Abmelden</Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <div className="fixed bottom-6 right-6 z-50">
-        <Button onClick={saveAll} className="shadow-lg">Alle Änderungen speichern</Button>
+        <Button onClick={saveAll} className="rounded-full shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.15)] px-6">Alle Änderungen speichern</Button>
       </div>
     </div>
   );
