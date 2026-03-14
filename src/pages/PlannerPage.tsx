@@ -312,7 +312,7 @@ export default function PlannerPage() {
           <CalendarView posts={filtered} onPostClick={openEdit} />
         </div>
       ) : (
-        <div className="space-y-4">
+        <>
           {filtered.length === 0 && (
             <div className={cn(GLASS_CARD, 'p-8')}>
               <div className="flex flex-col items-center justify-center py-6 text-center">
@@ -326,26 +326,35 @@ export default function PlannerPage() {
               </div>
             </div>
           )}
-          {filtered.map(post => {
-            const cfg = STATUS_CONFIG[post.status] || STATUS_CONFIG.draft;
-            return (
-              <div key={post.id} className={cn(GLASS_CARD_HOVER, 'p-5 cursor-pointer')} onClick={() => openEdit(post)}>
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <Badge variant={cfg.variant} className={cn('text-xs rounded-full', cfg.colorClass, 'text-white border-0')}>{cfg.label}</Badge>
-                  {post.type && <Badge variant="outline" className="text-xs rounded-full">{post.type}</Badge>}
-                  {post.angle && <Badge variant="outline" className="text-xs rounded-full">{post.angle}</Badge>}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {filtered.map(post => {
+              const cfg = STATUS_CONFIG[post.status] || STATUS_CONFIG.draft;
+              return (
+                <div
+                  key={post.id}
+                  className={cn(GLASS_CARD_HOVER, 'aspect-square p-4 cursor-pointer flex flex-col justify-between overflow-hidden')}
+                  onClick={() => openEdit(post)}
+                >
+                  <div>
+                    <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                      <Badge variant={cfg.variant} className={cn('text-[10px] rounded-full px-2 py-0', cfg.colorClass, 'text-white border-0')}>{cfg.label}</Badge>
+                      {post.type && <Badge variant="outline" className="text-[10px] rounded-full px-2 py-0">{post.type}</Badge>}
+                    </div>
+                    {post.hook && (
+                      <p className="font-playfair text-sm font-semibold text-foreground line-clamp-2">{post.hook}</p>
+                    )}
+                    <p className="mt-1.5 text-xs text-muted-foreground line-clamp-4">{post.content}</p>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-2">
+                    {post.scheduled_at
+                      ? format(new Date(post.scheduled_at), 'dd. MMM yyyy', { locale: de })
+                      : format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}
+                  </p>
                 </div>
-                {post.hook && <p className="font-playfair text-sm font-semibold text-foreground">{post.hook}</p>}
-                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{post.content}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {post.scheduled_at
-                    ? `Geplant: ${format(new Date(post.scheduled_at), 'dd. MMMM yyyy, HH:mm', { locale: de })} Uhr`
-                    : `Erstellt: ${format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}`}
-                </p>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </>
       )}
 
       <Dialog open={!!editPost} onOpenChange={open => !open && setEditPost(null)}>
