@@ -120,7 +120,7 @@ export default function LandingPage() {
       {/* Features */}
       {/* Text Reveal */}
       <TextRevealByWord
-        text="Alles, was Sie brauchen – Drei Module für Ihren LinkedIn-Erfolg."
+        text="Alles was Sie brauchen – Drei Module für Ihren Erfolg."
         className="h-[150vh]"
       />
 
