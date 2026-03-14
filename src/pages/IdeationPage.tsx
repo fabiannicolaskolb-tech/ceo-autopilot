@@ -52,8 +52,61 @@ export default function IdeationPage() {
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [generating, setGenerating] = useState(false);
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
+  const [listening, setListening] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
+  const recognitionRef = useRef<any>(null);
+
+  const toggleListening = useCallback(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast({ title: 'Nicht unterstützt', description: 'Ihr Browser unterstützt kein Voice-to-Text. Bitte nutzen Sie Chrome, Edge oder Safari.', variant: 'destructive' });
+      return;
+    }
+
+    if (listening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'de-DE';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    let finalTranscript = '';
+
+    recognition.onresult = (event: any) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+          setInput(prev => prev + transcript + ' ');
+        } else {
+          interim = transcript;
+        }
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setListening(false);
+      if (event.error === 'not-allowed') {
+        toast({ title: 'Mikrofon blockiert', description: 'Bitte erlauben Sie den Zugriff auf Ihr Mikrofon in den Browser-Einstellungen.', variant: 'destructive' });
+      }
+    };
+
+    recognition.onend = () => {
+      setListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setListening(true);
+  }, [listening, toast]);
 
   const { data: topics = [] } = useQuery({
     queryKey: ['topics', user?.id],
