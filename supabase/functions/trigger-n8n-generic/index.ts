@@ -10,10 +10,30 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Parse optional body overrides
+    let bodyOverrides: Record<string, unknown> = {};
+    try {
+      bodyOverrides = await req.json();
+    } catch {
+      // no body is fine
+    }
+
+    const requestId = bodyOverrides.request_id || crypto.randomUUID();
+    const userId = bodyOverrides.user_id || "anonymous";
+
+    const payload = {
+      user_id: userId,
+      request_id: requestId,
+      command: bodyOverrides.command || "orchestrate",
+      stage: "started",
+      cycle_number: bodyOverrides.cycle_number || 1,
+      started_at: new Date().toISOString(),
+    };
+
     const n8nResponse = await fetch("https://n8n.thinc.de/webhook/orchestrate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "generic-trigger", timestamp: new Date().toISOString() }),
+      body: JSON.stringify(payload),
     });
 
     if (!n8nResponse.ok) {
