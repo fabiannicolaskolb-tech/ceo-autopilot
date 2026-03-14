@@ -63,7 +63,7 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen bg-background">
-      <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} />
+      <Particles className="absolute inset-0 z-0" quantity={150} color={theme === 'dark' ? '#8899bb' : '#1a2740'} size={0.5} />
       {/* Sticky Nav */}
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
