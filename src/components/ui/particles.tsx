@@ -37,6 +37,7 @@ interface ParticlesProps {
   color?: string
   vx?: number
   vy?: number
+  burst?: number
 }
 
 function hexToRgb(hex: string): number[] {
