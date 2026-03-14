@@ -17,22 +17,8 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { useAnalytics, type TimeRange, type AnalyticsPost } from '@/hooks/useAnalytics';
-import { GlowingEffect } from '@/components/ui/glowing-effect';
-import { cn } from '@/lib/utils';
 
 const DAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-
-// ──── Glow Card Wrapper ────
-function GlowCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className="relative">
-      <GlowingEffect spread={40} glow disabled={false} proximity={64} inactiveZone={0.01} borderWidth={1.5} />
-      <Card className={cn("relative border-border shadow-sm", className)}>
-        {children}
-      </Card>
-    </div>
-  );
-}
 
 // ──── Empty State ────
 function EmptyState() {
@@ -59,7 +45,7 @@ function KPICard({ label, value, trend, icon: Icon }: {
 }) {
   const isPositive = trend !== null && trend >= 0;
   return (
-    <GlowCard>
+    <Card className="border-border shadow-sm hover:shadow-md transition-shadow">
       <CardContent className="p-5">
         <div className="flex items-center justify-between">
           <Icon className="h-5 w-5 text-muted-foreground" />
@@ -76,7 +62,7 @@ function KPICard({ label, value, trend, icon: Icon }: {
         <p className="mt-3 text-2xl font-semibold text-foreground">{value}</p>
         <p className="text-xs text-muted-foreground">{label}</p>
       </CardContent>
-    </GlowCard>
+    </Card>
   );
 }
 
@@ -86,12 +72,14 @@ function BestTimeHeatmap({ data }: { data: { day: number; hour: number; intensit
   return (
     <div className="overflow-x-auto">
       <div className="grid gap-px" style={{ gridTemplateColumns: `48px repeat(24, minmax(28px, 1fr))` }}>
+        {/* Header row */}
         <div />
         {hours.map(h => (
           <div key={h} className="text-center text-[10px] text-muted-foreground pb-1">
             {h}
           </div>
         ))}
+        {/* Data rows */}
         {[1, 2, 3, 4, 5, 6, 0].map(day => (
           <React.Fragment key={day}>
             <div className="text-xs text-muted-foreground flex items-center pr-2 font-medium">
@@ -297,7 +285,7 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Performance Timeline */}
-          <GlowCard>
+          <Card className="border-border shadow-sm">
             <CardHeader>
               <CardTitle className="font-playfair text-base">Performance Timeline</CardTitle>
             </CardHeader>
@@ -345,11 +333,11 @@ export default function AnalyticsPage() {
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
-          </GlowCard>
+          </Card>
 
           {/* Content Type + Sentiment */}
           <div className="grid gap-4 lg:grid-cols-2">
-            <GlowCard>
+            <Card className="border-border shadow-sm">
               <CardHeader>
                 <CardTitle className="font-playfair text-base">Content Type Efficiency</CardTitle>
               </CardHeader>
@@ -373,9 +361,9 @@ export default function AnalyticsPage() {
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
-            </GlowCard>
+            </Card>
 
-            <GlowCard>
+            <Card className="border-border shadow-sm">
               <CardHeader>
                 <CardTitle className="font-playfair text-base">Sentiment Analyse</CardTitle>
               </CardHeader>
@@ -412,11 +400,11 @@ export default function AnalyticsPage() {
                   <p className="text-sm text-muted-foreground py-12">Keine Sentiment-Daten vorhanden</p>
                 )}
               </CardContent>
-            </GlowCard>
+            </Card>
           </div>
 
           {/* Best Time to Post */}
-          <GlowCard>
+          <Card className="border-border shadow-sm">
             <CardHeader>
               <CardTitle className="font-playfair text-base flex items-center gap-2">
                 <Clock className="h-4 w-4" /> Beste Posting-Zeiten
@@ -425,20 +413,20 @@ export default function AnalyticsPage() {
             <CardContent>
               <BestTimeHeatmap data={bestTimeData} />
             </CardContent>
-          </GlowCard>
+          </Card>
 
           {/* Top Posts Table */}
-          <GlowCard>
+          <Card className="border-border shadow-sm">
             <CardHeader>
               <CardTitle className="font-playfair text-base">Top Performing Posts</CardTitle>
             </CardHeader>
             <CardContent>
               <TopPostsTable posts={posts} />
             </CardContent>
-          </GlowCard>
+          </Card>
 
           {/* Post Compare */}
-          <GlowCard>
+          <Card className="border-border shadow-sm">
             <CardHeader>
               <CardTitle className="font-playfair text-base flex items-center gap-2">
                 <Minus className="h-4 w-4 rotate-90" /> Post-Vergleich
@@ -447,10 +435,10 @@ export default function AnalyticsPage() {
             <CardContent>
               <PostCompare posts={posts} />
             </CardContent>
-          </GlowCard>
+          </Card>
 
           {/* AI Insights */}
-          <GlowCard>
+          <Card className="border-border shadow-sm">
             <CardHeader>
               <CardTitle className="font-playfair text-base flex items-center gap-2">
                 <Lightbulb className="h-4 w-4" /> KI-Optimierungsvorschläge
@@ -469,7 +457,7 @@ export default function AnalyticsPage() {
                 </div>
               ))}
             </CardContent>
-          </GlowCard>
+          </Card>
         </>
       )}
     </div>

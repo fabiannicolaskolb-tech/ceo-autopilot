@@ -9,20 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
-
-function GlowCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className="relative">
-      <GlowingEffect spread={40} glow disabled={false} proximity={64} inactiveZone={0.01} borderWidth={1.5} />
-      <Card className={`relative border-border shadow-sm hover:shadow-md transition-shadow ${className || ''}`}>
-        {children}
-      </Card>
-    </div>
-  );
-}
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -97,7 +85,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <GlowCard>
+      <Card className="border-border shadow-sm hover:shadow-md transition-shadow">
         <CardContent className="flex items-center justify-between p-5">
           <div>
             <p className="text-sm font-medium text-foreground">Nächste Aktion</p>
@@ -111,14 +99,14 @@ export default function DashboardPage() {
             {draftCount > 0 ? 'Zum Planner' : 'Zum Ideation Lab'}
           </InteractiveHoverButton>
         </CardContent>
-      </GlowCard>
+      </Card>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: 'Entwürfe', value: String(draftCount), icon: FileText },
           { label: 'Veröffentlicht', value: String(postCount), icon: TrendingUp },
         ].map(s => (
-          <GlowCard key={s.label}>
+          <Card key={s.label} className="border-border shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="p-5">
               <s.icon className="h-5 w-5 text-muted-foreground" />
               <div className="mt-3">
@@ -126,11 +114,11 @@ export default function DashboardPage() {
                 <p className="text-xs text-muted-foreground">{s.label}</p>
               </div>
             </CardContent>
-          </GlowCard>
+          </Card>
         ))}
       </div>
 
-      <GlowCard>
+      <Card className="border-border shadow-sm hover:shadow-md transition-shadow">
         <CardHeader className="pb-3">
           <CardTitle className="font-playfair text-lg">Nächster geplanter Post</CardTitle>
         </CardHeader>
@@ -154,7 +142,7 @@ export default function DashboardPage() {
             <p className="text-sm text-muted-foreground">Kein Post geplant. Planen Sie Ihren nächsten Beitrag im Planner.</p>
           )}
         </CardContent>
-      </GlowCard>
+      </Card>
     </div>
   );
 }
