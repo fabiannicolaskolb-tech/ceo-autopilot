@@ -1,1 +1,7 @@
 project_id = "hyxwfsqpwiochtrzugol"
+
+[functions.trigger-n8n]
+verify_jwt = false
+
+[functions.n8n-callback]
+verify_jwt = false
