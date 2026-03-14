@@ -210,7 +210,7 @@ export default function DashboardPage() {
       {/* Creator Level Gamification */}
       <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
         <div className="flex items-center gap-3 mb-6">
-          <div className="rounded-[12px] p-2.5 bg-[#d98320]">
+          <div className="rounded-[12px] p-2.5 bg-[#d98320]/[0.33]">
             <Trophy className="h-5 w-5 text-primary" />
           </div>
           <div>
