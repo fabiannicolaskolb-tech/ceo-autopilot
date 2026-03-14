@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, X, GripVertical } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PhotoUpload from '@/components/PhotoUpload';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 const TONES = [
   { value: 'authoritative', label: 'Authoritative' },
@@ -166,31 +167,121 @@ export default function ProfilePage() {
       </Card>
 
       <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-playfair text-base">Profilfotos</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="font-playfair text-base">Profilfotos</CardTitle>
+          <p className="text-xs text-muted-foreground">Drag & Drop zum Umsortieren — das erste Bild ist Ihr Hauptprofilbild</p>
+        </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-6">
-            {[
-              { label: 'Hauptprofilbild', key: 'avatar_url_1' as const },
-              { label: 'Alternativbild 1', key: 'avatar_url_2' as const },
-              { label: 'Alternativbild 2', key: 'avatar_url_3' as const },
-            ].map((item, i) => (
-              <PhotoUpload
-                key={item.key}
-                label={item.label}
-                currentUrl={profile?.[item.key]}
-                userId={user?.id || ''}
-                index={i + 1}
-                onUploaded={async (url) => { await updateProfile({ [item.key]: url }); await refreshProfile(); }}
-                onRemoved={async () => { await updateProfile({ [item.key]: null }); await refreshProfile(); }}
-              />
-            ))}
-          </div>
+          <PhotoGrid
+            profile={profile}
+            userId={user?.id || ''}
+            updateProfile={updateProfile}
+            refreshProfile={refreshProfile}
+          />
         </CardContent>
       </Card>
 
       <div className="flex justify-end">
         <Button onClick={save}>Profil speichern</Button>
       </div>
+    </div>
+  );
+}
+
+const AVATAR_KEYS = ['avatar_url_1', 'avatar_url_2', 'avatar_url_3'] as const;
+const LABELS = ['Hauptprofilbild', 'Alternativbild 1', 'Alternativbild 2'];
+
+interface PhotoGridProps {
+  profile: any;
+  userId: string;
+  updateProfile: (data: any) => Promise<void>;
+  refreshProfile: () => Promise<void>;
+}
+
+function PhotoGrid({ profile, userId, updateProfile, refreshProfile }: PhotoGridProps) {
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+  const { toast } = useToast();
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDragIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setOverIndex(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    setOverIndex(null);
+    if (dragIndex === null || dragIndex === targetIndex) {
+      setDragIndex(null);
+      return;
+    }
+
+    // Swap the URLs
+    const sourceKey = AVATAR_KEYS[dragIndex];
+    const targetKey = AVATAR_KEYS[targetIndex];
+    const sourceUrl = profile?.[sourceKey] || null;
+    const targetUrl = profile?.[targetKey] || null;
+
+    try {
+      await updateProfile({ [sourceKey]: targetUrl, [targetKey]: sourceUrl });
+      await refreshProfile();
+      toast({ title: 'Reihenfolge aktualisiert' });
+    } catch {
+      toast({ title: 'Fehler beim Umsortieren', variant: 'destructive' });
+    }
+    setDragIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+    setOverIndex(null);
+  };
+
+  return (
+    <div className="flex flex-wrap gap-6">
+      {AVATAR_KEYS.map((key, i) => {
+        const hasImage = !!profile?.[key];
+        return (
+          <div
+            key={key}
+            draggable={hasImage}
+            onDragStart={(e) => handleDragStart(e, i)}
+            onDragOver={(e) => handleDragOver(e, i)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, i)}
+            onDragEnd={handleDragEnd}
+            className={cn(
+              'relative transition-all duration-200',
+              dragIndex === i && 'opacity-40 scale-95',
+              overIndex === i && dragIndex !== i && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-lg',
+            )}
+          >
+            {hasImage && (
+              <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 cursor-grab active:cursor-grabbing rounded-full bg-muted p-1 shadow-sm border border-border">
+                <GripVertical className="h-3 w-3 text-muted-foreground" />
+              </div>
+            )}
+            <PhotoUpload
+              label={LABELS[i]}
+              currentUrl={profile?.[key]}
+              userId={userId}
+              index={i + 1}
+              onUploaded={async (url) => { await updateProfile({ [key]: url }); await refreshProfile(); }}
+              onRemoved={async () => { await updateProfile({ [key]: null }); await refreshProfile(); }}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
