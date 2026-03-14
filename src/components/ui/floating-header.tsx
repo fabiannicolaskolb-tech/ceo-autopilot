@@ -155,15 +155,7 @@ export function FloatingHeader() {
                     className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent"
                   >
                     <User className="h-4 w-4" strokeWidth={2} />
-                    Profil Setup
-                  </Link>
-                  <Link
-                    to="/settings"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent"
-                  >
-                    <Settings className="h-4 w-4" strokeWidth={2} />
-                    Einstellungen
+                    Profil
                   </Link>
                 </nav>
 
