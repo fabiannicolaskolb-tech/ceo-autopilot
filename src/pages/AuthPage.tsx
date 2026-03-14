@@ -97,7 +97,7 @@ export default function AuthPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background p-4">
-      <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} />
+      <Particles className="absolute inset-0 z-0" quantity={150} color="#1a2740" size={0.5} burst={burstKey} />
       <Card className="relative z-10 w-full max-w-md border-border shadow-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
