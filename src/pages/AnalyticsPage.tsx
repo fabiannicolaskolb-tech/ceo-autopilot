@@ -51,24 +51,24 @@ function KPICard({ label, value, trend, icon: Icon }: {
 }) {
   const isPositive = trend !== null && trend >= 0;
   return (
-    <Card className="border-border shadow-sm hover:shadow-md transition-shadow">
-      <CardContent className="p-5">
-        <div className="flex items-center justify-between">
+    <div className={cn(GLASS_CARD_HOVER, 'p-5')}>
+      <div className="flex items-center justify-between">
+        <div className="rounded-[12px] bg-primary/8 p-2.5">
           <Icon className="h-5 w-5 text-muted-foreground" />
-          {trend !== null && (
-            <Badge
-              variant="secondary"
-              className={`text-xs ${isPositive ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}
-            >
-              {isPositive ? <ArrowUpRight className="mr-1 h-3 w-3" /> : <ArrowDownRight className="mr-1 h-3 w-3" />}
-              {Math.abs(trend)}%
-            </Badge>
-          )}
         </div>
-        <p className="mt-3 text-2xl font-semibold text-foreground">{value}</p>
-        <p className="text-xs text-muted-foreground">{label}</p>
-      </CardContent>
-    </Card>
+        {trend !== null && (
+          <Badge
+            variant="secondary"
+            className={`text-xs rounded-full ${isPositive ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}
+          >
+            {isPositive ? <ArrowUpRight className="mr-1 h-3 w-3" /> : <ArrowDownRight className="mr-1 h-3 w-3" />}
+            {Math.abs(trend)}%
+          </Badge>
+        )}
+      </div>
+      <p className="mt-3 text-2xl font-semibold text-foreground">{value}</p>
+      <p className="text-xs text-muted-foreground">{label}</p>
+    </div>
   );
 }
 
