@@ -180,8 +180,8 @@ export default function ProfilePage() {
                 currentUrl={profile?.[item.key]}
                 userId={user?.id || ''}
                 index={i + 1}
-                onUploaded={(url) => updateProfile({ [item.key]: url })}
-                onRemoved={() => updateProfile({ [item.key]: null })}
+                onUploaded={async (url) => { await updateProfile({ [item.key]: url }); await refreshProfile(); }}
+                onRemoved={async () => { await updateProfile({ [item.key]: null }); await refreshProfile(); }}
               />
             ))}
           </div>
