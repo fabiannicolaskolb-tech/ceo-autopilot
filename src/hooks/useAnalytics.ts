@@ -16,6 +16,7 @@ export interface AnalyticsPost {
   id: string;
   hook: string | null;
   type: string | null;
+  content_category: string | null;
   posted_at: string | null;
   metrics: PostMetrics;
 }
@@ -90,7 +91,7 @@ export function useAnalytics() {
       setLoading(true);
       const { data, error } = await supabase
         .from('posts')
-        .select('id, hook, type, posted_at, metrics')
+        .select('id, hook, type, content_category, posted_at, metrics')
         .eq('user_id', user!.id)
         .eq('status', 'posted')
         .not('metrics', 'is', null)
@@ -174,7 +175,7 @@ export function useAnalytics() {
   const contentTypeData = useMemo((): ContentTypePoint[] => {
     const map = new Map<string, ContentTypePoint>();
     filteredPosts.forEach(p => {
-      const type = p.type || 'Sonstige';
+      const type = p.content_category || p.type || 'Sonstige';
       const existing = map.get(type) || { type, impressions: 0, engagement: 0, count: 0 };
       existing.impressions += p.metrics.impressions || 0;
       existing.engagement += weightedEngagement(p.metrics);
