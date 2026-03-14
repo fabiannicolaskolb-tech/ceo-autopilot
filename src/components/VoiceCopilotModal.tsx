@@ -6,6 +6,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 
+const AGENT_ID = 'agent_9101kkpxh6v2etjvksnsahfjeg0a';
+
 interface TranscriptEntry {
   role: 'user' | 'agent';
   text: string;
@@ -63,13 +65,8 @@ export function VoiceCopilotModal({ open, onClose, onInsightsSaved }: VoiceCopil
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
-      const { data, error } = await supabase.functions.invoke('voice-copilot-token');
-      if (error || !data?.token) {
-        throw new Error(error?.message || 'Kein Token erhalten');
-      }
-
       await conversation.startSession({
-        conversationToken: data.token,
+        agentId: AGENT_ID,
         connectionType: 'webrtc',
       });
     } catch (err: any) {
