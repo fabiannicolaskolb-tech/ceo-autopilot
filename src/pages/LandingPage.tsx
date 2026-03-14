@@ -75,9 +75,14 @@ export default function LandingPage() {
               CEO Autopilot
             </span>
           </div>
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/auth">Anmelden</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
+              {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/auth">Anmelden</Link>
+            </Button>
+          </div>
         </div>
       </header>
 
