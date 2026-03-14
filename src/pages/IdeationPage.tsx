@@ -440,6 +440,56 @@ export default function IdeationPage() {
       </div>
 
       {/* Voice Insights */}
+      {voiceInsights.length === 0 && user && (
+        <div className="flex justify-center">
+          <Button
+            variant="outline"
+            className="rounded-sm gap-2 text-sm"
+            onClick={async () => {
+              const demoData = [
+                {
+                  user_id: user.id,
+                  conversation_id: 'demo-1',
+                  transcript: 'Gespräch über Leadership und Teamführung',
+                  key_points: [
+                    'Authentische Führung beginnt mit Selbstreflexion — wer sich selbst nicht führen kann, wird andere nicht inspirieren.',
+                    'Die besten Teams entstehen, wenn Führungskräfte Verletzlichkeit als Stärke zeigen und Fehler offen ansprechen.',
+                  ],
+                },
+                {
+                  user_id: user.id,
+                  conversation_id: 'demo-2',
+                  transcript: 'Gespräch über KI-Strategie im Mittelstand',
+                  key_points: [
+                    'KI im Mittelstand scheitert selten an der Technologie — es fehlt an klarer Strategie und Change-Management.',
+                    'Der größte ROI von KI liegt nicht in der Automatisierung, sondern in der Augmentation menschlicher Entscheidungen.',
+                  ],
+                },
+                {
+                  user_id: user.id,
+                  conversation_id: 'demo-3',
+                  transcript: 'Gespräch über Personal Branding auf LinkedIn',
+                  key_points: [
+                    'Personal Branding auf LinkedIn ist kein Marketing — es ist systematisches Vertrauenskapital aufbauen.',
+                    'Die wirkungsvollsten LinkedIn-Posts teilen nicht Expertise, sondern den Weg dorthin — inklusive der Rückschläge.',
+                  ],
+                },
+              ];
+              const { error } = await supabase.from('voice_insights' as any).insert(demoData as any);
+              if (error) {
+                toast({ title: 'Fehler', description: error.message, variant: 'destructive' });
+              } else {
+                toast({ title: 'Demo-Gespräche erstellt', description: '3 simulierte Erkenntnisse wurden hinzugefügt.' });
+                refetchInsights();
+              }
+            }}
+          >
+            <MessageSquare className="h-4 w-4" />
+            Demo-Gespräch simulieren
+          </Button>
+        </div>
+      )}
+
       {voiceInsights.length > 0 && (
         <div className="space-y-4">
           <h2 className="font-playfair text-xl font-semibold text-foreground flex items-center gap-2">
