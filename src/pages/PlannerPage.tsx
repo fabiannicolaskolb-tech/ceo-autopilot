@@ -196,6 +196,27 @@ export default function PlannerPage() {
     },
   });
 
+  const triggerN8nMutation = useMutation({
+    mutationFn: async (postId: string) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase.functions.invoke('trigger-n8n', {
+        body: { postId, action: 'publish' },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      setEditPost(null);
+      toast({ title: 'Workflow gestartet', description: 'Der Post wurde an n8n gesendet.' });
+    },
+    onError: (err: Error) => {
+      toast({ title: 'Fehler', description: err.message, variant: 'destructive' });
+    },
+  });
+
   const filtered = filter === 'all' ? posts : posts.filter(p => p.status === filter);
 
   const openEdit = (post: any) => {
