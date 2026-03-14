@@ -42,7 +42,7 @@ function RadialProgress({
         strokeDasharray={circumference}
         strokeDashoffset={offset}
         className="transition-all duration-1000 ease-out"
-        style={glowing ? { filter: 'drop-shadow(0 0 8px hsl(var(--score-glow) / 0.6))' } : {}}
+        filter={glowing ? 'url(#glowFilter)' : undefined}
       />
       <defs>
         <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -50,6 +50,13 @@ function RadialProgress({
           <stop offset="60%" stopColor="hsl(var(--score-electric-purple))" />
           <stop offset="100%" stopColor="hsl(var(--score-gold))" />
         </linearGradient>
+        <filter id="glowFilter" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
     </svg>
   );
