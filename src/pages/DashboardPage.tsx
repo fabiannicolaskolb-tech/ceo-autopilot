@@ -101,15 +101,17 @@ export default function DashboardPage() {
           { label: 'Entwürfe', value: String(draftCount), icon: FileText },
           { label: 'Veröffentlicht', value: String(postCount), icon: TrendingUp },
         ].map(s => (
-          <Card key={s.label} className="border-border shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-5">
-              <s.icon className="h-5 w-5 text-muted-foreground" />
-              <div className="mt-3">
-                <p className="text-2xl font-semibold text-foreground">{s.value}</p>
-                <p className="text-xs text-muted-foreground">{s.label}</p>
-              </div>
-            </CardContent>
-          </Card>
+          <HoverBorderGradient key={s.label}>
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="p-5">
+                <s.icon className="h-5 w-5 text-muted-foreground" />
+                <div className="mt-3">
+                  <p className="text-2xl font-semibold text-foreground">{s.value}</p>
+                  <p className="text-xs text-muted-foreground">{s.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </HoverBorderGradient>
         ))}
       </div>
 
