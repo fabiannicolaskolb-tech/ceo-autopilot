@@ -10,12 +10,25 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Sparkline } from '@/components/Sparkline';
 import { MeshBackground } from '@/components/MeshBackground';
 import CreatorScoreCard from '@/components/CreatorScoreCard';
-import { format } from 'date-fns';
+import { format, subDays, startOfDay } from 'date-fns';
 import { de } from 'date-fns/locale';
 
-// Fictive sparkline trend data
-const DRAFT_TREND = [1, 2, 1, 3, 2, 4, 3, 5, 4, 3];
-const POSTED_TREND = [0, 1, 1, 2, 2, 3, 4, 3, 5, 6];
+function buildTrend(posts: any[], status: string, days = 30): number[] {
+  const now = new Date();
+  const buckets: number[] = [];
+  const bucketCount = 10;
+  const bucketSize = Math.ceil(days / bucketCount);
+  for (let i = bucketCount - 1; i >= 0; i--) {
+    const bucketEnd = subDays(now, i * bucketSize);
+    const bucketStart = subDays(now, (i + 1) * bucketSize);
+    const count = posts.filter(p => {
+      const d = new Date(status === 'draft' ? p.created_at : (p.posted_at || p.created_at));
+      return d >= startOfDay(bucketStart) && d < startOfDay(bucketEnd);
+    }).length;
+    buckets.push(count);
+  }
+  return buckets;
+}
 
 export default function DashboardPage() {
   const navigate = useNavigate();
