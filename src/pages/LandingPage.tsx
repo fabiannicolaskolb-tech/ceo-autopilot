@@ -175,6 +175,15 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Scroll to Top */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="fixed bottom-6 right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-opacity hover:bg-primary/90"
+        aria-label="Nach oben scrollen"
+      >
+        <ArrowUp className="h-5 w-5" />
+      </button>
+
       {/* Footer */}
       <footer className="border-t border-border bg-background">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-6 sm:px-6">
