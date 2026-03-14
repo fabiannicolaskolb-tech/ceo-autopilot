@@ -13,6 +13,9 @@ interface Profile {
   bio: string | null;
   linkedin_connected: boolean;
   onboarding_completed: boolean;
+  avatar_url_1: string | null;
+  avatar_url_2: string | null;
+  avatar_url_3: string | null;
 }
 
 interface AuthContextType {
