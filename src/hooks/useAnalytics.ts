@@ -16,6 +16,7 @@ export interface AnalyticsPost {
   id: string;
   hook: string | null;
   type: string | null;
+  content_category: string | null;
   posted_at: string | null;
   metrics: PostMetrics;
 }
