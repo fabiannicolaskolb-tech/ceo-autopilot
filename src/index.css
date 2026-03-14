@@ -60,6 +60,11 @@
     --feature-accent: 220 55% 20%;
     --feature-icon-bg: 216 85% 96%;
     --feature-icon: 220 55% 25%;
+
+    --score-deep-blue: 225 60% 22%;
+    --score-electric-purple: 270 65% 55%;
+    --score-gold: 42 85% 55%;
+    --score-glow: 270 80% 65%;
   }
 }
 
