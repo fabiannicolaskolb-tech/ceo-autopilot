@@ -336,9 +336,21 @@ export default function PlannerPage() {
               </Popover>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setEditPost(null)}>Abbrechen</Button>
             <Button onClick={saveEdit} disabled={updateMutation.isPending}>Speichern</Button>
+            <Button
+              onClick={() => editPost && triggerN8nMutation.mutate(editPost.id)}
+              disabled={triggerN8nMutation.isPending}
+              className="bg-[hsl(var(--status-posted))] hover:bg-[hsl(var(--status-posted))]/90 text-white gap-2"
+            >
+              {triggerN8nMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+              An n8n senden
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
