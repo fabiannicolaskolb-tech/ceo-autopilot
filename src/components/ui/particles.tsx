@@ -80,6 +80,7 @@ const Particles: React.FC<ParticlesProps> = ({
   color = "#ffffff",
   vx = 0,
   vy = 0,
+  burst = 0,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const canvasContainerRef = useRef<HTMLDivElement>(null)
