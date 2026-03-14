@@ -27,9 +27,9 @@ export const LampContainer = ({
             ease: "easeInOut",
           }}
           style={{
-            backgroundImage: `conic-gradient(var(--conic-position), var(--tw-gradient-stops))`,
+            backgroundImage: `conic-gradient(from 70deg at center top, hsl(var(--primary)), transparent, transparent)`,
           }}
-          className="absolute inset-auto right-1/2 h-56 w-[30rem] overflow-visible bg-gradient-conic from-primary via-transparent to-transparent text-foreground [--conic-position:from_70deg_at_center_top]"
+          className="absolute inset-auto right-1/2 h-56 w-[30rem] overflow-visible text-foreground"
         >
           <div className="absolute bottom-0 left-0 z-20 h-40 w-full bg-background [mask-image:linear-gradient(to_top,white,transparent)]" />
           <div className="absolute bottom-0 left-0 z-20 h-full w-40 bg-background [mask-image:linear-gradient(to_right,white,transparent)]" />
