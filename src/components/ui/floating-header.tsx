@@ -74,6 +74,11 @@ export function FloatingHeader() {
 
         {/* Right: Avatar Dropdown (desktop) + Mobile trigger */}
         <div className="flex items-center gap-2">
+          {/* Theme toggle */}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
+            {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+          </Button>
+
           {/* Desktop avatar dropdown */}
           <div className="hidden lg:block">
             <DropdownMenu>
