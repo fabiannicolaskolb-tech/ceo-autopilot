@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { WarpBackground } from '@/components/ui/warp-background';
 
 export default function AuthPage() {
   const [email, setEmail] = useState('');
@@ -65,7 +64,7 @@ export default function AuthPage() {
 
   if (showReset) {
     return (
-      <WarpBackground gridColor="hsl(220 55% 20% / 0.15)" className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md border-border shadow-sm">
           <CardHeader className="text-center">
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
@@ -89,12 +88,12 @@ export default function AuthPage() {
             </form>
           </CardContent>
         </Card>
-      </WarpBackground>
+      </div>
     );
   }
 
   return (
-    <WarpBackground gridColor="hsl(220 55% 20% / 0.15)" className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md border-border shadow-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
@@ -145,6 +144,6 @@ export default function AuthPage() {
           </Tabs>
         </CardContent>
       </Card>
-    </WarpBackground>
+    </div>
   );
 }
