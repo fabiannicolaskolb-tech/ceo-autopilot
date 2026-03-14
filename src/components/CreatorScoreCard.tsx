@@ -50,6 +50,13 @@ function RadialProgress({
           <stop offset="60%" stopColor="hsl(var(--score-electric-purple))" />
           <stop offset="100%" stopColor="hsl(var(--score-gold))" />
         </linearGradient>
+        <filter id="glowFilter" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
     </svg>
   );
