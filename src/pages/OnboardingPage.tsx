@@ -36,6 +36,7 @@ export default function OnboardingPage() {
   const [focusInput, setFocusInput] = useState('');
   const [noGoInput, setNoGoInput] = useState('');
   const [voiceSamples, setVoiceSamples] = useState<string[]>(['', '', '']);
+  const [avatarUrls, setAvatarUrls] = useState<(string | null)[]>([null, null, null]);
   const [saving, setSaving] = useState(false);
 
   const { user, updateProfile } = useAuth();
