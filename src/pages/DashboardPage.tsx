@@ -202,6 +202,100 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* Creator Level Gamification */}
+      <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="rounded-[12px] bg-primary/8 p-2.5">
+            <Trophy className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-playfair text-base font-semibold text-foreground">Creator Level</h2>
+            <p className="text-xs text-muted-foreground">Ihr Fortschritt als LinkedIn Creator</p>
+          </div>
+        </div>
+
+        {/* Current Level Hero */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="h-16 w-16 rounded-full flex items-center justify-center text-3xl" style={{ background: `${creatorLevel.color}15` }}>
+                {creatorLevel.emoji}
+              </div>
+              <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-card flex items-center justify-center text-xs font-bold shadow-sm border-2" style={{ borderColor: creatorLevel.color, color: creatorLevel.color }}>
+                {creatorLevel.level}
+              </div>
+            </div>
+            <div>
+              <p className="text-xl font-bold text-foreground tracking-tight">{creatorLevel.name}</p>
+              <p className="text-sm text-muted-foreground">{creatorLevel.description}</p>
+            </div>
+          </div>
+          <div className="sm:ml-auto text-right">
+            <p className="text-2xl font-bold text-foreground tracking-tight">{totalPostCount}</p>
+            <p className="text-xs text-muted-foreground">Posts gesamt</p>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        {creatorLevel.nextLevel && (
+          <div className="space-y-2 mb-6">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">
+                Level {creatorLevel.level} · {creatorLevel.name}
+              </span>
+              <span className="text-muted-foreground">
+                Level {creatorLevel.nextLevel.level} · {creatorLevel.nextLevel.name}
+              </span>
+            </div>
+            <div className="h-3 rounded-full bg-muted/60 overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-700 ease-out"
+                style={{
+                  width: `${creatorLevel.progressInLevel}%`,
+                  background: `linear-gradient(90deg, ${creatorLevel.color}, ${creatorLevel.nextLevel.color})`,
+                }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Noch <span className="font-semibold text-foreground">{creatorLevel.postsToNext} Posts</span> bis zum nächsten Level
+            </p>
+          </div>
+        )}
+
+        {/* All Levels Overview */}
+        <div className="grid grid-cols-5 gap-2">
+          {CREATOR_LEVELS.map(l => {
+            const isActive = l.level === creatorLevel.level;
+            const isReached = l.level <= creatorLevel.level;
+            return (
+              <div
+                key={l.level}
+                className={`relative rounded-[16px] p-3 text-center transition-all duration-300 ${
+                  isActive
+                    ? 'bg-primary/8 ring-2 ring-primary/20 scale-105'
+                    : isReached
+                      ? 'bg-muted/40'
+                      : 'bg-muted/20 opacity-50'
+                }`}
+              >
+                <div className="text-2xl mb-1">{l.emoji}</div>
+                <p className={`text-xs font-semibold ${isReached ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  {l.name}
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  {l.max === Infinity ? `${l.min}+` : `${l.min}–${l.max}`} Posts
+                </p>
+                {isActive && (
+                  <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary flex items-center justify-center">
+                    <Star className="h-2.5 w-2.5 text-primary-foreground" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
