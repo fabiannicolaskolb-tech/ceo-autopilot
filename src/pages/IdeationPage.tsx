@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
-import { HoverBorderGradient } from '@/components/ui/hover-border-gradient';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
@@ -68,40 +67,36 @@ export default function IdeationPage() {
         <p className="text-sm text-muted-foreground">Verwandeln Sie Ihre Gedanken in LinkedIn-Content</p>
       </div>
 
-      <HoverBorderGradient>
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-5">
-            <Textarea value={input} onChange={e => setInput(e.target.value)} placeholder="Was ist heute passiert? Was beschäftigt Sie gerade? Teilen Sie eine Beobachtung, ein Erlebnis oder eine Idee..." className="mb-4 min-h-[120px] bg-card" />
-            <InteractiveHoverButton onClick={generate} disabled={generating}>
-              {generating ? 'Ideen werden generiert...' : 'Ideen generieren'}
-            </InteractiveHoverButton>
-          </CardContent>
-        </Card>
-      </HoverBorderGradient>
+      <Card className="border-border shadow-sm">
+        <CardContent className="p-5">
+          <Textarea value={input} onChange={e => setInput(e.target.value)} placeholder="Was ist heute passiert? Was beschäftigt Sie gerade? Teilen Sie eine Beobachtung, ein Erlebnis oder eine Idee..." className="mb-4 min-h-[120px] bg-card" />
+          <InteractiveHoverButton onClick={generate} disabled={generating}>
+            {generating ? 'Ideen werden generiert...' : 'Ideen generieren'}
+          </InteractiveHoverButton>
+        </CardContent>
+      </Card>
 
       {concepts.length > 0 && (
         <div>
           <h2 className="font-playfair text-lg font-semibold text-foreground mb-4">Generierte Konzepte</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {concepts.map((c, i) => (
-              <HoverBorderGradient key={i}>
-                <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="font-playfair text-base">{c.hook}</CardTitle>
-                    <div className="flex gap-2">
-                      <Badge variant="secondary" className="text-xs">{c.type}</Badge>
-                      <Badge variant="outline" className="text-xs">{c.angle}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="mb-4 text-sm text-muted-foreground line-clamp-3">{c.preview}</p>
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={() => saveMutation.mutate(c)} disabled={saveMutation.isPending}>Auswählen</Button>
-                      <Button size="sm" variant="outline">Bearbeiten</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </HoverBorderGradient>
+              <Card key={i} className="border-border shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="font-playfair text-base">{c.hook}</CardTitle>
+                  <div className="flex gap-2">
+                    <Badge variant="secondary" className="text-xs">{c.type}</Badge>
+                    <Badge variant="outline" className="text-xs">{c.angle}</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="mb-4 text-sm text-muted-foreground line-clamp-3">{c.preview}</p>
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={() => saveMutation.mutate(c)} disabled={saveMutation.isPending}>Auswählen</Button>
+                    <Button size="sm" variant="outline">Bearbeiten</Button>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
