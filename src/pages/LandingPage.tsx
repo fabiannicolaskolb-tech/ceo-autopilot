@@ -8,7 +8,6 @@ import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { TypingAnimation } from '@/components/ui/typing-animation';
-import { LampContainer } from '@/components/ui/lamp';
 import analyticsPreview from '@/assets/analytics-preview.jpg';
 
 const features = [
@@ -120,13 +119,13 @@ export default function LandingPage() {
 
       {/* Features */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
-        <LampContainer className="min-h-[300px]">
+        <div className="mb-12 text-center">
           <TypingAnimation
             text="Alles was Sie brauchen – Drei Module für Ihren Erfolg."
             duration={80}
             className="font-playfair text-3xl font-bold text-foreground sm:text-4xl"
           />
-        </LampContainer>
+        </div>
 
       
         <div className="grid gap-6 sm:grid-cols-3">
