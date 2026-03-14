@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, TrendingUp, CalendarDays, Sparkles, PenLine, Rocket } from 'lucide-react';
+import { FileText, TrendingUp, CalendarDays, Sparkles, PenLine, Rocket, Trophy, Star, Zap, Crown, Award } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
