@@ -193,11 +193,9 @@ export default function CreatorScoreCard() {
                         } ${isLocked ? 'bg-muted/40' : ''}`}
                         style={{
                           background: isReached ? `${level.color}20` : undefined,
-                          ringColor: isCurrent ? level.color : undefined,
                           ...(isCurrent
                             ? ({
-                                boxShadow: `0 0 16px ${level.color}40`,
-                                '--tw-ring-color': level.color,
+                                boxShadow: `0 0 16px ${level.color}40, 0 0 0 3px ${level.color}`,
                               } as React.CSSProperties)
                             : {}),
                         }}
