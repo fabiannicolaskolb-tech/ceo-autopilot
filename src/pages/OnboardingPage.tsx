@@ -43,7 +43,7 @@ export default function OnboardingPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const totalSteps = 5;
+  const totalSteps = 6;
   const progress = (step / totalSteps) * 100;
 
   const addTopic = (type: 'focus' | 'nogo') => {
