@@ -127,7 +127,7 @@ export default function LandingPage() {
           />
         </div>
 
-      <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 sm:pb-28">
+      
         <div className="grid gap-6 sm:grid-cols-3">
           {features.map((f) =>
           <Card
