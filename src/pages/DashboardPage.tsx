@@ -13,15 +13,6 @@ import CreatorScoreCard from '@/components/CreatorScoreCard';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { useAuth } from '@/hooks/useAuth';
-import { Badge } from '@/components/ui/badge';
-import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Sparkline } from '@/components/Sparkline';
-import { MeshBackground } from '@/components/MeshBackground';
-import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
-import { Progress } from '@/components/ui/progress';
-
 // Fictive sparkline trend data
 const DRAFT_TREND = [1, 2, 1, 3, 2, 4, 3, 5, 4, 3];
 const POSTED_TREND = [0, 1, 1, 2, 2, 3, 4, 3, 5, 6];
