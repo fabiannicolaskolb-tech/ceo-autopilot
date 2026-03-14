@@ -159,6 +159,41 @@ export type Database = {
           },
         ]
       }
+      voice_insights: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          id: string
+          key_points: Json | null
+          transcript: string | null
+          user_id: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          key_points?: Json | null
+          transcript?: string | null
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          key_points?: Json | null
+          transcript?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_insights_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       voice_samples: {
         Row: {
           content: string
