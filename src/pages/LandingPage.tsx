@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Zap, Lightbulb, CalendarDays, BarChart3, Shield, Lock, UserCheck } from 'lucide-react';
+import { Zap, Lightbulb, CalendarDays, BarChart3, Shield, Lock, UserCheck, ArrowUp } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuroraBackground } from '@/components/ui/aurora-background';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
@@ -174,6 +174,15 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Scroll to Top */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="fixed bottom-6 right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-opacity hover:bg-primary/90"
+        aria-label="Nach oben scrollen"
+      >
+        <ArrowUp className="h-5 w-5" />
+      </button>
 
       {/* Footer */}
       <footer className="border-t border-border bg-background">
