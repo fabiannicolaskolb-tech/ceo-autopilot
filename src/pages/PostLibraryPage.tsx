@@ -159,6 +159,7 @@ interface PostCardProps {
 }
 
 function PostCard({ post, tab, onMutate }: PostCardProps) {
+  const { profile } = useAuth();
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content || '');
@@ -214,52 +215,75 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
   const contentPreview = post.content || '';
   const isLong = contentPreview.length > 200;
 
+  const userName = profile?.name || 'Du';
+  const typeLabel = post.type || post.content_category || 'Post';
+
   return (
-    <div className={cn(GLASS_CARD, 'p-5 space-y-3 transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]')}>
-      {/* Header */}
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-2">
-          <StatusBadge status={post.status} />
-          {post.cycle_number && post.cycle_number > 0 && (
-            <Badge variant="outline" className="text-[10px] rounded-full">Zyklus {post.cycle_number}</Badge>
+    <div className={cn(GLASS_CARD, 'overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]')}>
+      {/* LinkedIn-style Header */}
+      <div className="p-5 pb-0 space-y-3">
+        <div className="flex items-center gap-3">
+          {profile?.avatar_url_1 ? (
+            <img src={profile.avatar_url_1} alt={userName} className="h-10 w-10 rounded-full object-cover ring-2 ring-border" />
+          ) : (
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
+              {userName.charAt(0).toUpperCase()}
+            </div>
           )}
-          {post.type && <Badge variant="outline" className="text-xs rounded-full">{post.type}</Badge>}
-          {post.angle && <Badge variant="outline" className="text-xs rounded-full">{post.angle}</Badge>}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-foreground truncate">{userName}</span>
+              <span className="text-xs text-muted-foreground">·</span>
+              <span className="text-xs text-muted-foreground">
+                {post.posted_at ? format(new Date(post.posted_at), 'dd. MMM', { locale: de }) : format(new Date(post.created_at), 'dd. MMM', { locale: de })}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground truncate">
+              {typeLabel} · {post.angle || 'shared'}
+            </p>
+          </div>
+          <StatusBadge status={post.status} />
         </div>
-        <span className="text-[11px] text-muted-foreground">
-          {post.posted_at ? format(new Date(post.posted_at), 'dd.MM.yyyy', { locale: de }) : format(new Date(post.created_at), 'dd.MM.yyyy', { locale: de })}
-        </span>
+
+        {/* Content */}
+        {editing ? (
+          <div className="space-y-2">
+            <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} />
+            <div className="flex gap-2">
+              <Button size="sm" onClick={handleSaveEdit} disabled={saving}>Speichern</Button>
+              <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Abbrechen</Button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <p className={cn('text-sm text-foreground leading-relaxed whitespace-pre-line', !expanded && isLong && 'line-clamp-4')}>
+              {contentPreview}
+            </p>
+            {isLong && (
+              <button onClick={() => setExpanded(!expanded)} className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                {expanded ? <><ChevronUp className="h-3 w-3" /> Weniger anzeigen</> : <><ChevronDown className="h-3 w-3" /> Mehr anzeigen</>}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Hashtags */}
+        {hashtags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {hashtags.map((tag, i) => (
+              <span key={i} className="text-[11px] text-primary/70">{tag.startsWith('#') ? tag : `#${tag}`}</span>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Content */}
-      {editing ? (
-        <div className="space-y-2">
-          <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} />
-          <div className="flex gap-2">
-            <Button size="sm" onClick={handleSaveEdit} disabled={saving}>Speichern</Button>
-            <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Abbrechen</Button>
-          </div>
-        </div>
-      ) : (
-        <div>
-          <p className={cn('text-sm text-foreground leading-relaxed whitespace-pre-line', !expanded && isLong && 'line-clamp-3')}>
-            {contentPreview}
-          </p>
-          {isLong && (
-            <button onClick={() => setExpanded(!expanded)} className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
-              {expanded ? <><ChevronUp className="h-3 w-3" /> Weniger anzeigen</> : <><ChevronDown className="h-3 w-3" /> Mehr anzeigen</>}
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Post Image */}
+      {/* Post Image — full width, below content */}
       {post.image_url && (
-        <div className="rounded-lg overflow-hidden border border-border/50">
+        <div className="mt-3 border-t border-border/30">
           <img
             src={post.image_url}
             alt="Post Bild"
-            className="w-full aspect-square object-cover"
+            className="w-full object-cover max-h-[400px]"
             loading="lazy"
           />
         </div>
