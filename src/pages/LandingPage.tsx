@@ -62,11 +62,13 @@ export default function LandingPage() {
 
   const handleFeatureClick = (title: string) => {
     if (expandedFeature === title) {
-      // Closing: first collapse image, then after delay remove col-span & show others
+      // Step 1: collapse image
       setExpandedFeature(null);
-      setTimeout(() => setColSpanFeature(null), 700);
+      // Step 2: after image collapsed, show other cards (but keep col-span)
+      setTimeout(() => {
+        setColSpanFeature(null);
+      }, 1200);
     } else {
-      // Opening: set col-span immediately, then expand
       setColSpanFeature(title);
       setExpandedFeature(title);
     }
