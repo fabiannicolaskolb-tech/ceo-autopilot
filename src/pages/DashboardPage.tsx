@@ -103,6 +103,34 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Daily Briefing */}
+      <DailyBriefing />
+
+      {/* Quick Navigation */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { title: 'Ideation Lab', desc: 'Neue Ideen generieren', icon: Lightbulb, url: '/ideation', color: 'hsl(var(--warning))' },
+          { title: 'Post Library', desc: 'Alle Beiträge verwalten', icon: GalleryHorizontalEnd, url: '/post-library', color: 'hsl(var(--success))' },
+          { title: 'Analytics', desc: 'Performance analysieren', icon: BarChart3, url: '/analytics', color: 'hsl(var(--primary))' },
+        ].map(item => (
+          <Link
+            key={item.url}
+            to={item.url}
+            className="group rounded-2xl bg-card/80 backdrop-blur-xl p-4 sm:p-5 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border border-transparent hover:border-primary/20 transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.12)] hover:-translate-y-0.5"
+          >
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl p-2.5 transition-colors" style={{ backgroundColor: `color-mix(in srgb, ${item.color} 12%, transparent)` }}>
+                <item.icon className="h-5 w-5 transition-transform group-hover:scale-110" style={{ color: item.color }} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground truncate">{item.title}</p>
+                <p className="text-xs text-muted-foreground truncate hidden sm:block">{item.desc}</p>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+
       {/* Bento Grid Stats */}
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {/* Drafts Widget */}
