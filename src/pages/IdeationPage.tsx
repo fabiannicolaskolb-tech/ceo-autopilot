@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Mic, Loader2, X, ArrowRight, Sparkles, MessageSquare } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Loader2, X, ArrowRight, Sparkles, MessageSquare, FileText } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -7,9 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { MeshBackground } from '@/components/MeshBackground';
 import { VoiceCopilotModal } from '@/components/VoiceCopilotModal';
 
@@ -22,14 +20,8 @@ interface Concept {
   category: string;
 }
 
-const TEMPLATES = [
-  { emoji: '🚀', label: 'Kundenerfolg teilen', prompt: 'Wir haben kürzlich einem Kunden geholfen, [Ergebnis] zu erreichen. Der Schlüssel war [Ansatz]. Was mich dabei am meisten überrascht hat...' },
-  { emoji: '💡', label: 'Leadership-Lektion', prompt: 'Eine Erfahrung als Führungskraft hat mich diese Woche besonders geprägt: [Situation]. Meine wichtigste Erkenntnis daraus ist...' },
-  { emoji: '📈', label: 'Branchen-Trend kommentieren', prompt: 'In unserer Branche sehe ich gerade einen spannenden Trend: [Trend]. Meine These dazu ist, dass dies bedeutet...' },
-];
-
 const LOADING_TEXTS = [
-  'Analysiere Branchentrends...',
+  'Analysiere bestehende Posts...',
   'Gleiche mit Ihrer Brand Voice ab...',
   'Berechne Engagement-Potenzial...',
 ];
@@ -42,66 +34,12 @@ function ScoreBadge({ score }: { score: number }) {
 }
 
 export default function IdeationPage() {
-  const [input, setInput] = useState('');
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [generating, setGenerating] = useState(false);
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
-  const [listening, setListening] = useState(false);
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
-  const recognitionRef = useRef<any>(null);
-
-  const toggleListening = useCallback(() => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      toast({ title: 'Nicht unterstützt', description: 'Ihr Browser unterstützt kein Voice-to-Text. Bitte nutzen Sie Chrome, Edge oder Safari.', variant: 'destructive' });
-      return;
-    }
-
-    if (listening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      setListening(false);
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'de-DE';
-    recognition.continuous = true;
-    recognition.interimResults = true;
-
-    let finalTranscript = '';
-
-    recognition.onresult = (event: any) => {
-      let interim = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript + ' ';
-          setInput(prev => prev + transcript + ' ');
-        } else {
-          interim = transcript;
-        }
-      }
-    };
-
-    recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
-      setListening(false);
-      if (event.error === 'not-allowed') {
-        toast({ title: 'Mikrofon blockiert', description: 'Bitte erlauben Sie den Zugriff auf Ihr Mikrofon in den Browser-Einstellungen.', variant: 'destructive' });
-      }
-    };
-
-    recognition.onend = () => {
-      setListening(false);
-      recognitionRef.current = null;
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-    setListening(true);
-  }, [listening, toast]);
 
   const { data: topics = [] } = useQuery({
     queryKey: ['topics', user?.id],
@@ -114,7 +52,6 @@ export default function IdeationPage() {
     enabled: !!user,
   });
 
-  // Voice insights query
   const { data: voiceInsights = [], refetch: refetchInsights } = useQuery({
     queryKey: ['voice_insights', user?.id],
     queryFn: async () => {
@@ -131,13 +68,6 @@ export default function IdeationPage() {
     enabled: !!user,
   });
 
-  const matchedTopics = useMemo(() => {
-    if (!input.trim() || topics.length === 0) return [];
-    const lower = input.toLowerCase();
-    return topics.filter(t => lower.includes(t.name.toLowerCase()));
-  }, [input, topics]);
-
-  // Cycling loading text
   useEffect(() => {
     if (!generating) return;
     setLoadingTextIndex(0);
@@ -187,16 +117,12 @@ export default function IdeationPage() {
     },
   });
 
-  const generate = async () => {
-    if (!input.trim()) {
-      toast({ title: 'Bitte geben Sie einen Input ein', variant: 'destructive' });
-      return;
-    }
+  const generatePost = async () => {
     setGenerating(true);
     try {
       const requestId = crypto.randomUUID();
       const payload = {
-        input,
+        input: '__post_only__',
         profile: {
           name: profile?.name,
           company: profile?.company,
@@ -225,24 +151,20 @@ export default function IdeationPage() {
         }));
         setConcepts(mapped);
 
-        // Save generated ideas to Supabase for n8n
-        const { error: saveError } = await supabase.from('generated_ideas').insert({
+        await supabase.from('generated_ideas').insert({
           user_id: user!.id,
           request_id: requestId,
           ideas: mapped as any,
-          raw_experience: input,
+          raw_experience: null,
           status: 'generated',
           has_history: false,
         });
-        if (saveError) {
-          console.error('Error saving generated ideas:', saveError);
-        }
       } else {
-        toast({ title: 'Keine Ideen generiert', description: 'Der Workflow hat keine Konzepte zurückgegeben. Versuchen Sie es mit einem anderen Input.', variant: 'destructive' });
+        toast({ title: 'Keine Posts generiert', description: 'Der Workflow hat keine Konzepte zurückgegeben.', variant: 'destructive' });
       }
     } catch (err: any) {
-      console.error('Generate ideas error:', err);
-      toast({ title: 'Fehler bei der Ideengenerierung', description: err?.message || 'Unbekannter Fehler', variant: 'destructive' });
+      console.error('Generate post error:', err);
+      toast({ title: 'Fehler bei der Post-Generierung', description: err?.message || 'Unbekannter Fehler', variant: 'destructive' });
     } finally {
       setGenerating(false);
     }
@@ -252,261 +174,74 @@ export default function IdeationPage() {
     setConcepts(prev => prev.filter((_, i) => i !== index));
   };
 
-  const primaryTopic = matchedTopics.length > 0 ? matchedTopics[0].name : (topics.length > 0 ? topics[0].name : 'Leadership');
+  const primaryTopic = topics.length > 0 ? topics[0].name : 'Leadership';
 
   return (
     <div className="relative space-y-8">
       <MeshBackground />
 
-      {/* Voice Copilot Modal */}
       <VoiceCopilotModal
         open={voiceModalOpen}
         onClose={() => setVoiceModalOpen(false)}
         onInsightsSaved={() => refetchInsights()}
       />
 
-      {/* Split View */}
-      <div className="hidden md:block">
-        <ResizablePanelGroup direction="horizontal" className="min-h-[420px] rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
-          {/* Left: Brain Dump */}
-          <ResizablePanel defaultSize={75} minSize={60}>
-            <div className="p-8 h-full flex flex-col">
-              <h1 className="font-playfair text-3xl font-bold text-foreground tracking-tight">
-                Gedanken in Reichweite verwandeln
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1 mb-6">
-                Teilen Sie eine Beobachtung, und wir verwandeln sie in wirkungsvollen LinkedIn-Content.
-              </p>
-
-              <div className="relative flex-1 mb-4">
-                <Textarea
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  placeholder="Was ist heute passiert? Was beschäftigt Sie gerade? Teilen Sie eine Beobachtung, ein Erlebnis oder eine Idee..."
-                  className="min-h-[180px] h-full bg-card rounded-sm resize-none pr-12 text-base"
-                />
-                <button
-                  type="button"
-                  onClick={toggleListening}
-                  className={`absolute right-3 bottom-3 p-2 rounded-sm transition-colors ${listening ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/40' : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-secondary'}`}
-                  title={listening ? 'Aufnahme stoppen' : 'Voice-to-Text starten'}
-                >
-                  <Mic className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* Detected topics */}
-              {matchedTopics.length > 0 && (
-                <div className="flex items-center gap-2 mb-4 flex-wrap">
-                  <span className="text-xs text-muted-foreground font-medium">Erkannte Themen:</span>
-                  {matchedTopics.map(t => (
-                    <Badge key={t.id} variant="secondary" className="text-xs rounded-sm">
-                      {t.name}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-
-              {/* Actions row */}
-              <div className="flex items-center gap-3">
-                {generating ? (
-                  <div className="flex items-center gap-3 py-3">
-                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                    <span className="text-sm text-muted-foreground animate-pulse">
-                      {LOADING_TEXTS[loadingTextIndex]}
-                    </span>
-                  </div>
-                ) : (
-                  <InteractiveHoverButton onClick={generate}>
-                    Ideen generieren
-                  </InteractiveHoverButton>
-                )}
-
-              </div>
-            </div>
-          </ResizablePanel>
-
-          <ResizableHandle />
-
-          {/* Right: Context Sidebar */}
-          <ResizablePanel defaultSize={25} minSize={20}>
-            <div className="p-6 h-full bg-muted/30 border-l-0">
-              <h2 className="font-playfair text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">
-                Inspirations-Vorlagen
-              </h2>
-              <div className="space-y-3">
-                {TEMPLATES.map((tpl, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => setInput(tpl.prompt)}
-                    className="w-full text-left p-3 rounded-sm border border-border bg-card hover:border-primary hover:border-l-2 transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-start gap-2">
-                      <span className="text-lg leading-none">{tpl.emoji}</span>
-                      <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                        {tpl.label}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-
-              {/* User's focus topics */}
-              {topics.length > 0 && (
-                <div className="mt-6 pt-4 border-t border-border">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                    Ihre Fokus-Themen
-                  </h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {topics.slice(0, 8).map(t => (
-                      <Badge key={t.id} variant="outline" className="text-xs rounded-sm">
-                        {t.name}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+      <div>
+        <h1 className="font-playfair text-3xl font-bold text-foreground tracking-tight">
+          Ideation Lab
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Generieren Sie Posts aus Ihren Daten oder teilen Sie persönliche Erlebnisse per Sprache.
+        </p>
       </div>
 
-      {/* Mobile layout */}
-      <div className="md:hidden space-y-4">
-        <div>
-          <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">
-            Gedanken in Reichweite verwandeln
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Teilen Sie eine Beobachtung, und wir verwandeln sie in wirkungsvollen LinkedIn-Content.
-          </p>
-        </div>
-
-        {/* Mobile templates */}
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {TEMPLATES.map((tpl, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setInput(tpl.prompt)}
-              className="flex-shrink-0 px-3 py-2 rounded-sm border border-border bg-card text-xs font-medium hover:border-primary transition-colors"
-            >
-              {tpl.emoji} {tpl.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="relative">
-          <Textarea
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            placeholder="Was beschäftigt Sie gerade?"
-            className="min-h-[140px] bg-card rounded-sm resize-none pr-12"
-          />
-          <button
-            type="button"
-            onClick={toggleListening}
-            className={`absolute right-3 bottom-3 p-2 rounded-sm transition-colors ${listening ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/40' : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-secondary'}`}
-            title={listening ? 'Aufnahme stoppen' : 'Voice-to-Text starten'}
-          >
-            <Mic className="h-4 w-4" />
-          </button>
-        </div>
-
-        {matchedTopics.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-muted-foreground font-medium">Erkannte Themen:</span>
-            {matchedTopics.map(t => (
-              <Badge key={t.id} variant="secondary" className="text-xs rounded-sm">{t.name}</Badge>
-            ))}
-          </div>
-        )}
-
-        <div className="flex items-center gap-3">
-          {generating ? (
-            <div className="flex items-center gap-3 py-3">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              <span className="text-sm text-muted-foreground animate-pulse">{LOADING_TEXTS[loadingTextIndex]}</span>
-            </div>
-          ) : (
-            <InteractiveHoverButton onClick={generate}>Ideen generieren</InteractiveHoverButton>
-          )}
-
-        </div>
-      </div>
-
-      {/* Voice Copilot CTA */}
-      <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
-        <CardContent className="p-6 flex items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/10 shrink-0">
-              <MessageSquare className="h-6 w-6 text-primary" />
+      {/* Two action cards */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
+          <CardContent className="p-8 flex flex-col items-center text-center gap-5">
+            <div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-primary/10">
+              <FileText className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <h3 className="font-playfair text-lg font-semibold text-foreground">Gespräch starten</h3>
-              <p className="text-sm text-muted-foreground">
-                Starten Sie ein Gespräch und erzählen Sie uns von Ihren Ideen — wir machen Content daraus.
+              <h3 className="font-playfair text-xl font-semibold text-foreground">Post generieren</h3>
+              <p className="text-sm text-muted-foreground mt-2">
+                Basierend auf Ihrem Profil, Ihren Themen und bisherigen Posts — ohne persönliche Erlebnisse.
               </p>
             </div>
-          </div>
-          <InteractiveHoverButton onClick={() => setVoiceModalOpen(true)} className="shrink-0">
-            Gespräch starten
-          </InteractiveHoverButton>
-        </CardContent>
-      </Card>
+            {generating ? (
+              <div className="flex items-center gap-3 py-3">
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                <span className="text-sm text-muted-foreground animate-pulse">
+                  {LOADING_TEXTS[loadingTextIndex]}
+                </span>
+              </div>
+            ) : (
+              <InteractiveHoverButton onClick={generatePost}>
+                Post generieren
+              </InteractiveHoverButton>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
+          <CardContent className="p-8 flex flex-col items-center text-center gap-5">
+            <div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-primary/10">
+              <MessageSquare className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-playfair text-xl font-semibold text-foreground">Gespräch starten</h3>
+              <p className="text-sm text-muted-foreground mt-2">
+                Erzählen Sie von Ihrem Tag oder einer Erkenntnis — persönliche Daten werden für Ihren Content verwendet.
+              </p>
+            </div>
+            <InteractiveHoverButton onClick={() => setVoiceModalOpen(true)}>
+              Gespräch starten
+            </InteractiveHoverButton>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Voice Insights */}
-      {voiceInsights.length === 0 && user && (
-        <div className="flex justify-center">
-          <Button
-            variant="outline"
-            className="rounded-sm gap-2 text-sm"
-            onClick={async () => {
-              const demoData = [
-                {
-                  user_id: user.id,
-                  conversation_id: 'demo-1',
-                  transcript: 'Gespräch über Leadership und Teamführung',
-                  key_points: [
-                    'Authentische Führung beginnt mit Selbstreflexion — wer sich selbst nicht führen kann, wird andere nicht inspirieren.',
-                    'Die besten Teams entstehen, wenn Führungskräfte Verletzlichkeit als Stärke zeigen und Fehler offen ansprechen.',
-                  ],
-                },
-                {
-                  user_id: user.id,
-                  conversation_id: 'demo-2',
-                  transcript: 'Gespräch über KI-Strategie im Mittelstand',
-                  key_points: [
-                    'KI im Mittelstand scheitert selten an der Technologie — es fehlt an klarer Strategie und Change-Management.',
-                    'Der größte ROI von KI liegt nicht in der Automatisierung, sondern in der Augmentation menschlicher Entscheidungen.',
-                  ],
-                },
-                {
-                  user_id: user.id,
-                  conversation_id: 'demo-3',
-                  transcript: 'Gespräch über Personal Branding auf LinkedIn',
-                  key_points: [
-                    'Personal Branding auf LinkedIn ist kein Marketing — es ist systematisches Vertrauenskapital aufbauen.',
-                    'Die wirkungsvollsten LinkedIn-Posts teilen nicht Expertise, sondern den Weg dorthin — inklusive der Rückschläge.',
-                  ],
-                },
-              ];
-              const { error } = await supabase.from('voice_insights' as any).insert(demoData as any);
-              if (error) {
-                toast({ title: 'Fehler', description: error.message, variant: 'destructive' });
-              } else {
-                toast({ title: 'Demo-Gespräche erstellt', description: '3 simulierte Erkenntnisse wurden hinzugefügt.' });
-                refetchInsights();
-              }
-            }}
-          >
-            <MessageSquare className="h-4 w-4" />
-            Demo-Gespräch simulieren
-          </Button>
-        </div>
-      )}
-
       {voiceInsights.length > 0 && (
         <div className="space-y-4">
           <h2 className="font-playfair text-xl font-semibold text-foreground flex items-center gap-2">
@@ -545,7 +280,7 @@ export default function IdeationPage() {
       {/* Generated Results */}
       {concepts.length > 0 && (
         <div className="space-y-4">
-          <h2 className="font-playfair text-xl font-semibold text-foreground">Generierte Ideen</h2>
+          <h2 className="font-playfair text-xl font-semibold text-foreground">Generierte Posts</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {concepts.map((c, i) => (
               <Card key={i} className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)] transition-all duration-300">
@@ -570,14 +305,6 @@ export default function IdeationPage() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="rounded-sm text-xs"
-                      onClick={() => toast({ title: 'Bearbeiten', description: 'Editor wird bald verfügbar.' })}
-                    >
-                      Bearbeiten
-                    </Button>
-                    <Button
-                      size="sm"
                       variant="ghost"
                       className="rounded-sm text-xs px-2"
                       onClick={() => dismissConcept(i)}
@@ -589,10 +316,9 @@ export default function IdeationPage() {
               </Card>
             ))}
           </div>
-
           <p className="text-xs text-muted-foreground pt-2">
             <Sparkles className="h-3 w-3 inline mr-1" />
-            Basierend auf Ihren erfolgreichsten Posts zum Thema <span className="font-medium text-foreground">{primaryTopic}</span> aus der letzten Woche.
+            Basierend auf Ihrem Profil und Thema <span className="font-medium text-foreground">{primaryTopic}</span>.
           </p>
         </div>
       )}
