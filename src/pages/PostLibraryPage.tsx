@@ -670,7 +670,7 @@ export default function PostLibraryPage() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {pendingApproval.map(post => (
-              <ApprovalCard key={post.id} post={post} onMutate={handleMutate} />
+              <ApprovalCard key={post.id} post={post} onMutate={handleMutate} profile={profile} />
             ))}
           </div>
         </div>
