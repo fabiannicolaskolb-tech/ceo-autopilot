@@ -457,6 +457,24 @@ export default function PostLibraryPage() {
         )}
       </div>
 
+      {/* Approval Queue */}
+      {!loading && pendingApproval.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-warning/15">
+              <Zap className="h-3.5 w-3.5 text-warning" />
+            </div>
+            <h2 className="font-playfair text-lg font-semibold text-foreground">Zur Freigabe</h2>
+            <Badge variant="secondary" className="text-[10px] rounded-full bg-warning/15 text-warning">{pendingApproval.length}</Badge>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {pendingApproval.map(post => (
+              <ApprovalCard key={post.id} post={post} onMutate={handleMutate} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2">
