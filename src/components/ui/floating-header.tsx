@@ -44,7 +44,7 @@ export function FloatingHeader() {
               <Zap className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="text-[15px] font-semibold tracking-tight text-foreground">
-              CEO Autopilot
+              Briefly
             </span>
           </Link>
 
