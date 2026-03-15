@@ -196,7 +196,7 @@ export function VoiceCopilotModal({ open, onClose, onInsightsSaved }: VoiceCopil
   const isConnected = conversation.status === 'connected';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'hsl(222 50% 6% / 0.95)' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'hsl(270 30% 5% / 0.95)' }}>
       <div className="relative w-full max-w-lg mx-4 flex flex-col items-center gap-8 py-12">
         {/* Close */}
         <button

@@ -207,7 +207,7 @@ export default function LandingPage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-3">
             {trustItems.map((item) =>
-              <div key={item.title} className="rounded-2xl bg-[hsl(var(--feature-card))] p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_28px_-4px_hsl(220_55%_20%/0.14)]">
+              <div key={item.title} className="rounded-2xl bg-[hsl(var(--feature-card))]/80 backdrop-blur-xl border border-primary/[0.08] p-6 shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.08)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_28px_-4px_hsl(263_50%_40%/0.14)]">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[hsl(var(--feature-icon-bg))]">
                   <item.icon className="h-6 w-6 text-foreground/70" />
                 </div>
