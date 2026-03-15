@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X } from 'lucide-react';
+import { Particles } from '@/components/ui/particles';
+import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import PhotoUpload from '@/components/PhotoUpload';
@@ -42,6 +44,12 @@ export default function OnboardingPage() {
   const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { theme } = useTheme();
+  const [burstKey, setBurstKey] = useState(0);
+
+  useEffect(() => {
+    setBurstKey(k => k + 1);
+  }, [step]);
 
   const totalSteps = 6;
   const progress = (step / totalSteps) * 100;
@@ -105,7 +113,8 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
+      <Particles className="absolute inset-0 z-0" quantity={150} color={theme === 'dark' ? '#8899bb' : '#1a2740'} size={0.5} burst={burstKey} />
       <div className="sticky top-0 z-10 bg-card border-b border-border">
         <Progress value={progress} className="h-1 rounded-none" />
         <div className="flex items-center justify-between px-6 py-3">
@@ -117,7 +126,7 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-2xl px-4 py-10">
+      <div className="relative z-10 mx-auto max-w-2xl px-4 py-10">
         {step === 1 && (
           <div className="space-y-8">
             <div className="text-center">
@@ -288,7 +297,7 @@ export default function OnboardingPage() {
         )}
       </div>
 
-      <div className="sticky bottom-0 border-t border-border bg-card px-6 py-4">
+      <div className="sticky bottom-0 z-10 border-t border-border bg-card px-6 py-4">
         <div className="mx-auto flex max-w-2xl justify-between">
           <Button variant="outline" onClick={() => setStep(s => s - 1)} disabled={step === 1}>
             Zurück
