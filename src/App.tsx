@@ -14,7 +14,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
 import IdeationPage from "@/pages/IdeationPage";
 import PlannerPage from "@/pages/PlannerPage";
-import PostQueuePage from "@/pages/PostQueuePage";
+import PostLibraryPage from "@/pages/PostLibraryPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 
 import NotFound from "@/pages/NotFound";
@@ -41,7 +41,7 @@ const App = () => (
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/ideation" element={<IdeationPage />} />
                 <Route path="/planner" element={<PlannerPage />} />
-                <Route path="/post-queue" element={<PostQueuePage />} />
+                <Route path="/post-library" element={<PostLibraryPage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 
               </Route>

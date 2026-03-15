@@ -1,13 +1,20 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Eye, TrendingUp, TrendingDown, Users, ArrowUpRight, ArrowDownRight,
   BarChart3, Clock, MessageCircle, Heart, Share2, Lightbulb, Minus, Rocket,
+  Upload, Image as ImageIcon, Save, Brain, Zap, ArrowRight,
 } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { usePosts } from '@/hooks/useRealtime';
+import { toast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
@@ -485,8 +492,406 @@ export default function AnalyticsPage() {
               ))}
             </div>
           </div>
+
+          {/* Screenshot Analytics Import */}
+          <ScreenshotAnalytics />
+
+          {/* AI Learning Insights */}
+          <AILearningInsights />
+
+          {/* Cycle Comparison */}
+          <CycleComparison />
         </>
       )}
+    </div>
+  );
+}
+
+// ──── Screenshot Analytics ────
+function ScreenshotAnalytics() {
+  const { user } = useAuth();
+  const { posts: allPosts } = usePosts(user?.id);
+  const [selectedPostId, setSelectedPostId] = useState('');
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [base64Image, setBase64Image] = useState<string | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [extractedMetrics, setExtractedMetrics] = useState<any>(null);
+  const [editableMetrics, setEditableMetrics] = useState<any>(null);
+
+  const postedPosts = useMemo(() =>
+    allPosts.filter(p => p.status === 'posted' || p.status === 'analyzed').slice(0, 50),
+    [allPosts]
+  );
+
+  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setImagePreview(result);
+      setBase64Image(result.split(',')[1]);
+      setExtractedMetrics(null);
+      setEditableMetrics(null);
+    };
+    reader.readAsDataURL(file);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setImagePreview(result);
+      setBase64Image(result.split(',')[1]);
+      setExtractedMetrics(null);
+      setEditableMetrics(null);
+    };
+    reader.readAsDataURL(file);
+  }, []);
+
+  const handleAnalyze = async () => {
+    if (!base64Image || !selectedPostId) return;
+    setAnalyzing(true);
+    try {
+      const selectedPost = postedPosts.find(p => p.id === selectedPostId);
+      const { data, error } = await supabase.functions.invoke('analyze-screenshot', {
+        body: { base64Image, postText: selectedPost?.content || '' },
+      });
+      if (error) throw error;
+      setExtractedMetrics(data);
+      setEditableMetrics({ ...data });
+    } catch (err: any) {
+      toast({ title: 'Analyse fehlgeschlagen', description: err.message, variant: 'destructive' });
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const handleSaveMetrics = async () => {
+    if (!editableMetrics || !selectedPostId) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase.from('posts').update({
+        metrics: editableMetrics,
+        status: 'analyzed',
+      }).eq('id', selectedPostId);
+      if (error) throw error;
+      toast({ title: 'Metriken gespeichert', description: 'Post wurde als analysiert markiert.' });
+      setExtractedMetrics(null);
+      setEditableMetrics(null);
+      setImagePreview(null);
+      setBase64Image(null);
+      setSelectedPostId('');
+    } catch (err: any) {
+      toast({ title: 'Fehler', description: err.message, variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const confidence = editableMetrics?.extraction_confidence;
+  const confidenceColor = confidence > 0.8 ? 'text-success' : confidence > 0.5 ? 'text-warning' : 'text-destructive';
+
+  return (
+    <div className={cn(GLASS_CARD, 'p-6')}>
+      <h2 className="font-playfair text-base font-semibold text-foreground mb-1 flex items-center gap-2">
+        <Upload className="h-4 w-4" /> Echte LinkedIn-Metriken importieren
+      </h2>
+      <p className="text-xs text-muted-foreground mb-4">
+        Laden Sie einen Screenshot Ihrer LinkedIn-Post-Analytik hoch. Unsere KI extrahiert die Zahlen automatisch.
+      </p>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Upload Area */}
+        <div>
+          <div
+            className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-primary/50 transition-colors cursor-pointer"
+            onDragOver={e => e.preventDefault()}
+            onDrop={handleDrop}
+            onClick={() => document.getElementById('screenshot-upload')?.click()}
+          >
+            {imagePreview ? (
+              <img src={imagePreview} alt="Screenshot preview" className="max-h-48 mx-auto rounded-lg" />
+            ) : (
+              <div className="space-y-2">
+                <ImageIcon className="h-8 w-8 text-muted-foreground mx-auto" />
+                <p className="text-sm text-muted-foreground">Bild hierher ziehen oder klicken</p>
+                <p className="text-xs text-muted-foreground">PNG, JPG, WebP</p>
+              </div>
+            )}
+            <input id="screenshot-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+          </div>
+
+          <div className="mt-3 space-y-2">
+            <Select value={selectedPostId} onValueChange={setSelectedPostId}>
+              <SelectTrigger><SelectValue placeholder="Post auswählen..." /></SelectTrigger>
+              <SelectContent>
+                {postedPosts.map(p => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {(p.content || '').substring(0, 50)}... {p.posted_at ? `(${new Date(p.posted_at).toLocaleDateString('de-DE')})` : ''}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button onClick={handleAnalyze} disabled={!base64Image || !selectedPostId || analyzing} className="w-full">
+              {analyzing ? 'Analysiere...' : 'Screenshot analysieren'}
+            </Button>
+          </div>
+        </div>
+
+        {/* Extracted Metrics */}
+        {editableMetrics && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-foreground">Extrahierte Metriken</p>
+              {confidence != null && (
+                <Badge variant="outline" className={cn('text-xs rounded-full', confidenceColor)}>
+                  Konfidenz: {Math.round(confidence * 100)}%
+                </Badge>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {(['impressions', 'likes', 'comments', 'shares', 'clicks', 'engagement_rate'] as const).map(key => (
+                <div key={key} className="space-y-1">
+                  <label className="text-[11px] text-muted-foreground capitalize">{key.replace('_', ' ')}</label>
+                  <Input
+                    type="number"
+                    value={editableMetrics[key] ?? 0}
+                    onChange={e => setEditableMetrics((prev: any) => ({ ...prev, [key]: Number(e.target.value) }))}
+                    className="h-8 text-xs"
+                  />
+                </div>
+              ))}
+            </div>
+            {editableMetrics.notes && (
+              <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg p-2">{editableMetrics.notes}</p>
+            )}
+            <Button onClick={handleSaveMetrics} disabled={saving} className="w-full">
+              <Save className="h-3 w-3 mr-1" /> {saving ? 'Speichere...' : 'Metriken speichern'}
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ──── AI Learning Insights ────
+function AILearningInsights() {
+  const { user } = useAuth();
+  const { posts: allPosts } = usePosts(user?.id);
+
+  const analyzed = useMemo(() =>
+    allPosts.filter(p => (p.status === 'analyzed' || p.status === 'posted') && p.metrics && typeof p.metrics === 'object' && (p.metrics as any).impressions),
+    [allPosts]
+  );
+
+  if (analyzed.length === 0) return null;
+
+  const bestPattern = useMemo(() => {
+    const map: Record<string, { total: number; count: number }> = {};
+    analyzed.forEach(p => {
+      const m = p.metrics as any;
+      const pattern = m?.content_pattern || p.type || p.content_category;
+      if (!pattern) return;
+      const eng = Number(m?.engagement_rate || 0);
+      if (!map[pattern]) map[pattern] = { total: 0, count: 0 };
+      map[pattern].total += eng;
+      map[pattern].count++;
+    });
+    let best = '';
+    let bestAvg = 0;
+    Object.entries(map).forEach(([k, v]) => { const avg = v.total / v.count; if (avg > bestAvg) { bestAvg = avg; best = k; } });
+    return best || null;
+  }, [analyzed]);
+
+  const topTags = useMemo(() => {
+    const tagCount: Record<string, number> = {};
+    analyzed.forEach(p => {
+      const m = p.metrics as any;
+      const tags = m?.topic_tags || [];
+      if (Array.isArray(tags)) tags.forEach((t: string) => { tagCount[t] = (tagCount[t] || 0) + 1; });
+    });
+    return Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  }, [analyzed]);
+
+  const sentimentDist = useMemo(() => {
+    let pos = 0, neu = 0, neg = 0;
+    analyzed.forEach(p => {
+      const m = p.metrics as any;
+      const s = m?.sentiment;
+      if (typeof s === 'string') {
+        if (s === 'positive') pos++;
+        else if (s === 'negative') neg++;
+        else neu++;
+      } else if (s && typeof s === 'object') {
+        pos += s.positive || 0;
+        neu += s.neutral || 0;
+        neg += s.negative || 0;
+      }
+    });
+    const total = pos + neu + neg;
+    if (total === 0) return null;
+    return { pos: Math.round((pos / total) * 100), neu: Math.round((neu / total) * 100), neg: Math.round((neg / total) * 100) };
+  }, [analyzed]);
+
+  const recommendations = useMemo(() => {
+    const recs: string[] = [];
+    [...analyzed].reverse().slice(0, 3).forEach(p => {
+      const m = p.metrics as any;
+      const followUps = m?.recommended_follow_ups;
+      if (Array.isArray(followUps)) followUps.forEach((r: string) => { if (!recs.includes(r)) recs.push(r); });
+    });
+    return recs.slice(0, 5);
+  }, [analyzed]);
+
+  return (
+    <div className={cn(GLASS_CARD, 'p-6')}>
+      <h2 className="font-playfair text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+        <Brain className="h-4 w-4" /> Was Ihre KI gelernt hat
+      </h2>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {bestPattern && (
+          <div className="rounded-[16px] bg-primary/5 p-4">
+            <p className="text-xs text-muted-foreground mb-1">Bester Content-Typ</p>
+            <p className="text-sm font-semibold text-foreground">{bestPattern}</p>
+            <p className="text-xs text-muted-foreground mt-1">Höchste durchschnittliche Engagement Rate</p>
+          </div>
+        )}
+        {topTags.length > 0 && (
+          <div className="rounded-[16px] bg-success/5 p-4">
+            <p className="text-xs text-muted-foreground mb-2">Themen die ankommen</p>
+            <div className="flex flex-wrap gap-1.5">
+              {topTags.map(([tag, count]) => (
+                <Badge key={tag} variant="outline" className="text-[10px] rounded-full">{tag} ({count})</Badge>
+              ))}
+            </div>
+          </div>
+        )}
+        {sentimentDist && (
+          <div className="rounded-[16px] bg-warning/5 p-4">
+            <p className="text-xs text-muted-foreground mb-2">Sentiment-Verteilung</p>
+            <div className="flex gap-2 h-3 rounded-full overflow-hidden">
+              <div className="bg-success rounded-full" style={{ width: `${sentimentDist.pos}%` }} />
+              <div className="bg-muted rounded-full" style={{ width: `${sentimentDist.neu}%` }} />
+              <div className="bg-destructive rounded-full" style={{ width: `${sentimentDist.neg}%` }} />
+            </div>
+            <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+              <span>Positiv {sentimentDist.pos}%</span>
+              <span>Neutral {sentimentDist.neu}%</span>
+              <span>Kritisch {sentimentDist.neg}%</span>
+            </div>
+          </div>
+        )}
+      </div>
+      {recommendations.length > 0 && (
+        <div className="mt-4 space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">KI-Empfehlungen</p>
+          {recommendations.map((rec, i) => (
+            <div key={i} className="flex items-start gap-2 rounded-xl bg-muted/30 p-3">
+              <Zap className="h-3 w-3 mt-0.5 shrink-0 text-primary" />
+              <p className="text-xs text-foreground">{rec}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ──── Cycle Comparison ────
+function CycleComparison() {
+  const { user } = useAuth();
+  const { posts: allPosts } = usePosts(user?.id);
+
+  const cycles = useMemo(() => {
+    const analyzed = allPosts.filter(p =>
+      (p.status === 'analyzed' || p.status === 'posted') &&
+      p.metrics && typeof p.metrics === 'object' && (p.metrics as any).impressions
+    );
+    const byNumber: Record<number, any[]> = {};
+    analyzed.forEach(p => {
+      const cn = (p as any).cycle_number || 1;
+      if (!byNumber[cn]) byNumber[cn] = [];
+      byNumber[cn].push(p);
+    });
+    return byNumber;
+  }, [allPosts]);
+
+  const cycleNumbers = Object.keys(cycles).map(Number).sort((a, b) => a - b);
+  if (cycleNumbers.length < 2) return null;
+
+  const firstCycle = cycleNumbers[0];
+  const latestCycle = cycleNumbers[cycleNumbers.length - 1];
+
+  const avgMetrics = (posts: any[]) => {
+    const len = posts.length || 1;
+    const totalImp = posts.reduce((s, p) => s + (Number((p.metrics as any)?.impressions) || 0), 0);
+    const totalEng = posts.reduce((s, p) => s + (Number((p.metrics as any)?.engagement_rate) || 0), 0);
+    const totalLikes = posts.reduce((s, p) => s + (Number((p.metrics as any)?.likes) || 0), 0);
+    const totalComments = posts.reduce((s, p) => s + (Number((p.metrics as any)?.comments) || 0), 0);
+    return {
+      impressions: Math.round(totalImp / len),
+      engagement_rate: (totalEng / len).toFixed(1),
+      likes: Math.round(totalLikes / len),
+      comments: Math.round(totalComments / len),
+    };
+  };
+
+  const first = avgMetrics(cycles[firstCycle]);
+  const latest = avgMetrics(cycles[latestCycle]);
+
+  const delta = (a: number, b: number) => {
+    if (b === 0) return null;
+    return Math.round(((a - b) / b) * 100);
+  };
+
+  const metrics = [
+    { label: 'Impressions', first: first.impressions, latest: latest.impressions },
+    { label: 'Engagement Rate', first: Number(first.engagement_rate), latest: Number(latest.engagement_rate) },
+    { label: 'Likes', first: first.likes, latest: latest.likes },
+    { label: 'Kommentare', first: first.comments, latest: latest.comments },
+  ];
+
+  return (
+    <div className={cn(GLASS_CARD, 'p-6')}>
+      <h2 className="font-playfair text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+        <ArrowRight className="h-4 w-4" /> Zyklen vergleichen
+      </h2>
+      <p className="text-xs text-muted-foreground mb-4">
+        Durchschnittswerte: Zyklus {firstCycle} ({cycles[firstCycle].length} Posts) vs. Zyklus {latestCycle} ({cycles[latestCycle].length} Posts)
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {metrics.map(m => {
+          const d = delta(m.latest, m.first);
+          const isPositive = d !== null && d >= 0;
+          return (
+            <div key={m.label} className="rounded-[16px] bg-muted/30 p-4 text-center">
+              <p className="text-xs text-muted-foreground mb-2">{m.label}</p>
+              <div className="flex items-center justify-center gap-3">
+                <div>
+                  <p className="text-lg font-semibold text-foreground/60">{m.first}</p>
+                  <p className="text-[10px] text-muted-foreground">Zyklus {firstCycle}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-lg font-semibold text-foreground">{m.latest}</p>
+                  <p className="text-[10px] text-muted-foreground">Zyklus {latestCycle}</p>
+                </div>
+              </div>
+              {d !== null && (
+                <Badge variant="secondary" className={cn('mt-2 text-[10px] rounded-full', isPositive ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive')}>
+                  {isPositive ? '+' : ''}{d}%
+                </Badge>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
