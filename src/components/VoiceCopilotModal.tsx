@@ -37,19 +37,26 @@ export function VoiceCopilotModal({ open, onClose, onInsightsSaved }: VoiceCopil
     },
     onMessage: (message: any) => {
       console.log('Voice Copilot message:', JSON.stringify(message));
-      // Try multiple known message formats
-      const userText = message.user_transcription_event?.user_transcript
-        || (message.type === 'user_transcript' && message.text)
-        || (message.role === 'user' && message.message);
-      const agentText = message.agent_response_event?.agent_response
-        || (message.type === 'agent_response' && message.text)
-        || (message.role === 'agent' && message.message);
+      
+      // ElevenLabs format: { source: "ai"|"user", role: "agent"|"user", message: "..." }
+      // Also handle event-based formats
+      const isUser = message.source === 'user' || message.role === 'user' 
+        || message.type === 'user_transcript';
+      const isAgent = message.source === 'ai' || message.role === 'agent' 
+        || message.type === 'agent_response';
 
-      if (userText) {
-        transcriptsRef.current.push({ role: 'user', text: String(userText) });
-      }
-      if (agentText) {
-        transcriptsRef.current.push({ role: 'agent', text: String(agentText) });
+      const text = message.message 
+        || message.user_transcription_event?.user_transcript
+        || message.agent_response_event?.agent_response
+        || message.text;
+
+      if (text && typeof text === 'string' && text.trim().length > 0) {
+        if (isUser) {
+          transcriptsRef.current.push({ role: 'user', text: text.trim() });
+        } else if (isAgent) {
+          transcriptsRef.current.push({ role: 'agent', text: text.trim() });
+        }
+        console.log('Transcript count:', transcriptsRef.current.length);
       }
     },
     onError: (error: any) => {
