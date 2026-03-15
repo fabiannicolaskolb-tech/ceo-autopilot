@@ -199,6 +199,8 @@ export function usePosts(userId: string | undefined) {
                 p.id === (payload.new as Post).id ? (payload.new as Post) : p
               )
             );
+          } else if (payload.eventType === "DELETE" && payload.old && "id" in payload.old) {
+            setPosts((prev) => prev.filter((p) => p.id !== (payload.old as Post).id));
           }
         }
       )
