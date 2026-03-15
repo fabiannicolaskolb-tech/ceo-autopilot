@@ -436,18 +436,19 @@ function GalleryGrid({ posts, onPostClick }: { posts: any[]; onPostClick?: (post
 }
 
 // ──── Approval Card ────
-function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
+function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => void; profile: any }) {
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content || '');
   const [saving, setSaving] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  const contentText = post.content || '—';
-  const isLong = contentText.length > 200;
+
+  const authorName = profile?.name || 'LinkedIn Creator';
+  const authorHeadline = [profile?.role, profile?.company].filter(Boolean).join(' at ') || 'Professional';
+  const authorAvatar = profile?.avatar_url_1 || undefined;
+  const postedAt = format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de });
 
   const handleApprove = async () => {
     const { error } = await supabase.from('posts').update({ status: 'approved' }).eq('id', post.id);
     if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
-    // Trigger n8n workflow
     const { error: fnError } = await supabase.functions.invoke('trigger-n8n', { body: { postId: post.id } });
     if (fnError) console.error('n8n trigger error:', fnError);
     toast({ title: 'Post freigegeben ✓' });
@@ -485,53 +486,31 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
   };
 
   return (
-    <div className={cn(GLASS_CARD, 'overflow-hidden border-l-4 border-l-primary')}>
-      {/* Image preview if available */}
-      {post.image_url && (
-        <div className="w-full h-32 overflow-hidden">
-          <img src={post.image_url} alt="Post Bild" className="w-full h-full object-cover" loading="lazy" />
-        </div>
-      )}
-
-      <div className="p-4 space-y-3">
-        {/* Header row */}
-        <div className="flex items-end justify-between gap-3">
-          <div className="flex items-center gap-2">
-            {post.type && <Badge variant="outline" className="text-[10px] rounded-full">{post.type}</Badge>}
-            {post.angle && <Badge variant="outline" className="text-[10px] rounded-full">{post.angle}</Badge>}
-          </div>
-          <div className="text-right shrink-0">
-            <span className="text-[10px] text-muted-foreground">
-              {format(new Date(post.created_at), 'dd. MMM · HH:mm', { locale: de })}
-            </span>
+    <div className="relative">
+      {editing ? (
+        <div className={cn(GLASS_CARD, 'p-4 space-y-3')}>
+          <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} className="text-xs" />
+          <div className="flex gap-2">
+            <Button size="sm" className="text-xs h-7" onClick={handleSaveEdit} disabled={saving}>
+              {saving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}Speichern
+            </Button>
+            <Button size="sm" variant="ghost" className="text-xs h-7" onClick={() => { setEditing(false); setEditContent(post.content || ''); }}>Abbrechen</Button>
           </div>
         </div>
-
-        {/* Content */}
-        {editing ? (
-          <div className="space-y-2">
-            <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} className="text-xs" />
-            <div className="flex gap-2">
-              <Button size="sm" className="text-xs h-7" onClick={handleSaveEdit} disabled={saving}>
-                {saving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}Speichern
-              </Button>
-              <Button size="sm" variant="ghost" className="text-xs h-7" onClick={() => { setEditing(false); setEditContent(post.content || ''); }}>Abbrechen</Button>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <p className={cn('text-sm text-foreground whitespace-pre-line leading-relaxed', !expanded && isLong && 'line-clamp-4')}>{contentText}</p>
-            {isLong && (
-              <button onClick={() => setExpanded(!expanded)} className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
-                {expanded ? <><ChevronUp className="h-3 w-3" /> Weniger anzeigen</> : <><ChevronDown className="h-3 w-3" /> Mehr anzeigen</>}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Actions */}
-        {!editing && (
-          <div className="flex items-center gap-2 pt-1 border-t border-border/50">
+      ) : (
+        <div>
+          <LinkedInPostPreview
+            authorName={authorName}
+            authorHeadline={authorHeadline}
+            authorAvatar={authorAvatar}
+            content={post.content || ''}
+            hook={post.hook || undefined}
+            imageUrl={post.image_url}
+            postedAt={postedAt}
+            showActions={false}
+          />
+          {/* Approval actions */}
+          <div className={cn(GLASS_CARD, '-mt-3 rounded-t-none pt-4 pb-3 px-4 flex items-center gap-2 border-t border-border/50')}>
             <Button size="sm" className="text-xs h-8 flex-1" onClick={handleApprove}>
               <Check className="h-3 w-3 mr-1" /> Freigeben
             </Button>
@@ -556,8 +535,8 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
               </AlertDialogContent>
             </AlertDialog>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -689,9 +668,9 @@ export default function PostLibraryPage() {
             <h2 className="font-playfair text-lg font-semibold text-foreground">Zur Freigabe</h2>
             <Badge variant="secondary" className="text-[10px] rounded-full bg-warning/15 text-warning">{pendingApproval.length}</Badge>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="flex flex-col items-center gap-4">
             {pendingApproval.map(post => (
-              <ApprovalCard key={post.id} post={post} onMutate={handleMutate} />
+              <ApprovalCard key={post.id} post={post} onMutate={handleMutate} profile={profile} />
             ))}
           </div>
         </div>
