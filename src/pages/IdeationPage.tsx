@@ -278,24 +278,21 @@ export default function IdeationPage() {
     },
   });
 
-  const saveInsightAsPost = useMutation({
-    mutationFn: async (keyPoint: string) => {
-      const { error } = await supabase.from('posts').insert({
-        user_id: user!.id,
-        content: keyPoint,
-        status: 'draft',
-        type: 'Voice Insight',
-        content_category: 'Voice Copilot',
+  const [selectedInsights, setSelectedInsights] = useState<string[]>([]);
+
+  const toggleInsightForNextPost = (keyPoint: string) => {
+    setSelectedInsights(prev => {
+      const isSelected = prev.includes(keyPoint);
+      const updated = isSelected ? prev.filter(p => p !== keyPoint) : [...prev, keyPoint];
+      toast({
+        title: isSelected ? 'Erkenntnis entfernt' : 'Erkenntnis vorgemerkt',
+        description: isSelected
+          ? 'Wird nicht mehr für den nächsten Post genutzt.'
+          : 'Wird als Grundlage für den nächsten Post genutzt.',
       });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({ title: 'Post-Entwurf erstellt', description: 'Erkenntnis wurde als Draft gespeichert.' });
-    },
-    onError: (err: any) => {
-      toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
-    },
-  });
+      return updated;
+    });
+  };
 
   const generatePost = async () => {
     setGenerating(true);
