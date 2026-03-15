@@ -194,7 +194,7 @@ export default function LandingPage() {
             {features.map((f) => {
               const isExpanded = expandedFeature === f.title;
               const hasColSpan = colSpanFeature === f.title;
-              const isHidden = (expandedFeature != null && expandedFeature !== f.title) || (colSpanFeature != null && colSpanFeature !== f.title);
+              const isHidden = expandedFeature != null && expandedFeature !== f.title;
               const previewImage = f.title === 'Analytics' ? calendarPreview : f.title === 'Planning' ? plannerPreview : ideationPreview;
 
               return (
