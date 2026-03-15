@@ -91,7 +91,12 @@ export default function CreatorScoreCard() {
   const isStreakActive = score.weekStreak >= 2;
 
   return (
-    <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
+    <div className="relative rounded-[24px] bg-card/60 backdrop-blur-2xl p-6 sm:p-8 border border-white/20 dark:border-white/10 shadow-[0_8px_32px_-8px_hsl(var(--primary)/0.15)] overflow-hidden">
+      {/* Liquid glass overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-white/10 dark:from-white/10 dark:via-transparent dark:to-white/5 pointer-events-none rounded-[24px]" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/60 dark:via-white/30 to-transparent rounded-t-[24px]" />
+
+      <div className="relative z-10">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
@@ -249,6 +254,7 @@ export default function CreatorScoreCard() {
           </div>
         </div>
       </TooltipProvider>
+    </div>
     </div>
   );
 }
