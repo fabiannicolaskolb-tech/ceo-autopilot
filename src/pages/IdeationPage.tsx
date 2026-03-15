@@ -545,13 +545,21 @@ export default function IdeationPage() {
                       </span>
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant={selectedInsights.includes(point) ? "default" : "outline"}
                         className="rounded-sm text-xs"
-                        onClick={() => saveInsightAsPost.mutate(point)}
-                        disabled={saveInsightAsPost.isPending}
+                        onClick={() => toggleInsightForNextPost(point)}
                       >
-                        Als Post übernehmen
-                        <ArrowRight className="h-3 w-3 ml-1" />
+                        {selectedInsights.includes(point) ? (
+                          <>
+                            <Check className="h-3 w-3 mr-1" />
+                            Vorgemerkt
+                          </>
+                        ) : (
+                          <>
+                            Für nächsten Post nutzen
+                            <ArrowRight className="h-3 w-3 ml-1" />
+                          </>
+                        )}
                       </Button>
                     </div>
                   </CardContent>
