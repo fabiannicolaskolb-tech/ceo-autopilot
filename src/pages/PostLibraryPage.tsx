@@ -502,18 +502,17 @@ function FeedView({ posts, profile }: { posts: any[]; profile: any }) {
 // ──── Main Page ────
 export default function PostLibraryPage() {
   const { user, profile } = useAuth();
-  const { posts, loading } = usePosts(user?.id);
+  const { posts, loading, refetch } = usePosts(user?.id);
   const [tab, setTab] = useState<'drafts' | 'published'>('drafts');
   const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar' | 'feed'>('list');
-  const [refreshKey, setRefreshKey] = useState(0);
 
-  const pendingApproval = useMemo(() => posts.filter(p => p.status === 'draft'), [posts, refreshKey]);
-  const drafts = useMemo(() => posts.filter(p => ['draft', 'approved', 'scheduled'].includes(p.status)), [posts, refreshKey]);
-  const published = useMemo(() => posts.filter(p => ['posted', 'analyzed'].includes(p.status)), [posts, refreshKey]);
+  const pendingApproval = useMemo(() => posts.filter(p => p.status === 'draft'), [posts]);
+  const drafts = useMemo(() => posts.filter(p => ['draft', 'approved', 'scheduled'].includes(p.status)), [posts]);
+  const published = useMemo(() => posts.filter(p => ['posted', 'analyzed'].includes(p.status)), [posts]);
 
   const currentPosts = tab === 'drafts' ? drafts : published;
 
-  const handleMutate = () => setRefreshKey(k => k + 1);
+  const handleMutate = () => refetch();
 
 
   // Dummy handler for gallery/calendar clicks (scrolls to card view)
