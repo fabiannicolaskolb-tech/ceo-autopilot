@@ -71,6 +71,7 @@ export default function OnboardingPage() {
       if (parsed.company) setCompany(parsed.company);
       if (parsed.role) setRole(parsed.role);
       if (parsed.industry) setIndustry(parsed.industry);
+      setCvUploaded(true);
       toast({ title: 'CV erfolgreich ausgelesen!' });
     } catch (err: any) {
       toast({ title: 'CV konnte nicht ausgelesen werden', description: err?.message, variant: 'destructive' });
