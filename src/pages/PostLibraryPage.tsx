@@ -403,27 +403,6 @@ export default function PostLibraryPage() {
 
   const handleMutate = () => setRefreshKey(k => k + 1);
 
-  // n8n trigger
-  const triggerGenericMutation = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.functions.invoke('trigger-n8n-generic', {
-        body: {
-          user_id: user?.id,
-          request_id: crypto.randomUUID(),
-          command: 'orchestrate',
-          cycle_number: 1,
-        },
-      });
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      toast({ title: 'Workflow gestartet', description: 'n8n wurde erfolgreich getriggert.' });
-    },
-    onError: (err: Error) => {
-      toast({ title: 'Fehler', description: err.message, variant: 'destructive' });
-    },
-  });
 
   // Dummy handler for gallery/calendar clicks (scrolls to card view)
   const handlePostClick = (_post: any) => {
