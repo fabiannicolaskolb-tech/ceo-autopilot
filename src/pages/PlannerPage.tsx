@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, isSameMonth, addMonths, subMonths, isToday } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, isSameMonth, addMonths, subMonths, isToday, setHours, setMinutes } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { CalendarIcon, Rocket, ChevronLeft, ChevronRight, List, CalendarDays, Send, Loader2, Zap } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
