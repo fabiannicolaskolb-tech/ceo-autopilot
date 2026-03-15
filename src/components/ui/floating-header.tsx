@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Lightbulb, GalleryHorizontalEnd, BarChart3, Zap, LogOut, MenuIcon, User, Sun, Moon,
+  LayoutDashboard, Lightbulb, GalleryHorizontalEnd, BarChart3, Zap, LogOut, MenuIcon, User, Sun, Moon, Globe,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -12,14 +12,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
+import { useLang } from '@/hooks/useLang';
 import { cn } from '@/lib/utils';
-
-const navItems = [
-  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Ideation Lab', url: '/ideation', icon: Lightbulb },
-  { title: 'Post Library', url: '/post-library', icon: GalleryHorizontalEnd },
-  { title: 'Analytics', url: '/analytics', icon: BarChart3 },
-];
 
 function getInitials(email?: string | null, name?: string | null) {
   if (name) return name.slice(0, 2).toUpperCase();
@@ -32,7 +26,14 @@ export function FloatingHeader() {
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const isDashboard = location.pathname === '/dashboard';
+  const { lang, toggleLang, t } = useLang();
+
+  const navItems = [
+    { title: t('nav.dashboard'), url: '/dashboard', icon: LayoutDashboard },
+    { title: t('nav.ideation'), url: '/ideation', icon: Lightbulb },
+    { title: t('nav.postlibrary'), url: '/post-library', icon: GalleryHorizontalEnd },
+    { title: t('nav.analytics'), url: '/analytics', icon: BarChart3 },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg">
@@ -53,7 +54,7 @@ export function FloatingHeader() {
                 const active = location.pathname === item.url;
                 return (
                   <Link
-                    key={item.title}
+                    key={item.url}
                     to={item.url}
                     className={cn(
                       'relative flex items-center gap-1.5 px-3 py-2 text-[13px] transition-colors',
@@ -73,8 +74,14 @@ export function FloatingHeader() {
             </nav>
         </div>
 
-        {/* Right: Avatar Dropdown (desktop) + Mobile trigger */}
+        {/* Right */}
         <div className="flex items-center gap-2">
+          {/* Language toggle */}
+          <Button variant="ghost" size="sm" onClick={toggleLang} className="h-9 gap-1.5 text-xs">
+            <Globe className="h-3.5 w-3.5" />
+            {lang === 'de' ? 'EN' : 'DE'}
+          </Button>
+
           {/* Theme toggle */}
           <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
             {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
@@ -100,13 +107,13 @@ export function FloatingHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center gap-2">
                     <User className="h-3.5 w-3.5" strokeWidth={2} />
-                    Profil
+                    {t('nav.profile')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut} className="flex items-center gap-2 text-destructive focus:text-destructive">
                   <LogOut className="h-3.5 w-3.5" strokeWidth={2} />
-                  Abmelden
+                  {t('nav.signout')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -133,7 +140,7 @@ export function FloatingHeader() {
                       const active = location.pathname === item.url;
                       return (
                         <Link
-                          key={item.title}
+                          key={item.url}
                           to={item.url}
                           onClick={() => setOpen(false)}
                           className={cn(
@@ -155,7 +162,7 @@ export function FloatingHeader() {
                       className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent"
                     >
                       <User className="h-4 w-4" strokeWidth={2} />
-                      Profil
+                      {t('nav.profile')}
                     </Link>
                   </nav>
 
@@ -169,7 +176,7 @@ export function FloatingHeader() {
                       onClick={() => { signOut(); setOpen(false); }}
                     >
                       <LogOut className="h-3.5 w-3.5" strokeWidth={2} />
-                      Abmelden
+                      {t('nav.signout')}
                     </Button>
                   </SheetFooter>
                 </SheetContent>

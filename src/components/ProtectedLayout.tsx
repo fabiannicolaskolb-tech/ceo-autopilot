@@ -5,10 +5,12 @@ import { FloatingHeader } from '@/components/ui/floating-header';
 import { Particles } from '@/components/ui/particles';
 import { WaveMeshBackground } from '@/components/WaveMeshBackground';
 import { useTheme } from '@/hooks/useTheme';
+import { useLang } from '@/hooks/useLang';
 
 function ProtectedLayout() {
   const { user, profile, loading } = useAuth();
   const { theme } = useTheme();
+  const { t } = useLang();
   const location = useLocation();
   const [burstKey, setBurstKey] = useState(0);
 
@@ -19,7 +21,7 @@ function ProtectedLayout() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="animate-pulse font-playfair text-xl text-muted-foreground">Laden...</div>
+        <div className="animate-pulse font-playfair text-xl text-muted-foreground">{t('loading')}</div>
       </div>
     );
   }
@@ -28,7 +30,7 @@ function ProtectedLayout() {
   if (!profile) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="animate-pulse font-playfair text-xl text-muted-foreground">Laden...</div>
+        <div className="animate-pulse font-playfair text-xl text-muted-foreground">{t('loading')}</div>
       </div>
     );
   }
