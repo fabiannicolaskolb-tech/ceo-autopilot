@@ -15,6 +15,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import IdeationPage from "@/pages/IdeationPage";
 import PostLibraryPage from "@/pages/PostLibraryPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
+import PricingPage from "@/pages/PricingPage";
 
 import NotFound from "@/pages/NotFound";
 import { Particles } from "@/components/ui/particles";
