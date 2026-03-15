@@ -363,23 +363,23 @@ export default function OnboardingPage() {
               {voiceSamples.map((sample, i) => (
                 <div key={i} className="space-y-1">
                   <Label>Sample {i + 1}</Label>
-                  <Textarea
-                    value={sample}
-                    onChange={e => {
-                      const updated = [...voiceSamples];
-                      updated[i] = e.target.value;
-                      setVoiceSamples(updated);
-                    }}
-                    placeholder="Fügen Sie hier einen LinkedIn-Post ein..."
-                    className="min-h-[100px] bg-card"
-                    minLength={500}
-                    maxLength={3000}
-                  />
-                  {sample.trim().length > 0 && (
-                    <p className={cn("text-xs", sample.trim().length < 500 ? "text-destructive" : "text-muted-foreground")}>
-                      {sample.trim().length} / 3.000 Zeichen {sample.trim().length < 500 && '(min. 500)'}
-                    </p>
-                  )}
+                  <div className="relative">
+                    <Textarea
+                      value={sample}
+                      onChange={e => {
+                        const updated = [...voiceSamples];
+                        updated[i] = e.target.value;
+                        setVoiceSamples(updated);
+                      }}
+                      placeholder="Fügen Sie hier einen LinkedIn-Post ein..."
+                      className="min-h-[100px] bg-card pb-7"
+                      minLength={500}
+                      maxLength={3000}
+                    />
+                    <span className={cn("absolute bottom-2 right-3 text-xs pointer-events-none", sample.trim().length > 0 && sample.trim().length < 500 ? "text-destructive" : "text-muted-foreground")}>
+                      {sample.trim().length} / 3.000{sample.trim().length > 0 && sample.trim().length < 500 ? ' (min. 500)' : ''}
+                    </span>
+                  </div>
                 </div>
               ))}
               {voiceSamples.length < 5 && (
