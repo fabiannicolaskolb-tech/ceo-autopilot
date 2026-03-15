@@ -680,7 +680,7 @@ export default function PostLibraryPage() {
       </div>
 
       {/* Approval Queue (hidden in feed mode) */}
-      {viewMode !== 'feed' && !loading && pendingApproval.length > 0 && (
+      {viewMode === 'list' && !loading && pendingApproval.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center h-6 w-6 rounded-full bg-warning/15">
@@ -720,7 +720,7 @@ export default function PostLibraryPage() {
         ) : (
           <GalleryGrid posts={posts} onPostClick={handlePostClick} />
         )
-      ) : currentPosts.length === 0 ? (
+      ) : currentPosts.length === 0 && (tab !== 'drafts' || pendingApproval.length === 0) ? (
         <EmptyState tab={tab} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
