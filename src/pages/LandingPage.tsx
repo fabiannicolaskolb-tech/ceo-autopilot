@@ -65,7 +65,7 @@ export default function LandingPage() {
     if (expandedFeature === title) {
       // Closing: first collapse image, then after delay remove col-span & show others
       setExpandedFeature(null);
-      setTimeout(() => setColSpanFeature(null), 700);
+      setTimeout(() => setColSpanFeature(null), 500);
     } else {
       // Opening: set col-span immediately, then expand
       setColSpanFeature(title);
