@@ -48,8 +48,7 @@ export function FloatingHeader() {
             </span>
           </Link>
 
-          {!isDashboard && (
-            <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-1 lg:flex">
               {navItems.map((item) => {
                 const active = location.pathname === item.url;
                 return (
@@ -72,7 +71,6 @@ export function FloatingHeader() {
                 );
               })}
             </nav>
-          )}
         </div>
 
         {/* Right: Avatar Dropdown (desktop) + Mobile trigger */}
@@ -114,9 +112,8 @@ export function FloatingHeader() {
             </DropdownMenu>
           </div>
 
-          {/* Mobile hamburger - hidden on dashboard */}
-          {!isDashboard && (
-            <div className="lg:hidden">
+          {/* Mobile hamburger */}
+          <div className="lg:hidden">
               <Sheet open={open} onOpenChange={setOpen}>
                 <Button variant="ghost" size="icon" onClick={() => setOpen(!open)} className="h-9 w-9">
                   <MenuIcon className="h-5 w-5" />
@@ -178,7 +175,6 @@ export function FloatingHeader() {
                 </SheetContent>
               </Sheet>
             </div>
-          )}
         </div>
       </div>
     </header>
