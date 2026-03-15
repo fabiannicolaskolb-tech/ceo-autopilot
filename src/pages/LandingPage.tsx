@@ -217,7 +217,7 @@ export default function LandingPage() {
                       </span>
                     </div>
                     <div
-                      className={`w-full max-w-3xl mx-auto overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+                      className={`w-full max-w-3xl mx-auto overflow-hidden transition-all duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
                     >
                       <div className="px-6 pb-6">
                         <img
