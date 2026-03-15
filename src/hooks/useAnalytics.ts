@@ -51,21 +51,26 @@ interface BestTimeCell {
   intensity: number;
 }
 
-function getDaysForRange(range: TimeRange): number {
+function getDaysForRange(range: TimeRange, customStart?: Date): number {
   if (range === '7d') return 7;
   if (range === '30d') return 30;
   if (range === '90d') return 90;
-  // YTD
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 1);
-  return Math.ceil((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  if (range === 'custom' && customStart) {
+    return Math.ceil((new Date().getTime() - customStart.getTime()) / (1000 * 60 * 60 * 24));
+  }
+  return 30;
 }
 
-function getRangeStart(range: TimeRange): Date {
+function getRangeStart(range: TimeRange, customStart?: Date): Date {
+  if (range === 'custom' && customStart) return customStart;
   const now = new Date();
-  if (range === 'ytd') return new Date(now.getFullYear(), 0, 1);
   const days = getDaysForRange(range);
   return new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+}
+
+function getRangeEnd(range: TimeRange, customEnd?: Date): Date {
+  if (range === 'custom' && customEnd) return customEnd;
+  return new Date();
 }
 
 function getMetrics(raw: unknown): PostMetrics {
