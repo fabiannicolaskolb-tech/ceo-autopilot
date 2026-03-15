@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { TypingAnimation } from '@/components/ui/typing-animation';
 import analyticsPreview from '@/assets/analytics-preview.png';
 import calendarPreview from '@/assets/ki-optimierung-preview.png';
+import plannerPreview from '@/assets/planner-preview.png';
 
 const features = [
 {
