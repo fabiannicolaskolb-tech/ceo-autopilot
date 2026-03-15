@@ -427,7 +427,20 @@ export default function AnalyticsPage() {
             <p className="text-sm text-muted-foreground mt-0.5">Performance-Übersicht Ihres LinkedIn-Auftritts</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Tabs value={timeRange} onValueChange={v => {
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLinkedInImport}
+              disabled={importLoading}
+              className="gap-2"
+            >
+              {importLoading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Linkedin className="h-4 w-4" />
+              )}
+              {importLoading ? 'Importiere…' : 'Posts importieren'}
+            </Button>
               setTimeRange(v as TimeRange);
               if (v !== 'custom') setCustomRange(null);
             }}>
