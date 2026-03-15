@@ -28,6 +28,8 @@ const TONES = [
   { value: 'inspirational', label: 'Inspirierend & motivierend' },
 ];
 
+const STEP_LABELS = ['Start', 'Basis', 'Fotos', 'Strategie', 'Themen', 'Voice'];
+
 export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [name, setName] = useState('');
@@ -169,6 +171,27 @@ export default function OnboardingPage() {
             <span className="font-playfair text-lg font-semibold text-foreground">CEO Autopilot</span>
           </div>
           <span className="text-sm text-muted-foreground">Schritt {step} von {totalSteps}</span>
+        </div>
+        {/* Step navigation bar */}
+        <div className="flex items-center justify-center gap-1.5 px-6 pb-3">
+          {STEP_LABELS.map((label, i) => {
+            const s = i + 1;
+            const isActive = s === step;
+            return (
+              <button
+                key={s}
+                onClick={() => setStep(s)}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
+                  isActive
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                )}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
