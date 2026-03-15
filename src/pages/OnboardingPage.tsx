@@ -96,7 +96,7 @@ export default function OnboardingPage() {
       case 3: return avatarUrls.every(url => url !== null);
       case 4: return targetAudience.trim() !== '' && tone.trim() !== '';
       case 5: return focusTopics.length > 0;
-      case 6: return voiceSamples.filter(s => s.trim().length >= 500 && s.trim().length <= 3000).length >= 3;
+      case 6: return true;
       default: return true;
     }
   })();
