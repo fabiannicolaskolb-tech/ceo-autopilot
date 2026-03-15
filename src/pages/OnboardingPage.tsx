@@ -297,7 +297,7 @@ export default function OnboardingPage() {
                 onClick={() => cvInputRef.current?.click()}
               >
                 {parsingCv ? <Loader2 className="h-4 w-4 animate-spin" /> : cvUploaded ? <Check className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
-                {parsingCv ? 'CV wird analysiert...' : cvUploaded ? 'CV erfolgreich hochgeladen ✓' : 'CV hochladen (Pflicht)'}
+                {parsingCv ? 'CV wird analysiert...' : cvUploaded ? 'CV erfolgreich hochgeladen ✓' : 'CV Upload zum automatischen Ausfüllen'}
               </Button>
               {!cvUploaded && !parsingCv && (
                 <p className="text-xs text-destructive">Bitte laden Sie Ihren CV hoch, um fortzufahren.</p>
