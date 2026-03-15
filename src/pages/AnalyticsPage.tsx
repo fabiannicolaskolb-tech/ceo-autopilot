@@ -754,8 +754,6 @@ function AILearningInsights() {
     [allPosts]
   );
 
-  if (analyzed.length === 0) return null;
-
   const bestPattern = useMemo(() => {
     const map: Record<string, { total: number; count: number }> = {};
     analyzed.forEach(p => {
