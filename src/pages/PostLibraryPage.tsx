@@ -5,7 +5,7 @@ import {
   FileText, Send, Check, Clock, BarChart3, Copy, Pencil, Trash2,
   CalendarDays, ChevronDown, ChevronUp, Inbox, Sparkles,
   Eye, Heart, MessageCircle, Share2, List, ChevronLeft, ChevronRight,
-  Loader2, Zap, Rocket,
+  Loader2, Zap, Rocket, Newspaper,
 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -28,6 +28,7 @@ import { MeshBackground } from '@/components/MeshBackground';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import { LinkedInPostPreview } from '@/components/LinkedInPostPreview';
 
 const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
 const GLASS_CARD_HOVER = `${GLASS_CARD} transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]`;
@@ -449,12 +450,52 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
   );
 }
 
+// ──── Feed View (LinkedIn Preview) ────
+function FeedView({ posts, profile }: { posts: any[]; profile: any }) {
+  const authorName = profile?.name || 'LinkedIn Creator';
+  const authorHeadline = [profile?.role, profile?.company].filter(Boolean).join(' at ') || 'Professional';
+  const authorAvatar = profile?.avatar_url_1 || undefined;
+
+  if (posts.length === 0) return <EmptyState tab="drafts" />;
+
+  return (
+    <div className="flex flex-col items-center gap-4 py-2">
+      {posts.map(post => {
+        const metrics = post.metrics && typeof post.metrics === 'object' ? post.metrics as any : undefined;
+        const postedAt = post.posted_at
+          ? format(new Date(post.posted_at), 'dd. MMM yyyy', { locale: de })
+          : post.scheduled_at
+            ? format(new Date(post.scheduled_at), 'dd. MMM yyyy', { locale: de })
+            : 'Just now';
+
+        return (
+          <LinkedInPostPreview
+            key={post.id}
+            authorName={authorName}
+            authorHeadline={authorHeadline}
+            authorAvatar={authorAvatar}
+            content={post.content || ''}
+            hook={post.hook || undefined}
+            postedAt={postedAt}
+            metrics={metrics ? {
+              likes: metrics.likes,
+              comments: metrics.comments,
+              shares: metrics.shares,
+              impressions: metrics.impressions,
+            } : undefined}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 // ──── Main Page ────
 export default function PostLibraryPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { posts, loading } = usePosts(user?.id);
   const [tab, setTab] = useState<'drafts' | 'published'>('drafts');
-  const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar' | 'feed'>('list');
   const [refreshKey, setRefreshKey] = useState(0);
 
   const pendingApproval = useMemo(() => posts.filter(p => p.status === 'draft'), [posts, refreshKey]);
@@ -494,6 +535,9 @@ export default function PostLibraryPage() {
                 </TabsTrigger>
                 <TabsTrigger value="calendar" className="gap-1 text-xs px-2.5">
                   <CalendarDays className="h-3 w-3" /> Kalender
+                </TabsTrigger>
+                <TabsTrigger value="feed" className="gap-1 text-xs px-2.5">
+                  <Newspaper className="h-3 w-3" /> Feed
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -552,6 +596,8 @@ export default function PostLibraryPage() {
         <div className={cn(GLASS_CARD, 'p-6')}>
           <CalendarView posts={posts} onPostClick={handlePostClick} />
         </div>
+      ) : viewMode === 'feed' ? (
+        <FeedView posts={currentPosts} profile={profile} />
       ) : viewMode === 'gallery' ? (
         posts.length === 0 ? (
           <EmptyState tab={tab} />
