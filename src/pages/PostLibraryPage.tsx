@@ -478,7 +478,6 @@ function FeedView({ posts, profile }: { posts: any[]; profile: any }) {
             hook={post.hook || undefined}
             postedAt={postedAt}
             showActions={false}
-            defaultExpanded={true}
             metrics={metrics ? {
               likes: metrics.likes,
               comments: metrics.comments,
