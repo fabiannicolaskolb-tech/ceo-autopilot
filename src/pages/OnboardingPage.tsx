@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X } from 'lucide-react';
+import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X, Upload, Loader2 } from 'lucide-react';
 import { Particles } from '@/components/ui/particles';
 import { useTheme } from '@/hooks/useTheme';
 import ShimmerText from '@/components/ui/shimmer-text';
@@ -42,6 +42,37 @@ export default function OnboardingPage() {
   const [voiceSamples, setVoiceSamples] = useState<string[]>(['', '', '']);
   const [avatarUrls, setAvatarUrls] = useState<(string | null)[]>([null, null, null]);
   const [saving, setSaving] = useState(false);
+  const [parsingCv, setParsingCv] = useState(false);
+  const cvInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setParsingCv(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-cv`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
+          body: formData,
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Fehler beim Parsen');
+      if (data.name) setName(data.name);
+      if (data.company) setCompany(data.company);
+      if (data.role) setRole(data.role);
+      if (data.industry) setIndustry(data.industry);
+      toast({ title: 'CV erfolgreich ausgelesen!' });
+    } catch (err: any) {
+      toast({ title: 'CV konnte nicht ausgelesen werden', description: err?.message, variant: 'destructive' });
+    }
+    setParsingCv(false);
+    if (cvInputRef.current) cvInputRef.current.value = '';
+  };
 
   const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
@@ -158,6 +189,25 @@ export default function OnboardingPage() {
             <div className="text-center">
               <h1 className="font-playfair text-2xl font-bold">Basis-Informationen</h1>
               <p className="mt-1 text-muted-foreground">Erzählen Sie uns von sich</p>
+            </div>
+            <div className="flex justify-center">
+              <input
+                ref={cvInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.txt"
+                className="hidden"
+                onChange={handleCvUpload}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="gap-2"
+                disabled={parsingCv}
+                onClick={() => cvInputRef.current?.click()}
+              >
+                {parsingCv ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {parsingCv ? 'CV wird analysiert...' : 'CV hochladen & Felder ausfüllen'}
+              </Button>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
