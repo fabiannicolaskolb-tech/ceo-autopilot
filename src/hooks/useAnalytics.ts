@@ -249,6 +249,3 @@ export function useAnalytics() {
     customRange,
     setCustomRange,
   };
-}
-  };
-}
