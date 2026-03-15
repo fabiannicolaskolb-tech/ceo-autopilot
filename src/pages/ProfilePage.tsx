@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X, GripVertical, Wifi, WifiOff } from 'lucide-react';
+import { Plus, X, GripVertical, Wifi, WifiOff, Loader2, Link as LinkIcon, Download } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PhotoUpload from '@/components/PhotoUpload';
 import { supabase } from '@/integrations/supabase/client';
