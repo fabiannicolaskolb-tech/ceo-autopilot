@@ -402,12 +402,43 @@ export default function OnboardingPage() {
           {step < totalSteps ? (
             <InteractiveHoverButton onClick={() => setStep(s => s + 1)} disabled={!isStepValid}>Weiter</InteractiveHoverButton>
           ) : (
-            <InteractiveHoverButton onClick={handleComplete} disabled={saving || !isStepValid}>
+            <InteractiveHoverButton onClick={() => {
+              const validSamples = voiceSamples.filter(s => s.trim().length >= 500 && s.trim().length <= 3000).length;
+              if (validSamples < 3) {
+                setShowVoiceWarning(true);
+              } else {
+                handleComplete();
+              }
+            }} disabled={saving || !isStepValid}>
               {saving ? 'Wird gespeichert...' : 'Abschließen'}
             </InteractiveHoverButton>
           )}
         </div>
       </div>
+
+      <Dialog open={showVoiceWarning} onOpenChange={setShowVoiceWarning}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              Voice Samples unvollständig
+            </DialogTitle>
+            <DialogDescription className="pt-2 text-sm leading-relaxed">
+              Ohne mindestens 3 ausgefüllte Voice Samples (je 500–3.000 Zeichen) kann die KI Ihren Schreibstil nicht optimal erfassen. Die Qualität Ihrer generierten Inhalte könnte darunter leiden.
+              <br /><br />
+              Sie können die Voice Samples jederzeit nachträglich in den <strong>Profileinstellungen</strong> ergänzen.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setShowVoiceWarning(false)}>
+              Zurück zum Ausfüllen
+            </Button>
+            <Button variant="default" onClick={() => { setShowVoiceWarning(false); handleComplete(); }}>
+              Trotzdem abschließen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
