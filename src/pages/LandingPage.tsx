@@ -226,13 +226,8 @@ export default function LandingPage() {
                       {isExpanded && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{
-                            height: { duration: 0.15, ease: 'easeOut' },
-                            opacity: { duration: 0.1 },
-                            exit: { height: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }, opacity: { duration: 0.3 } },
-                          }}
+                          animate={{ height: 'auto', opacity: 1, transition: { height: { duration: 0.15, ease: 'easeOut' }, opacity: { duration: 0.1 } } }}
+                          exit={{ height: 0, opacity: 0, transition: { height: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }, opacity: { duration: 0.3 } } }}
                           className="w-full max-w-3xl mx-auto overflow-hidden"
                         >
                           <div className="px-6 pb-6">
