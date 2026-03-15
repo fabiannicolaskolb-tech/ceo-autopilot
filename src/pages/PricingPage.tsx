@@ -105,7 +105,7 @@ export default function PricingPage() {
             transition={{ duration: 0.5 }}
             className="font-playfair text-4xl font-bold text-foreground sm:text-5xl"
           >
-            Pricing
+            {t('pricing.title')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -113,7 +113,7 @@ export default function PricingPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto"
           >
-            Wählen Sie den Plan, der zu Ihrem Wachstum passt.
+            {t('pricing.subtitle')}
           </motion.p>
         </div>
 
