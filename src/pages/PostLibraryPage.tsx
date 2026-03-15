@@ -393,14 +393,22 @@ function GalleryGrid({ posts, onPostClick }: { posts: any[]; onPostClick?: (post
 function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
   const handleApprove = async () => {
     const { error } = await supabase.from('posts').update({ status: 'approved' }).eq('id', post.id);
-    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
+    if (error) { 
+      console.error('Approve error:', error);
+      toast({ title: 'Fehler beim Freigeben', description: error.message, variant: 'destructive' }); 
+      return; 
+    }
     toast({ title: 'Post freigegeben ✓' });
     onMutate();
   };
 
   const handleReject = async () => {
     const { error } = await supabase.from('posts').delete().eq('id', post.id);
-    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
+    if (error) { 
+      console.error('Reject error:', error);
+      toast({ title: 'Fehler beim Ablehnen', description: error.message, variant: 'destructive' }); 
+      return; 
+    }
     toast({ title: 'Post abgelehnt und gelöscht' });
     onMutate();
   };
