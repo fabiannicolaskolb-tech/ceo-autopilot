@@ -22,7 +22,7 @@ const ShimmerButton = React.forwardRef<HTMLButtonElement, ShimmerButtonProps>(
       background = "rgba(0, 0, 0, 1)",
       className,
       children,
-      ...props,
+      ...props
     },
     ref,
   ) => {
