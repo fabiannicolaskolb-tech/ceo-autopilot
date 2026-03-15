@@ -2,9 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Sun, CheckCircle2, Lightbulb, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useLang } from '@/hooks/useLang';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
+import { de, enUS } from 'date-fns/locale';
 
 const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
 
@@ -22,6 +23,8 @@ interface BriefingMetrics {
 
 export default function DailyBriefing() {
   const { user } = useAuth();
+  const { t, lang } = useLang();
+  const dateFnsLocale = lang === 'de' ? de : enUS;
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -102,9 +105,9 @@ export default function DailyBriefing() {
           <div className="rounded-full bg-muted/60 p-5 mb-4">
             <Sun className="h-10 w-10 text-muted-foreground/40" />
           </div>
-          <h2 className="font-playfair text-lg font-semibold text-foreground">Noch kein Briefing verfügbar</h2>
+          <h2 className="font-playfair text-lg font-semibold text-foreground">{t('briefing.no_briefing')}</h2>
           <p className="text-sm text-muted-foreground mt-2 max-w-md">
-            Sobald dein erster Post analysiert wurde, erscheint hier dein tägliches Morgen-Briefing mit Performance-Daten und KI-Empfehlungen.
+            {t('briefing.no_briefing_desc')}
           </p>
         </div>
       </div>
@@ -113,18 +116,16 @@ export default function DailyBriefing() {
 
   return (
     <div className={cn(GLASS_CARD, 'p-6 sm:p-8 space-y-6')}>
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <Sun className="h-5 w-5 text-warning" />
-          <h2 className="font-playfair text-lg font-semibold text-foreground">Dein Morgen-Briefing</h2>
+          <h2 className="font-playfair text-lg font-semibold text-foreground">{t('briefing.title')}</h2>
         </div>
         <span className="text-sm text-muted-foreground">
-          {format(new Date(), "'Heute,' d. MMMM", { locale: de })}
+          {format(new Date(), lang === 'de' ? "'Heute,' d. MMMM" : "'Today,' MMMM d", { locale: dateFnsLocale })}
         </span>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { value: formatNumber(metrics.impressions), label: 'Impressions' },
@@ -139,19 +140,17 @@ export default function DailyBriefing() {
         ))}
       </div>
 
-      {/* Performance Summary */}
       {displaySummary && (
         <p className="text-sm text-foreground/80 leading-relaxed italic border-l-2 border-primary/30 pl-4">
           "{displaySummary}"
         </p>
       )}
 
-      {/* What Worked */}
       {displayWhatWorked.length > 0 && (
         <div className="space-y-2">
           <h3 className="flex items-center gap-2 text-sm font-medium text-foreground">
             <CheckCircle2 className="h-4 w-4 text-success" />
-            Was funktioniert hat
+            {t('briefing.what_worked')}
           </h3>
           <ul className="space-y-1.5 pl-6">
             {displayWhatWorked.map((item: string, i: number) => (
@@ -161,12 +160,11 @@ export default function DailyBriefing() {
         </div>
       )}
 
-      {/* Recommended Follow-ups */}
       {displayFollowUps.length > 0 && (
         <div className="space-y-2">
           <h3 className="flex items-center gap-2 text-sm font-medium text-foreground">
             <Lightbulb className="h-4 w-4 text-warning" />
-            Nächste Post-Ideen
+            {t('briefing.next_ideas')}
           </h3>
           <ul className="space-y-1.5 pl-6">
             {displayFollowUps.map((item: string, i: number) => (
