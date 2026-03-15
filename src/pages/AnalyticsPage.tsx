@@ -2,8 +2,10 @@ import React, { useState, useMemo, useCallback } from 'react';
 import {
   Eye, TrendingUp, TrendingDown, Users, ArrowUpRight, ArrowDownRight,
   BarChart3, Clock, MessageCircle, Heart, Share2, Lightbulb, Minus, Rocket,
-  Upload, Image as ImageIcon, Save, Brain, Zap, ArrowRight,
+  Upload, Image as ImageIcon, Save, Brain, Zap, ArrowRight, CalendarIcon,
 } from 'lucide-react';
+import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePosts } from '@/hooks/useRealtime';
@@ -18,6 +20,8 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   AreaChart, Area, LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
