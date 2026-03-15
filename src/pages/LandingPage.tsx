@@ -217,18 +217,26 @@ export default function LandingPage() {
                         {isExpanded ? 'Schließen ↑' : 'Vorschau ansehen →'}
                       </span>
                     </div>
-                    <div
-                      className={`w-full max-w-3xl mx-auto overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
-                    >
-                      <div className="px-6 pb-6">
-                        <img
-                          src={previewImage}
-                          alt={`${f.title} Vorschau`}
-                          className="w-full rounded-xl border border-border shadow-lg brightness-[1.02] dark:brightness-[0.85] dark:contrast-[1.1] dark:border-border/50"
-                          draggable={false}
-                        />
-                      </div>
-                    </div>
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                          className="w-full max-w-3xl mx-auto overflow-hidden"
+                        >
+                          <div className="px-6 pb-6">
+                            <img
+                              src={previewImage}
+                              alt={`${f.title} Vorschau`}
+                              className="w-full rounded-xl border border-border shadow-lg brightness-[1.02] dark:brightness-[0.85] dark:contrast-[1.1] dark:border-border/50"
+                              draggable={false}
+                            />
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               );
