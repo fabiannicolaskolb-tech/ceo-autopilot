@@ -194,6 +194,7 @@ export default function IdeationPage() {
     }
     setGenerating(true);
     try {
+      const requestId = crypto.randomUUID();
       const payload = {
         input,
         profile: {
@@ -223,6 +224,19 @@ export default function IdeationPage() {
           category: c.category || 'Allgemein',
         }));
         setConcepts(mapped);
+
+        // Save generated ideas to Supabase for n8n
+        const { error: saveError } = await supabase.from('generated_ideas').insert({
+          user_id: user!.id,
+          request_id: requestId,
+          ideas: mapped as any,
+          raw_experience: input,
+          status: 'generated',
+          has_history: false,
+        });
+        if (saveError) {
+          console.error('Error saving generated ideas:', saveError);
+        }
       } else {
         toast({ title: 'Keine Ideen generiert', description: 'Der Workflow hat keine Konzepte zurückgegeben. Versuchen Sie es mit einem anderen Input.', variant: 'destructive' });
       }
