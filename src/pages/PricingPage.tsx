@@ -76,12 +76,21 @@ export default function PricingPage() {
               Briefly
             </span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLang}
+              className="gap-1.5 text-xs font-medium"
+            >
+              <Globe className="h-3.5 w-3.5" />
+              {lang === 'de' ? 'EN' : 'DE'}
+            </Button>
             <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
               {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to="/auth">Anmelden</Link>
+              <Link to="/auth">{t('nav.login')}</Link>
             </Button>
           </div>
         </div>
