@@ -48,6 +48,7 @@ export default function OnboardingPage() {
   const [avatarUrls, setAvatarUrls] = useState<(string | null)[]>([null, null, null]);
   const [saving, setSaving] = useState(false);
   const [parsingCv, setParsingCv] = useState(false);
+  const [cvUploaded, setCvUploaded] = useState(false);
   const cvInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
