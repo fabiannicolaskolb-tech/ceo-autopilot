@@ -215,7 +215,7 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
   const isLong = contentPreview.length > 200;
 
   return (
-    <div className={cn(GLASS_CARD, 'p-5 space-y-3 transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]')}>
+    <div className={cn(GLASS_CARD, 'p-5 space-y-3 transition-all duration-200 hover:shadow-[0_8px_32px_-4px_hsl(263_50%_40%/0.1)]')}>
       {/* Header */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
