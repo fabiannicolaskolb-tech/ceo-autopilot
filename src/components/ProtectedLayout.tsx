@@ -36,6 +36,7 @@ function ProtectedLayout() {
 
   return (
     <div className="relative min-h-screen bg-background">
+      <WaveMeshBackground />
       <Particles className="absolute inset-0 z-0" quantity={150} color={theme === 'dark' ? '#8899bb' : '#1a2740'} size={0.5} burst={burstKey} />
       <div className="relative z-10">
         <FloatingHeader />
