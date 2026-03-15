@@ -9,6 +9,7 @@ interface LinkedInPostPreviewProps {
   authorAvatar?: string;
   content: string;
   hook?: string;
+  imageUrl?: string | null;
   postedAt?: string;
   metrics?: {
     likes?: number;
