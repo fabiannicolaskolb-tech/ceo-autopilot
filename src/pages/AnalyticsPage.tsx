@@ -430,16 +430,11 @@ export default function AnalyticsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={handleLinkedInImport}
-              disabled={importLoading}
+              onClick={() => document.getElementById('import-section')?.scrollIntoView({ behavior: 'smooth' })}
               className="gap-2"
             >
-              {importLoading ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                <Linkedin className="h-4 w-4" />
-              )}
-              {importLoading ? 'Importiere…' : 'Posts importieren'}
+              <Linkedin className="h-4 w-4" />
+              Posts importieren
             </Button>
             <Tabs value={timeRange} onValueChange={v => {
               setTimeRange(v as TimeRange);
@@ -723,7 +718,7 @@ function ScreenshotAnalytics() {
   const confidenceColor = confidence > 0.8 ? 'text-success' : confidence > 0.5 ? 'text-warning' : 'text-destructive';
 
   return (
-    <div className={cn(GLASS_CARD, 'p-6')}>
+    <div id="import-section" className={cn(GLASS_CARD, 'p-6')}>
       <h2 className="font-playfair text-base font-semibold text-foreground mb-1 flex items-center gap-2">
         <Upload className="h-4 w-4" /> Echte LinkedIn-Metriken importieren
       </h2>
