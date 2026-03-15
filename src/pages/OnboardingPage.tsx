@@ -20,11 +20,11 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 
 const TONES = [
-  { value: 'authoritative', label: 'Authoritative' },
-  { value: 'conversational', label: 'Conversational' },
-  { value: 'visionary', label: 'Visionary' },
-  { value: 'technical', label: 'Technical' },
-  { value: 'inspirational', label: 'Inspirational' },
+  { value: 'authoritative', label: 'Autoritär & bestimmt' },
+  { value: 'conversational', label: 'Locker & gesprächig' },
+  { value: 'visionary', label: 'Visionär & zukunftsorientiert' },
+  { value: 'technical', label: 'Fachlich & analytisch' },
+  { value: 'inspirational', label: 'Inspirierend & motivierend' },
 ];
 
 export default function OnboardingPage() {
