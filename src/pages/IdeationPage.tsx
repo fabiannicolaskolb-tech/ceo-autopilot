@@ -308,14 +308,6 @@ export default function IdeationPage() {
                   </InteractiveHoverButton>
                 )}
 
-                <Button
-                  variant="outline"
-                  className="rounded-sm gap-2"
-                  onClick={() => setVoiceModalOpen(true)}
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  Gespräch starten
-                </Button>
               </div>
             </div>
           </ResizablePanel>
