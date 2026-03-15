@@ -30,6 +30,7 @@ interface BriefingMetrics {
 
 export default function DailyBriefing() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
 
@@ -39,6 +40,7 @@ export default function DailyBriefing() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
 
   // Fetch posts & audio
   useEffect(() => {
