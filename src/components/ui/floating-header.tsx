@@ -48,8 +48,7 @@ export function FloatingHeader() {
             </span>
           </Link>
 
-          {!isDashboard && (
-            <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-1 lg:flex">
               {navItems.map((item) => {
                 const active = location.pathname === item.url;
                 return (
@@ -72,7 +71,6 @@ export function FloatingHeader() {
                 );
               })}
             </nav>
-          )}
         </div>
 
         {/* Right: Avatar Dropdown (desktop) + Mobile trigger */}
