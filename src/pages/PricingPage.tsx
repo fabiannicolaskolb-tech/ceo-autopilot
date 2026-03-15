@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Zap, Check, X, Sun, Moon, ArrowLeft, Sparkles } from 'lucide-react';
+import { Zap, Check, X, Sun, Moon, ArrowLeft, Sparkles, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/hooks/useTheme';
+import { useLang } from '@/hooks/useLang';
 
 const allFeatures = [
   'AI posts/month',
@@ -54,6 +55,7 @@ const plans = [
 
 export default function PricingPage() {
   const { theme, toggleTheme } = useTheme();
+  const { lang, toggleLang, t } = useLang();
   const navigate = useNavigate();
 
   return (
@@ -74,12 +76,21 @@ export default function PricingPage() {
               Briefly
             </span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLang}
+              className="gap-1.5 text-xs font-medium"
+            >
+              <Globe className="h-3.5 w-3.5" />
+              {lang === 'de' ? 'EN' : 'DE'}
+            </Button>
             <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
               {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to="/auth">Anmelden</Link>
+              <Link to="/auth">{t('nav.login')}</Link>
             </Button>
           </div>
         </div>
@@ -94,7 +105,7 @@ export default function PricingPage() {
             transition={{ duration: 0.5 }}
             className="font-playfair text-4xl font-bold text-foreground sm:text-5xl"
           >
-            Pricing
+            {t('pricing.title')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -102,7 +113,7 @@ export default function PricingPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto"
           >
-            Wählen Sie den Plan, der zu Ihrem Wachstum passt.
+            {t('pricing.subtitle')}
           </motion.p>
         </div>
 
@@ -152,7 +163,7 @@ export default function PricingPage() {
                 ) : (
                   <div className="mt-5">
                     <span className="font-playfair text-2xl font-bold text-foreground">Custom</span>
-                    <p className="text-sm text-muted-foreground mt-1">Individuell nach Bedarf</p>
+                    <p className="text-sm text-muted-foreground mt-1">{t('pricing.custom')}</p>
                   </div>
                 )}
 
@@ -196,14 +207,14 @@ export default function PricingPage() {
                           : 'bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.1] border border-border/50'
                       }`}
                     >
-                      Get Started
+                      {t('pricing.cta')}
                     </Button>
                   ) : (
                     <Button
                       onClick={() => window.location.href = 'mailto:sales@briefly.app'}
                       className="w-full h-11 rounded-xl font-medium bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.1] border border-border/50 transition-all duration-300"
                     >
-                      Contact Sales
+                      {t('pricing.contact')}
                     </Button>
                   )}
                 </div>
@@ -216,7 +227,7 @@ export default function PricingPage() {
           <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
             <Link to="/">
               <ArrowLeft className="h-4 w-4 mr-1.5" />
-              Zurück zur Startseite
+              {t('pricing.back')}
             </Link>
           </Button>
         </div>

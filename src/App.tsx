@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/hooks/useTheme";
+import { LangProvider } from "@/hooks/useLang";
 import ProtectedLayout from "@/components/ProtectedLayout";
 import LandingPage from "@/pages/LandingPage";
 import AuthPage from "@/pages/AuthPage";
@@ -25,6 +26,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
+    <LangProvider>
       <AuthProvider>
         <TooltipProvider>
           <Toaster />
@@ -52,6 +54,7 @@ const App = () => (
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
+    </LangProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
