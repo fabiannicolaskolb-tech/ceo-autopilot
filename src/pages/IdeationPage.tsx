@@ -192,60 +192,137 @@ export default function IdeationPage() {
         onClose={() => setVoiceModalOpen(false)}
         onInsightsSaved={() => refetchInsights()}
       />
+      {/* Split View: Actions + Sidebar */}
+      <div className="hidden md:block">
+        <ResizablePanelGroup direction="horizontal" className="min-h-[380px] rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
+          {/* Left: Actions */}
+          <ResizablePanel defaultSize={70} minSize={55}>
+            <div className="p-8 h-full flex flex-col">
+              <h1 className="font-playfair text-3xl font-bold text-foreground tracking-tight">
+                Ideation Lab
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1 mb-8">
+                Generieren Sie Posts aus Ihren Daten oder teilen Sie persönliche Erlebnisse per Sprache.
+              </p>
 
-      <div>
-        <h1 className="font-playfair text-3xl font-bold text-foreground tracking-tight">
-          Ideation Lab
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Generieren Sie Posts aus Ihren Daten oder teilen Sie persönliche Erlebnisse per Sprache.
-        </p>
+              <div className="grid gap-6 sm:grid-cols-2 flex-1">
+                {/* Post generieren */}
+                <div className="flex flex-col items-center text-center gap-4 p-6 rounded-2xl border border-border bg-muted/20">
+                  <div className="flex items-center justify-center h-14 w-14 rounded-2xl bg-primary/10">
+                    <FileText className="h-7 w-7 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-playfair text-lg font-semibold text-foreground">Post generieren</h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Basierend auf Profil, Themen & bisherigen Posts.
+                    </p>
+                  </div>
+                  {generating ? (
+                    <div className="flex items-center gap-3 py-2">
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                      <span className="text-sm text-muted-foreground animate-pulse">
+                        {LOADING_TEXTS[loadingTextIndex]}
+                      </span>
+                    </div>
+                  ) : (
+                    <InteractiveHoverButton onClick={generatePost}>
+                      Post generieren
+                    </InteractiveHoverButton>
+                  )}
+                </div>
+
+                {/* Gespräch starten */}
+                <div className="flex flex-col items-center text-center gap-4 p-6 rounded-2xl border border-border bg-muted/20">
+                  <div className="flex items-center justify-center h-14 w-14 rounded-2xl bg-primary/10">
+                    <MessageSquare className="h-7 w-7 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-playfair text-lg font-semibold text-foreground">Gespräch starten</h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Persönliche Erlebnisse per Sprache für Content nutzen.
+                    </p>
+                  </div>
+                  <InteractiveHoverButton onClick={() => setVoiceModalOpen(true)}>
+                    Gespräch starten
+                  </InteractiveHoverButton>
+                </div>
+              </div>
+            </div>
+          </ResizablePanel>
+
+          <ResizableHandle />
+
+          {/* Right: Context Sidebar */}
+          <ResizablePanel defaultSize={30} minSize={20}>
+            <div className="p-6 h-full bg-muted/30 border-l-0">
+              <h2 className="font-playfair text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">
+                Inspirations-Vorlagen
+              </h2>
+              <div className="space-y-3">
+                {TEMPLATES.map((tpl, i) => (
+                  <div
+                    key={i}
+                    className="w-full text-left p-3 rounded-sm border border-border bg-card group"
+                  >
+                    <div className="flex items-start gap-2">
+                      <span className="text-lg leading-none">{tpl.emoji}</span>
+                      <div>
+                        <span className="text-sm font-medium text-foreground">{tpl.label}</span>
+                        <p className="text-xs text-muted-foreground mt-0.5">{tpl.prompt}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {topics.length > 0 && (
+                <div className="mt-6 pt-4 border-t border-border">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                    Ihre Fokus-Themen
+                  </h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {topics.slice(0, 8).map(t => (
+                      <Badge key={t.id} variant="outline" className="text-xs rounded-sm">
+                        {t.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
 
-      {/* Two action cards */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
-          <CardContent className="p-8 flex flex-col items-center text-center gap-5">
-            <div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-primary/10">
-              <FileText className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-playfair text-xl font-semibold text-foreground">Post generieren</h3>
-              <p className="text-sm text-muted-foreground mt-2">
-                Basierend auf Ihrem Profil, Ihren Themen und bisherigen Posts — ohne persönliche Erlebnisse.
-              </p>
-            </div>
-            {generating ? (
-              <div className="flex items-center gap-3 py-3">
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                <span className="text-sm text-muted-foreground animate-pulse">
-                  {LOADING_TEXTS[loadingTextIndex]}
-                </span>
-              </div>
-            ) : (
-              <InteractiveHoverButton onClick={generatePost}>
-                Post generieren
-              </InteractiveHoverButton>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
-          <CardContent className="p-8 flex flex-col items-center text-center gap-5">
-            <div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-primary/10">
-              <MessageSquare className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-playfair text-xl font-semibold text-foreground">Gespräch starten</h3>
-              <p className="text-sm text-muted-foreground mt-2">
-                Erzählen Sie von Ihrem Tag oder einer Erkenntnis — persönliche Daten werden für Ihren Content verwendet.
-              </p>
-            </div>
-            <InteractiveHoverButton onClick={() => setVoiceModalOpen(true)}>
-              Gespräch starten
-            </InteractiveHoverButton>
-          </CardContent>
-        </Card>
+      {/* Mobile layout */}
+      <div className="md:hidden space-y-6">
+        <div>
+          <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Ideation Lab</h1>
+          <p className="text-sm text-muted-foreground mt-1">Posts generieren oder per Sprache Ideen teilen.</p>
+        </div>
+        <div className="grid gap-4">
+          <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
+            <CardContent className="p-6 flex flex-col items-center text-center gap-4">
+              <FileText className="h-7 w-7 text-primary" />
+              <h3 className="font-playfair text-lg font-semibold text-foreground">Post generieren</h3>
+              {generating ? (
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                  <span className="text-sm text-muted-foreground animate-pulse">{LOADING_TEXTS[loadingTextIndex]}</span>
+                </div>
+              ) : (
+                <InteractiveHoverButton onClick={generatePost}>Post generieren</InteractiveHoverButton>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
+            <CardContent className="p-6 flex flex-col items-center text-center gap-4">
+              <MessageSquare className="h-7 w-7 text-primary" />
+              <h3 className="font-playfair text-lg font-semibold text-foreground">Gespräch starten</h3>
+              <InteractiveHoverButton onClick={() => setVoiceModalOpen(true)}>Gespräch starten</InteractiveHoverButton>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Voice Insights */}
