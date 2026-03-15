@@ -37,7 +37,8 @@ export default function ProfilePage() {
   const [tone, setTone] = useState('visionary');
   const [focusInput, setFocusInput] = useState('');
   const [noGoInput, setNoGoInput] = useState('');
-
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [scraping, setScraping] = useState(false);
   useEffect(() => {
     if (profile) {
       setName(profile.name || '');
