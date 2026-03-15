@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Loader2, X, ArrowRight, Sparkles, MessageSquare, FileText, Check, Pencil, CalendarDays, Trash2 } from 'lucide-react';
+import { Loader2, X, ArrowRight, Sparkles, MessageSquare, FileText, Check, Pencil, CalendarDays, Trash2, ChevronDown } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
