@@ -42,6 +42,37 @@ export default function OnboardingPage() {
   const [voiceSamples, setVoiceSamples] = useState<string[]>(['', '', '']);
   const [avatarUrls, setAvatarUrls] = useState<(string | null)[]>([null, null, null]);
   const [saving, setSaving] = useState(false);
+  const [parsingCv, setParsingCv] = useState(false);
+  const cvInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setParsingCv(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-cv`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
+          body: formData,
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Fehler beim Parsen');
+      if (data.name) setName(data.name);
+      if (data.company) setCompany(data.company);
+      if (data.role) setRole(data.role);
+      if (data.industry) setIndustry(data.industry);
+      toast({ title: 'CV erfolgreich ausgelesen!' });
+    } catch (err: any) {
+      toast({ title: 'CV konnte nicht ausgelesen werden', description: err?.message, variant: 'destructive' });
+    }
+    setParsingCv(false);
+    if (cvInputRef.current) cvInputRef.current.value = '';
+  };
 
   const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
