@@ -419,15 +419,6 @@ export default function IdeationPage() {
             <InteractiveHoverButton onClick={generate}>Ideen generieren</InteractiveHoverButton>
           )}
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-sm gap-2"
-            onClick={() => setVoiceModalOpen(true)}
-          >
-            <MessageSquare className="h-4 w-4" />
-            Gespräch
-          </Button>
         </div>
       </div>
 
