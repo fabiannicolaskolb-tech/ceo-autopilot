@@ -64,7 +64,7 @@ export default function LandingPage() {
     if (expandedFeature === title) {
       // Closing: first collapse image, then after delay remove col-span & show others
       setExpandedFeature(null);
-      setTimeout(() => setColSpanFeature(null), 400);
+      setTimeout(() => setColSpanFeature(null), 700);
     } else {
       // Opening: set col-span immediately, then expand
       setColSpanFeature(title);
@@ -199,7 +199,7 @@ export default function LandingPage() {
                 <div
                   key={f.title}
                   onClick={() => handleFeatureClick(f.title)}
-                  className={`group relative cursor-pointer overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] transition-all duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${isHidden ? 'max-h-0 opacity-0 scale-95 overflow-hidden pointer-events-none' : 'max-h-[800px] opacity-100 scale-100'} ${hasColSpan ? 'sm:col-span-3' : ''}`}
+                  className={`group relative cursor-pointer overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${isHidden ? 'max-h-0 opacity-0 scale-95 overflow-hidden pointer-events-none' : 'max-h-[800px] opacity-100 scale-100'} ${hasColSpan ? 'sm:col-span-3' : ''}`}
                   style={isHidden ? { margin: 0, padding: 0, border: 'none', height: 0, gap: 0 } : undefined}
                 >
                   <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
@@ -217,7 +217,7 @@ export default function LandingPage() {
                       </span>
                     </div>
                     <div
-                      className={`w-full max-w-3xl mx-auto overflow-hidden transition-all duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+                      className={`w-full max-w-3xl mx-auto overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
                     >
                       <div className="px-6 pb-6">
                         <img
