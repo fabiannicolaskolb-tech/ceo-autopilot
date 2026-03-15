@@ -106,7 +106,7 @@ export function useGeneratedIdeas(userId: string | undefined) {
         .order("created_at", { ascending: false })
         .limit(10);
 
-      if (data) setIdeas(data as GeneratedIdea[]);
+      if (data) setIdeas(data as unknown as GeneratedIdea[]);
       setLoading(false);
     };
     fetchIdeas();
