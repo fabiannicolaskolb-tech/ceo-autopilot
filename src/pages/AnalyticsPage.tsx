@@ -328,7 +328,7 @@ function TopPostsTable({ posts }: { posts: AnalyticsPost[] }) {
               </TableCell>
               <TableCell>{(p.metrics.impressions || 0).toLocaleString()}</TableCell>
               <TableCell>{p.metrics.ctr != null ? `${p.metrics.ctr}%` : '—'}</TableCell>
-              <TableCell>{i.comments || 0}</TableCell>
+              <TableCell>{p.metrics.comments || 0}</TableCell>
               <TableCell>
                 <Badge variant="secondary" className="bg-success/10 text-success text-xs">{eng}%</Badge>
               </TableCell>
