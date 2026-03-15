@@ -246,5 +246,9 @@ export function useAnalytics() {
     hasData,
     timeRange,
     setTimeRange,
+    customRange,
+    setCustomRange,
+  };
+}
   };
 }
