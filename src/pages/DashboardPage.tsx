@@ -366,24 +366,24 @@ function LearningProgressCard({ posts }: { posts: any[] }) {
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="relative z-10 grid gap-4 sm:grid-cols-2">
         {engagementTrend.length >= 2 && (
-          <div className="rounded-[16px] bg-muted/30 p-4">
+          <div className="rounded-[16px] bg-white/30 dark:bg-white/10 backdrop-blur-sm border border-white/20 dark:border-white/5 p-4">
             <p className="text-xs text-muted-foreground mb-2">Engagement Rate Verlauf</p>
             <div className="h-[60px]">
               <Sparkline data={engagementTrend} color="hsl(160, 60%, 38%)" height={60} width={300} />
             </div>
           </div>
         )}
-        <div className="space-y-3">
+        <div className="relative z-10 space-y-3">
           {topPattern && (
-            <div className="rounded-[16px] bg-primary/5 p-3">
+            <div className="rounded-[16px] bg-white/40 dark:bg-white/10 backdrop-blur-sm border border-white/20 dark:border-white/5 p-3">
               <p className="text-xs text-muted-foreground">Top Content-Pattern</p>
               <p className="text-sm font-medium text-foreground mt-0.5">{topPattern}</p>
             </div>
           )}
           {latestSummary && (
-            <div className="rounded-[16px] bg-muted/30 p-3">
+            <div className="rounded-[16px] bg-white/30 dark:bg-white/10 backdrop-blur-sm border border-white/20 dark:border-white/5 p-3">
               <p className="text-xs text-muted-foreground">Letzte Analyse</p>
               <p className="text-xs text-foreground mt-0.5 line-clamp-2">{latestSummary}</p>
             </div>
