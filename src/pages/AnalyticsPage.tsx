@@ -1,8 +1,19 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Eye, TrendingUp, TrendingDown, Users, ArrowUpRight, ArrowDownRight,
   BarChart3, Clock, MessageCircle, Heart, Share2, Lightbulb, Minus, Rocket,
+  Upload, Image as ImageIcon, Save, Brain, Zap, ArrowRight,
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { usePosts } from '@/hooks/useRealtime';
+import { toast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import {
