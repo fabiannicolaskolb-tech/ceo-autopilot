@@ -131,7 +131,7 @@ export default function DashboardPage() {
         <div
           className={`transition-all duration-500 ease-in-out overflow-hidden ${showScore ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}
         >
-          <div className="border-t border-border/50 p-6 sm:p-8 pt-6">
+          <div className="border-t border-white/20 dark:border-white/10 p-6 sm:p-8 pt-6">
             <CreatorScoreCard />
           </div>
         </div>
