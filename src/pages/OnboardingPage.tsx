@@ -187,7 +187,7 @@ export default function OnboardingPage() {
         <div className="flex items-center justify-between px-6 py-3">
           <div className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" />
-            <span className="font-playfair text-lg font-semibold text-foreground">CEO Autopilot</span>
+            <span className="font-playfair text-lg font-semibold text-foreground">Briefly</span>
           </div>
           <span className="text-sm text-muted-foreground">Schritt {step} von {totalSteps}</span>
         </div>
@@ -218,7 +218,7 @@ export default function OnboardingPage() {
         {step === 1 &&
         <div className="space-y-8">
             <div className="text-center">
-              <ShimmerText className="font-playfair text-3xl font-bold text-foreground">Willkommen bei CEO Autopilot</ShimmerText>
+              <ShimmerText className="font-playfair text-3xl font-bold text-foreground">Willkommen bei Briefly</ShimmerText>
               <p className="mt-2 text-muted-foreground">Ihr LinkedIn-Autopilot für strategische Sichtbarkeit</p>
             </div>
             <div className="grid gap-6 sm:grid-cols-3">

@@ -36,7 +36,7 @@ export default function AppSidebar() {
           </div>
           {!collapsed && (
             <div>
-              <div className="font-playfair text-sm font-semibold text-sidebar-primary">CEO Autopilot</div>
+              <div className="font-playfair text-sm font-semibold text-sidebar-primary">Briefly</div>
               <div className="text-[10px] uppercase tracking-[0.2em] text-sidebar-foreground/60">LinkedIn</div>
             </div>
           )}

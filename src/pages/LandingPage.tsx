@@ -90,7 +90,7 @@ export default function LandingPage() {
               <Zap className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="font-playfair text-[15px] font-semibold tracking-tight text-foreground">
-              CEO Autopilot
+              Briefly
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -138,7 +138,7 @@ export default function LandingPage() {
             
             <img
               src={analyticsPreview}
-              alt="CEO Autopilot Analytics Tool Vorschau"
+              alt="Briefly Analytics Tool Vorschau"
               className="mx-auto rounded-2xl object-cover h-full w-full object-[15%_0%]"
               draggable={false} />
             
@@ -305,7 +305,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-2">
             <Zap className="h-4 w-4 text-primary" />
             <span className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} CEO Autopilot
+              © {new Date().getFullYear()} Briefly
             </span>
           </div>
           <span className="text-xs text-muted-foreground">DSGVO-konform · Made in Germany</span>
