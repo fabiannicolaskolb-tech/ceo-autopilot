@@ -274,7 +274,7 @@
   width: calc(100% + var(--border-width));
   height: calc(100% + var(--border-width));
   border-radius: calc(var(--card-radius) * 0.9);
-  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  box-shadow: none;
   mix-blend-mode: color-burn;
   z-index: -1;
   background: hsl(0deg 0% 16%) radial-gradient(
