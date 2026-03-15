@@ -16,7 +16,7 @@ const allFeatures = [
 const plans = [
   {
     name: 'Starter',
-    price: '$99',
+    price: '$7',
     popular: false,
     featureDetails: {
       'AI posts/month': '10',
@@ -28,7 +28,7 @@ const plans = [
   },
   {
     name: 'Pro',
-    price: '$249',
+    price: '$18',
     popular: true,
     featureDetails: {
       'AI posts/month': '30',
@@ -40,7 +40,7 @@ const plans = [
   },
   {
     name: 'Enterprise',
-    price: '$499',
+    price: '$59',
     popular: false,
     featureDetails: {
       'AI posts/month': 'Unlimited',
