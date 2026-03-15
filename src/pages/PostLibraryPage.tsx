@@ -1,11 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { format } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isToday } from 'date-fns';
 import { de } from 'date-fns/locale';
 import {
   FileText, Send, Check, Clock, BarChart3, Copy, Pencil, Trash2,
   CalendarDays, ChevronDown, ChevronUp, Inbox, Sparkles,
-  Eye, Heart, MessageCircle, Share2,
+  Eye, Heart, MessageCircle, Share2, List, ChevronLeft, ChevronRight,
+  Loader2, Zap, Rocket,
 } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { usePosts } from '@/hooks/useRealtime';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -27,14 +30,17 @@ import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 
 const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
+const GLASS_CARD_HOVER = `${GLASS_CARD} transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]`;
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  draft: { label: 'Entwurf', color: 'bg-muted text-muted-foreground', icon: FileText },
-  approved: { label: 'Freigegeben', color: 'bg-[hsl(var(--status-approved))]/15 text-[hsl(var(--status-approved))]', icon: Check },
-  scheduled: { label: 'Geplant', color: 'bg-[hsl(var(--status-scheduled))]/15 text-[hsl(var(--status-scheduled))]', icon: Clock },
-  posted: { label: 'Veröffentlicht', color: 'bg-[hsl(var(--status-posted))]/15 text-[hsl(var(--status-posted))]', icon: Send },
-  analyzed: { label: 'Analysiert', color: 'bg-warning/15 text-warning', icon: BarChart3 },
+const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType; dotClass: string }> = {
+  draft: { label: 'Entwurf', color: 'bg-muted text-muted-foreground', icon: FileText, dotClass: 'bg-[hsl(var(--status-draft))]' },
+  approved: { label: 'Freigegeben', color: 'bg-[hsl(var(--status-approved))]/15 text-[hsl(var(--status-approved))]', icon: Check, dotClass: 'bg-[hsl(var(--status-approved))]' },
+  scheduled: { label: 'Geplant', color: 'bg-[hsl(var(--status-scheduled))]/15 text-[hsl(var(--status-scheduled))]', icon: Clock, dotClass: 'bg-[hsl(var(--status-scheduled))]' },
+  posted: { label: 'Veröffentlicht', color: 'bg-[hsl(var(--status-posted))]/15 text-[hsl(var(--status-posted))]', icon: Send, dotClass: 'bg-[hsl(var(--status-posted))]' },
+  analyzed: { label: 'Analysiert', color: 'bg-warning/15 text-warning', icon: BarChart3, dotClass: 'bg-[hsl(var(--warning))]' },
 };
+
+const WEEKDAYS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
 function StatusBadge({ status }: { status: string }) {
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.draft;
@@ -47,6 +53,104 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+function getPostDate(post: any): Date | null {
+  if (post.posted_at) return new Date(post.posted_at);
+  if (post.scheduled_at) return new Date(post.scheduled_at);
+  return new Date(post.created_at);
+}
+
+// ──── Calendar View ────
+function CalendarView({ posts, onPostClick }: { posts: any[]; onPostClick: (post: any) => void }) {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  const startOffset = (getDay(monthStart) + 6) % 7;
+
+  const postsByDate = useMemo(() => {
+    const map = new Map<string, any[]>();
+    posts.forEach(post => {
+      const d = getPostDate(post);
+      if (d) {
+        const key = format(d, 'yyyy-MM-dd');
+        if (!map.has(key)) map.set(key, []);
+        map.get(key)!.push(post);
+      }
+    });
+    return map;
+  }, [posts]);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(prev => subMonths(prev, 1))}>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <h3 className="font-playfair text-lg font-semibold text-foreground">
+          {format(currentMonth, 'MMMM yyyy', { locale: de })}
+        </h3>
+        <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(prev => addMonths(prev, 1))}>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="flex flex-wrap gap-3 px-1">
+        {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+          <div key={key} className="flex items-center gap-1.5">
+            <div className={cn('h-2.5 w-2.5 rounded-full', cfg.dotClass)} />
+            <span className="text-xs text-muted-foreground">{cfg.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-7 gap-px rounded-xl overflow-hidden bg-border/50">
+        {WEEKDAYS.map(d => (
+          <div key={d} className="bg-muted/60 py-2 text-center text-xs font-medium text-muted-foreground">{d}</div>
+        ))}
+        {Array.from({ length: startOffset }).map((_, i) => (
+          <div key={`empty-${i}`} className="bg-card/40 min-h-[90px] p-1" />
+        ))}
+        {days.map(day => {
+          const key = format(day, 'yyyy-MM-dd');
+          const dayPosts = postsByDate.get(key) || [];
+          const today = isToday(day);
+          return (
+            <div key={key} className={cn('bg-card/60 min-h-[90px] p-1.5 transition-colors', today && 'bg-primary/[0.04]')}>
+              <div className={cn('text-xs font-medium mb-1 w-6 h-6 flex items-center justify-center rounded-full', today ? 'bg-primary text-primary-foreground' : 'text-muted-foreground')}>
+                {format(day, 'd')}
+              </div>
+              <div className="space-y-0.5">
+                {dayPosts.slice(0, 3).map(post => {
+                  const cfg = STATUS_CONFIG[post.status] || STATUS_CONFIG.draft;
+                  return (
+                    <Tooltip key={post.id}>
+                      <TooltipTrigger asChild>
+                        <button onClick={() => onPostClick(post)} className={cn('w-full text-left rounded-md px-1.5 py-0.5 text-[10px] font-medium truncate transition-all hover:opacity-80 cursor-pointer', cfg.dotClass, 'text-white')}>
+                          {post.hook || post.content?.slice(0, 30) || 'Post'}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-[240px]">
+                        <p className="font-semibold text-xs">{cfg.label}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{post.hook || post.content?.slice(0, 80) || '—'}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                })}
+                {dayPosts.length > 3 && <p className="text-[10px] text-muted-foreground pl-1">+{dayPosts.length - 3} mehr</p>}
+              </div>
+            </div>
+          );
+        })}
+        {Array.from({ length: (7 - ((startOffset + days.length) % 7)) % 7 }).map((_, i) => (
+          <div key={`trail-${i}`} className="bg-card/40 min-h-[90px] p-1" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ──── Post Card ────
 interface PostCardProps {
   post: any;
   tab: 'drafts' | 'published';
@@ -252,10 +356,44 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
   );
 }
 
+// ──── Gallery Grid View ────
+function GalleryGrid({ posts, onPostClick }: { posts: any[]; onPostClick?: (post: any) => void }) {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {posts.map(post => {
+        const cfg = STATUS_CONFIG[post.status] || STATUS_CONFIG.draft;
+        return (
+          <div
+            key={post.id}
+            className={cn(GLASS_CARD_HOVER, 'aspect-square p-4 cursor-pointer flex flex-col justify-between overflow-hidden')}
+            onClick={() => onPostClick?.(post)}
+          >
+            <div>
+              <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                <Badge variant="secondary" className={cn('text-[10px] rounded-full px-2 py-0', cfg.dotClass, 'text-white border-0')}>{cfg.label}</Badge>
+                {post.type && <Badge variant="outline" className="text-[10px] rounded-full px-2 py-0">{post.type}</Badge>}
+              </div>
+              {post.hook && <p className="font-playfair text-sm font-semibold text-foreground line-clamp-2">{post.hook}</p>}
+              <p className="mt-1.5 text-xs text-muted-foreground line-clamp-4">{post.content}</p>
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-2">
+              {post.scheduled_at
+                ? format(new Date(post.scheduled_at), 'dd. MMM yyyy', { locale: de })
+                : format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ──── Main Page ────
 export default function PostLibraryPage() {
   const { user } = useAuth();
   const { posts, loading } = usePosts(user?.id);
   const [tab, setTab] = useState<'drafts' | 'published'>('drafts');
+  const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar'>('list');
   const [refreshKey, setRefreshKey] = useState(0);
 
   const drafts = useMemo(() => posts.filter(p => ['draft', 'approved', 'scheduled'].includes(p.status)), [posts, refreshKey]);
@@ -264,6 +402,33 @@ export default function PostLibraryPage() {
   const currentPosts = tab === 'drafts' ? drafts : published;
 
   const handleMutate = () => setRefreshKey(k => k + 1);
+
+  // n8n trigger
+  const triggerGenericMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('trigger-n8n-generic', {
+        body: {
+          user_id: user?.id,
+          request_id: crypto.randomUUID(),
+          command: 'orchestrate',
+          cycle_number: 1,
+        },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({ title: 'Workflow gestartet', description: 'n8n wurde erfolgreich getriggert.' });
+    },
+    onError: (err: Error) => {
+      toast({ title: 'Fehler', description: err.message, variant: 'destructive' });
+    },
+  });
+
+  // Dummy handler for gallery/calendar clicks (scrolls to card view)
+  const handlePostClick = (_post: any) => {
+    setViewMode('list');
+  };
 
   return (
     <div className="relative space-y-6">
@@ -274,21 +439,58 @@ export default function PostLibraryPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Post Library</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">Verwalten und planen Sie Ihre LinkedIn-Posts</p>
+            <p className="text-sm text-muted-foreground mt-0.5">Verwalten, planen und visualisieren Sie Ihre LinkedIn-Posts</p>
           </div>
-          <Tabs value={tab} onValueChange={v => setTab(v as any)}>
-            <TabsList>
-              <TabsTrigger value="drafts" className="gap-1.5">
-                Entwürfe & Geplant
-                <Badge variant="secondary" className="text-[10px] rounded-full h-5 min-w-5 px-1.5">{drafts.length}</Badge>
-              </TabsTrigger>
-              <TabsTrigger value="published" className="gap-1.5">
-                Veröffentlicht
-                <Badge variant="secondary" className="text-[10px] rounded-full h-5 min-w-5 px-1.5">{published.length}</Badge>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* n8n trigger */}
+            <Button
+              onClick={() => triggerGenericMutation.mutate()}
+              disabled={triggerGenericMutation.isPending}
+              variant="outline"
+              className="gap-2 rounded-xl text-xs h-9"
+            >
+              {triggerGenericMutation.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Zap className="h-3.5 w-3.5" />
+              )}
+              n8n starten
+            </Button>
+
+            {/* View mode toggle */}
+            <Tabs value={viewMode} onValueChange={v => setViewMode(v as any)}>
+              <TabsList className="h-9">
+                <TabsTrigger value="list" className="gap-1 text-xs px-2.5">
+                  <List className="h-3 w-3" /> Liste
+                </TabsTrigger>
+                <TabsTrigger value="gallery" className="gap-1 text-xs px-2.5">
+                  <FileText className="h-3 w-3" /> Galerie
+                </TabsTrigger>
+                <TabsTrigger value="calendar" className="gap-1 text-xs px-2.5">
+                  <CalendarDays className="h-3 w-3" /> Kalender
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         </div>
+
+        {/* Content tabs (only for list view) */}
+        {viewMode === 'list' && (
+          <div className="mt-4">
+            <Tabs value={tab} onValueChange={v => setTab(v as any)}>
+              <TabsList>
+                <TabsTrigger value="drafts" className="gap-1.5">
+                  Entwürfe & Geplant
+                  <Badge variant="secondary" className="text-[10px] rounded-full h-5 min-w-5 px-1.5">{drafts.length}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="published" className="gap-1.5">
+                  Veröffentlicht
+                  <Badge variant="secondary" className="text-[10px] rounded-full h-5 min-w-5 px-1.5">{published.length}</Badge>
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -302,31 +504,47 @@ export default function PostLibraryPage() {
             </div>
           ))}
         </div>
-      ) : currentPosts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/60 py-16 px-6 text-center">
-          <div className="rounded-xl bg-muted/50 p-4 mb-4">
-            <Inbox className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <h2 className="font-playfair text-lg font-semibold text-foreground mb-1">
-            {tab === 'drafts' ? 'Noch keine Entwürfe' : 'Noch keine veröffentlichten Posts'}
-          </h2>
-          <p className="text-sm text-muted-foreground mb-6 max-w-sm">
-            {tab === 'drafts'
-              ? 'Starten Sie im Ideation Lab, um Ihre ersten Post-Ideen zu generieren.'
-              : 'Geben Sie einen Entwurf frei, um loszulegen.'}
-          </p>
-          {tab === 'drafts' && (
-            <Button asChild>
-              <Link to="/ideation">Erste Idee generieren</Link>
-            </Button>
-          )}
+      ) : viewMode === 'calendar' ? (
+        <div className={cn(GLASS_CARD, 'p-6')}>
+          <CalendarView posts={posts} onPostClick={handlePostClick} />
         </div>
+      ) : viewMode === 'gallery' ? (
+        posts.length === 0 ? (
+          <EmptyState tab={tab} />
+        ) : (
+          <GalleryGrid posts={posts} onPostClick={handlePostClick} />
+        )
+      ) : currentPosts.length === 0 ? (
+        <EmptyState tab={tab} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {currentPosts.map(post => (
             <PostCard key={post.id} post={post} tab={tab} onMutate={handleMutate} />
           ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+function EmptyState({ tab }: { tab: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/60 py-16 px-6 text-center">
+      <div className="rounded-xl bg-muted/50 p-4 mb-4">
+        <Inbox className="h-8 w-8 text-muted-foreground" />
+      </div>
+      <h2 className="font-playfair text-lg font-semibold text-foreground mb-1">
+        {tab === 'drafts' ? 'Noch keine Entwürfe' : 'Noch keine veröffentlichten Posts'}
+      </h2>
+      <p className="text-sm text-muted-foreground mb-6 max-w-sm">
+        {tab === 'drafts'
+          ? 'Starten Sie im Ideation Lab, um Ihre ersten Post-Ideen zu generieren.'
+          : 'Geben Sie einen Entwurf frei, um loszulegen.'}
+      </p>
+      {tab === 'drafts' && (
+        <Button asChild>
+          <Link to="/ideation">Erste Idee generieren</Link>
+        </Button>
       )}
     </div>
   );
