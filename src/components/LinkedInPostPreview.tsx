@@ -9,6 +9,7 @@ interface LinkedInPostPreviewProps {
   authorAvatar?: string;
   content: string;
   hook?: string;
+  imageUrl?: string | null;
   postedAt?: string;
   metrics?: {
     likes?: number;
@@ -26,6 +27,7 @@ export function LinkedInPostPreview({
   authorAvatar,
   content,
   hook,
+  imageUrl,
   postedAt = 'Just now',
   metrics,
   showActions = true,
@@ -80,6 +82,17 @@ export function LinkedInPostPreview({
           ))}
         </div>
       </div>
+
+      {imageUrl && (
+        <div className="w-full">
+          <img
+            src={imageUrl}
+            alt="Post image"
+            className="w-full aspect-square object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
 
       {(likeCount > 0 || commentCount > 0 || shareCount > 0) && (
         <div className="px-4 py-2 flex items-center justify-between text-xs text-[hsl(215_10%_45%)]">

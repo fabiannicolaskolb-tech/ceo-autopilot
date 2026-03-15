@@ -507,6 +507,7 @@ function FeedView({ posts, profile }: { posts: any[]; profile: any }) {
             authorAvatar={authorAvatar}
             content={post.content || ''}
             hook={post.hook || undefined}
+            imageUrl={post.image_url}
             postedAt={postedAt}
             showActions={false}
             metrics={metrics ? {
