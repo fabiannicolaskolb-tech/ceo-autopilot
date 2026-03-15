@@ -205,7 +205,7 @@ export default function LandingPage() {
                     opacity: isHidden ? 0 : 1,
                     height: isHidden ? 0 : 'auto',
                   }}
-                  transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                  transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
                   style={isHidden ? { margin: 0, padding: 0, border: 'none', overflow: 'hidden', pointerEvents: 'none' } : undefined}
                 >
                   <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
