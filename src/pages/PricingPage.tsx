@@ -163,7 +163,7 @@ export default function PricingPage() {
                 ) : (
                   <div className="mt-5">
                     <span className="font-playfair text-2xl font-bold text-foreground">Custom</span>
-                    <p className="text-sm text-muted-foreground mt-1">Individuell nach Bedarf</p>
+                    <p className="text-sm text-muted-foreground mt-1">{t('pricing.custom')}</p>
                   </div>
                 )}
 
