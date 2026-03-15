@@ -441,22 +441,14 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
 
       <div className="p-4 space-y-3">
         {/* Header row */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            {post.hook && (
-              <p className="font-playfair text-sm font-semibold text-foreground line-clamp-1">{post.hook}</p>
-            )}
-            <div className="flex items-center gap-2 mt-1">
-              {post.type && <Badge variant="outline" className="text-[10px] rounded-full">{post.type}</Badge>}
-              {post.angle && <Badge variant="outline" className="text-[10px] rounded-full">{post.angle}</Badge>}
-            </div>
+        <div className="flex items-end justify-between gap-3">
+          <div className="flex items-center gap-2">
+            {post.type && <Badge variant="outline" className="text-[10px] rounded-full">{post.type}</Badge>}
+            {post.angle && <Badge variant="outline" className="text-[10px] rounded-full">{post.angle}</Badge>}
           </div>
           <div className="text-right shrink-0">
-            <span className="text-[10px] text-muted-foreground block">
-              {format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}
-            </span>
             <span className="text-[10px] text-muted-foreground">
-              {format(new Date(post.created_at), 'HH:mm', { locale: de })} Uhr
+              {format(new Date(post.created_at), 'dd. MMM · HH:mm', { locale: de })}
             </span>
           </div>
         </div>
@@ -473,7 +465,7 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
             </div>
           </div>
         ) : (
-          <p className="text-xs text-muted-foreground line-clamp-3 whitespace-pre-line leading-relaxed">{post.content || '—'}</p>
+          <p className="text-sm text-foreground line-clamp-4 whitespace-pre-line leading-relaxed">{post.content || '—'}</p>
         )}
 
         {/* Actions */}
