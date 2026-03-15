@@ -48,29 +48,31 @@ export function FloatingHeader() {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
-            {navItems.map((item) => {
-              const active = location.pathname === item.url;
-              return (
-                <Link
-                  key={item.title}
-                  to={item.url}
-                  className={cn(
-                    'relative flex items-center gap-1.5 px-3 py-2 text-[13px] transition-colors',
-                    active
-                      ? 'font-semibold text-foreground'
-                      : 'font-medium text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  <item.icon className="h-3.5 w-3.5" strokeWidth={2} />
-                  {item.title}
-                  {active && (
-                    <span className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary" />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+          {!isDashboard && (
+            <nav className="hidden items-center gap-1 lg:flex">
+              {navItems.map((item) => {
+                const active = location.pathname === item.url;
+                return (
+                  <Link
+                    key={item.title}
+                    to={item.url}
+                    className={cn(
+                      'relative flex items-center gap-1.5 px-3 py-2 text-[13px] transition-colors',
+                      active
+                        ? 'font-semibold text-foreground'
+                        : 'font-medium text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    <item.icon className="h-3.5 w-3.5" strokeWidth={2} />
+                    {item.title}
+                    {active && (
+                      <span className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary" />
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
         </div>
 
         {/* Right: Avatar Dropdown (desktop) + Mobile trigger */}
