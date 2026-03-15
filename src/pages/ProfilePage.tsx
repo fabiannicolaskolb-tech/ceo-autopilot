@@ -47,6 +47,7 @@ export default function ProfilePage() {
       setIndustry(profile.industry || '');
       setTargetAudience(profile.target_audience || '');
       setTone(profile.tone || 'visionary');
+      setLinkedinUrl(profile.linkedin_url || '');
     }
   }, [profile]);
 
