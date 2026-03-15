@@ -28,6 +28,8 @@ const TONES = [
   { value: 'inspirational', label: 'Inspirierend & motivierend' },
 ];
 
+const STEP_LABELS = ['Start', 'Basis', 'Fotos', 'Strategie', 'Themen', 'Voice'];
+
 export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [name, setName] = useState('');
