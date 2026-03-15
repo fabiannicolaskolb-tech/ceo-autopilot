@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PhotoUpload from '@/components/PhotoUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useLang } from '@/hooks/useLang';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,6 +28,7 @@ const TONES = [
 
 export default function ProfilePage() {
   const { profile, user, updateProfile, refreshProfile, signOut, resetPassword } = useAuth();
+  const { t } = useLang();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
@@ -90,33 +92,30 @@ export default function ProfilePage() {
   const save = async () => {
     try {
       await updateProfile({ name, company, role, industry, target_audience: targetAudience, tone, linkedin_url: linkedinUrl || null });
-      toast({ title: 'Profil gespeichert' });
+      toast({ title: t('profile.saved') });
     } catch (err: any) {
-      toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
+      toast({ title: t('error'), description: err?.message, variant: 'destructive' });
     }
   };
 
   const handleScrapeProfile = async () => {
     if (!linkedinUrl.trim()) {
-      toast({ title: 'Bitte LinkedIn-URL eingeben', variant: 'destructive' });
+      toast({ title: t('profile.linkedin_url'), variant: 'destructive' });
       return;
     }
     setScraping(true);
     try {
-      // Save the URL first
       await updateProfile({ linkedin_url: linkedinUrl.trim() });
-      
       const { data, error } = await supabase.functions.invoke('scrape-linkedin', {
         body: { linkedin_url: linkedinUrl.trim(), user_id: user?.id },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      
       await refreshProfile();
-      toast({ title: 'LinkedIn-Profil importiert', description: 'Name, Bio und Profilbild wurden aktualisiert.' });
+      toast({ title: t('profile.imported'), description: t('profile.imported_desc') });
     } catch (err: any) {
       console.error('Scrape error:', err);
-      toast({ title: 'Fehler beim Import', description: err?.message || 'LinkedIn-Profil konnte nicht importiert werden.', variant: 'destructive' });
+      toast({ title: t('error'), description: err?.message, variant: 'destructive' });
     } finally {
       setScraping(false);
     }
@@ -126,9 +125,9 @@ export default function ProfilePage() {
     if (user?.email) {
       try {
         await resetPassword(user.email);
-        toast({ title: 'Passwort-Reset E-Mail gesendet' });
+        toast({ title: t('profile.reset_sent') });
       } catch (err: any) {
-        toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
+        toast({ title: t('error'), description: err?.message, variant: 'destructive' });
       }
     }
   };
@@ -138,46 +137,46 @@ export default function ProfilePage() {
       <MeshBackground />
 
       <div className={cn(GLASS_CARD, 'p-6 sm:p-8')}>
-        <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Profil</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Verwalten Sie Ihr Profil und Ihre LinkedIn-Strategie</p>
+        <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">{t('profile.title')}</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">{t('profile.subtitle')}</p>
       </div>
 
       <div className={cn(GLASS_CARD, 'p-6')}>
-        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Grundinformationen</h2>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">{t('profile.basics')}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2"><Label>Name</Label><Input value={name} onChange={e => setName(e.target.value)} className="bg-card/60" /></div>
-          <div className="space-y-2"><Label>Unternehmen</Label><Input value={company} onChange={e => setCompany(e.target.value)} className="bg-card/60" /></div>
-          <div className="space-y-2"><Label>Position</Label><Input value={role} onChange={e => setRole(e.target.value)} className="bg-card/60" /></div>
-          <div className="space-y-2"><Label>Branche</Label><Input value={industry} onChange={e => setIndustry(e.target.value)} className="bg-card/60" /></div>
+          <div className="space-y-2"><Label>{t('profile.name')}</Label><Input value={name} onChange={e => setName(e.target.value)} className="bg-card/60" /></div>
+          <div className="space-y-2"><Label>{t('profile.company')}</Label><Input value={company} onChange={e => setCompany(e.target.value)} className="bg-card/60" /></div>
+          <div className="space-y-2"><Label>{t('profile.position')}</Label><Input value={role} onChange={e => setRole(e.target.value)} className="bg-card/60" /></div>
+          <div className="space-y-2"><Label>{t('profile.industry')}</Label><Input value={industry} onChange={e => setIndustry(e.target.value)} className="bg-card/60" /></div>
         </div>
       </div>
 
       <div className={cn(GLASS_CARD, 'p-6')}>
-        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">KI-Konfiguration</h2>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">{t('profile.ai_config')}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label>Kommunikations-Tonfall</Label>
+            <Label>{t('profile.tone')}</Label>
             <Select value={tone} onValueChange={setTone}><SelectTrigger className="bg-card/60"><SelectValue /></SelectTrigger><SelectContent>{TONES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent></Select>
           </div>
-          <div className="space-y-2 sm:col-span-2"><Label>Zielgruppe</Label><Textarea value={targetAudience} onChange={e => setTargetAudience(e.target.value)} className="bg-card/60" /></div>
+          <div className="space-y-2 sm:col-span-2"><Label>{t('profile.audience')}</Label><Textarea value={targetAudience} onChange={e => setTargetAudience(e.target.value)} className="bg-card/60" /></div>
         </div>
       </div>
 
       <div className={cn(GLASS_CARD, 'p-6')}>
-        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Content-Steuerung</h2>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">{t('profile.content_control')}</h2>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Fokus-Themen</Label>
+            <Label>{t('profile.focus_topics')}</Label>
             <div className="flex gap-2">
-              <Input value={focusInput} onChange={e => setFocusInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('focus'))} className="bg-card/60" placeholder="Thema + Enter" />
+              <Input value={focusInput} onChange={e => setFocusInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('focus'))} className="bg-card/60" placeholder={t('profile.topic_placeholder')} />
               <Button size="icon" variant="outline" onClick={() => addTopic('focus')}><Plus className="h-4 w-4" /></Button>
             </div>
             <div className="flex flex-wrap gap-2">{focusTopics.map(t => <Badge key={t.id} variant="secondary" className="gap-1 rounded-full">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
           </div>
           <div className="space-y-2">
-            <Label>No-Go Themen</Label>
+            <Label>{t('profile.nogo_topics')}</Label>
             <div className="flex gap-2">
-              <Input value={noGoInput} onChange={e => setNoGoInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('nogo'))} className="bg-card/60" placeholder="Thema + Enter" />
+              <Input value={noGoInput} onChange={e => setNoGoInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTopic('nogo'))} className="bg-card/60" placeholder={t('profile.topic_placeholder')} />
               <Button size="icon" variant="outline" onClick={() => addTopic('nogo')}><Plus className="h-4 w-4" /></Button>
             </div>
             <div className="flex flex-wrap gap-2">{noGoTopics.map(t => <Badge key={t.id} variant="destructive" className="gap-1 rounded-full">{t.name}<X className="h-3 w-3 cursor-pointer" onClick={() => deleteTopicMutation.mutate(t.id)} /></Badge>)}</div>
@@ -186,86 +185,61 @@ export default function ProfilePage() {
       </div>
 
       <div className={cn(GLASS_CARD, 'p-6')}>
-        <h2 className="font-playfair text-base font-semibold text-foreground mb-2">Profilfotos</h2>
-        <p className="text-xs text-muted-foreground mb-4">Drag & Drop zum Umsortieren — das erste Bild ist Ihr Hauptprofilbild</p>
-        <PhotoGrid
-          profile={profile}
-          userId={user?.id || ''}
-          updateProfile={updateProfile}
-          refreshProfile={refreshProfile}
-        />
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-2">{t('profile.photos')}</h2>
+        <p className="text-xs text-muted-foreground mb-4">{t('profile.photos_desc')}</p>
+        <PhotoGrid profile={profile} userId={user?.id || ''} updateProfile={updateProfile} refreshProfile={refreshProfile} />
       </div>
 
       <div className={cn(GLASS_CARD, 'p-6')}>
-        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">LinkedIn Verbindung</h2>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">{t('profile.linkedin')}</h2>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>LinkedIn-Profil URL</Label>
+            <Label>{t('profile.linkedin_url')}</Label>
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  value={linkedinUrl}
-                  onChange={e => setLinkedinUrl(e.target.value)}
-                  placeholder="https://linkedin.com/in/dein-name"
-                  className="bg-card/60 pl-9"
-                />
+                <Input value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/your-name" className="bg-card/60 pl-9" />
               </div>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleScrapeProfile}
-                disabled={scraping || !linkedinUrl.trim()}
-                className="shrink-0"
-              >
+              <Button size="sm" variant="outline" onClick={handleScrapeProfile} disabled={scraping || !linkedinUrl.trim()} className="shrink-0">
                 {scraping ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <Download className="h-4 w-4 mr-1.5" />}
-                {scraping ? 'Importiere...' : 'Profil importieren'}
+                {scraping ? t('profile.importing') : t('profile.import_profile')}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Importiert Name, Bio und Profilbild von LinkedIn. Die URL wird auch für den Post-Import auf der Analytics-Seite verwendet.
-            </p>
+            <p className="text-xs text-muted-foreground">{t('profile.import_desc')}</p>
           </div>
           <div className="flex items-center gap-2">
             {linkedinUrl ? (
-              <>
-                <Wifi className="h-4 w-4 text-success" />
-                <span className="text-sm text-success">LinkedIn-URL hinterlegt</span>
-              </>
+              <><Wifi className="h-4 w-4 text-success" /><span className="text-sm text-success">{t('profile.linkedin_set')}</span></>
             ) : (
-              <>
-                <WifiOff className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Keine LinkedIn-URL hinterlegt</span>
-              </>
+              <><WifiOff className="h-4 w-4 text-muted-foreground" /><span className="text-sm text-muted-foreground">{t('profile.linkedin_missing')}</span></>
             )}
           </div>
         </div>
       </div>
 
       <div className={cn(GLASS_CARD, 'p-6')}>
-        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Account & Sicherheit</h2>
+        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">{t('profile.account_security')}</h2>
         <div className="space-y-4">
           <div className="space-y-1">
-            <Label>E-Mail</Label>
+            <Label>{t('auth.email')}</Label>
             <p className="text-sm text-muted-foreground">{user?.email || '—'}</p>
           </div>
           <Separator />
           <div className="flex gap-3">
-            <Button variant="outline" size="sm" onClick={handleResetPassword}>Passwort zurücksetzen</Button>
-            <Button variant="outline" size="sm" onClick={signOut}>Abmelden</Button>
+            <Button variant="outline" size="sm" onClick={handleResetPassword}>{t('profile.reset_password')}</Button>
+            <Button variant="outline" size="sm" onClick={signOut}>{t('nav.signout')}</Button>
           </div>
         </div>
       </div>
 
       <div className="fixed bottom-6 right-6 z-50">
-        <Button onClick={save} className="rounded-full shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.15)] px-6">Alle Änderungen speichern</Button>
+        <Button onClick={save} className="rounded-full shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.15)] px-6">{t('profile.save_all')}</Button>
       </div>
     </div>
   );
 }
 
 const AVATAR_KEYS = ['avatar_url_1', 'avatar_url_2', 'avatar_url_3'] as const;
-const LABELS = ['Hauptprofilbild', 'Alternativbild 1', 'Alternativbild 2'];
 
 interface PhotoGridProps {
   profile: any;
@@ -275,85 +249,35 @@ interface PhotoGridProps {
 }
 
 function PhotoGrid({ profile, userId, updateProfile, refreshProfile }: PhotoGridProps) {
+  const { t } = useLang();
+  const LABELS = t('onboarding.photo_labels').split(',');
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
   const { toast } = useToast();
 
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    setDragIndex(index);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    setOverIndex(index);
-  };
-
-  const handleDragLeave = () => {
-    setOverIndex(null);
-  };
-
+  const handleDragStart = (e: React.DragEvent, index: number) => { setDragIndex(index); e.dataTransfer.effectAllowed = 'move'; };
+  const handleDragOver = (e: React.DragEvent, index: number) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setOverIndex(index); };
+  const handleDragLeave = () => { setOverIndex(null); };
   const handleDrop = async (e: React.DragEvent, targetIndex: number) => {
-    e.preventDefault();
-    setOverIndex(null);
-    if (dragIndex === null || dragIndex === targetIndex) {
-      setDragIndex(null);
-      return;
-    }
-
-    const sourceKey = AVATAR_KEYS[dragIndex];
-    const targetKey = AVATAR_KEYS[targetIndex];
-    const sourceUrl = profile?.[sourceKey] || null;
-    const targetUrl = profile?.[targetKey] || null;
-
-    try {
-      await updateProfile({ [sourceKey]: targetUrl, [targetKey]: sourceUrl });
-      await refreshProfile();
-      toast({ title: 'Reihenfolge aktualisiert' });
-    } catch {
-      toast({ title: 'Fehler beim Umsortieren', variant: 'destructive' });
-    }
+    e.preventDefault(); setOverIndex(null);
+    if (dragIndex === null || dragIndex === targetIndex) { setDragIndex(null); return; }
+    const sourceKey = AVATAR_KEYS[dragIndex]; const targetKey = AVATAR_KEYS[targetIndex];
+    const sourceUrl = profile?.[sourceKey] || null; const targetUrl = profile?.[targetKey] || null;
+    try { await updateProfile({ [sourceKey]: targetUrl, [targetKey]: sourceUrl }); await refreshProfile(); } catch { toast({ title: t('error'), variant: 'destructive' }); }
     setDragIndex(null);
   };
-
-  const handleDragEnd = () => {
-    setDragIndex(null);
-    setOverIndex(null);
-  };
+  const handleDragEnd = () => { setDragIndex(null); setOverIndex(null); };
 
   return (
     <div className="flex flex-wrap gap-6">
       {AVATAR_KEYS.map((key, i) => {
         const hasImage = !!profile?.[key];
         return (
-          <div
-            key={key}
-            draggable={hasImage}
-            onDragStart={(e) => handleDragStart(e, i)}
-            onDragOver={(e) => handleDragOver(e, i)}
-            onDragLeave={handleDragLeave}
-            onDrop={(e) => handleDrop(e, i)}
-            onDragEnd={handleDragEnd}
-            className={cn(
-              'relative transition-all duration-200',
-              dragIndex === i && 'opacity-40 scale-95',
-              overIndex === i && dragIndex !== i && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-lg',
-            )}
-          >
-            <PhotoUpload
-              label={LABELS[i]}
-              currentUrl={profile?.[key]}
-              userId={userId}
-              index={i + 1}
-              onUploaded={async (url) => { await updateProfile({ [key]: url }); await refreshProfile(); }}
-              onRemoved={async () => { await updateProfile({ [key]: null }); await refreshProfile(); }}
-            />
+          <div key={key} draggable={hasImage} onDragStart={(e) => handleDragStart(e, i)} onDragOver={(e) => handleDragOver(e, i)} onDragLeave={handleDragLeave} onDrop={(e) => handleDrop(e, i)} onDragEnd={handleDragEnd} className={cn('relative transition-all duration-200', dragIndex === i && 'opacity-40 scale-95', overIndex === i && dragIndex !== i && 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-lg')}>
+            <PhotoUpload label={LABELS[i]} currentUrl={profile?.[key]} userId={userId} index={i + 1} onUploaded={async (url) => { await updateProfile({ [key]: url }); await refreshProfile(); }} onRemoved={async () => { await updateProfile({ [key]: null }); await refreshProfile(); }} />
             {hasImage && (
               <div className="flex justify-center mt-1 cursor-grab active:cursor-grabbing">
-                <div className="rounded-full bg-muted/60 p-1 shadow-sm">
-                  <GripVertical className="h-3 w-3 text-muted-foreground" />
-                </div>
+                <div className="rounded-full bg-muted/60 p-1 shadow-sm"><GripVertical className="h-3 w-3 text-muted-foreground" /></div>
               </div>
             )}
           </div>

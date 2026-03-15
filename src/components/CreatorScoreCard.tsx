@@ -1,6 +1,7 @@
 import React from 'react';
 import { Flame, Lock, Zap } from 'lucide-react';
 import { useCreatorScore, CREATOR_LEVELS } from '@/hooks/useCreatorScore';
+import { useLang } from '@/hooks/useLang';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 /* ── Radial Progress Ring ── */
@@ -21,29 +22,8 @@ function RadialProgress({
 
   return (
     <svg width={size} height={size} className="transform -rotate-90" overflow="visible" style={{ overflow: 'visible' }}>
-      {/* Track */}
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke="hsl(var(--muted) / 0.4)"
-        strokeWidth={strokeWidth}
-      />
-      {/* Progress */}
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke="url(#scoreGradient)"
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        className="transition-all duration-1000 ease-out"
-        filter={glowing ? 'url(#glowFilter)' : undefined}
-      />
+      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="hsl(var(--muted) / 0.4)" strokeWidth={strokeWidth} />
+      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="url(#scoreGradient)" strokeWidth={strokeWidth} strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} className="transition-all duration-1000 ease-out" filter={glowing ? 'url(#glowFilter)' : undefined} />
       <defs>
         <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="hsl(var(--score-deep-blue))" />
@@ -52,10 +32,7 @@ function RadialProgress({
         </linearGradient>
         <filter id="glowFilter" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
       </defs>
     </svg>
@@ -67,19 +44,11 @@ function SkillBar({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex-1 min-w-[80px]">
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-          {label}
-        </span>
+        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
         <span className="text-[11px] font-bold text-foreground">{value}%</span>
       </div>
       <div className="h-2 rounded-full bg-muted/50 overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-700 ease-out"
-          style={{
-            width: `${value}%`,
-            background: 'linear-gradient(90deg, hsl(var(--score-deep-blue)), hsl(var(--score-electric-purple)))',
-          }}
-        />
+        <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${value}%`, background: 'linear-gradient(90deg, hsl(var(--score-deep-blue)), hsl(var(--score-electric-purple)))' }} />
       </div>
     </div>
   );
@@ -88,6 +57,7 @@ function SkillBar({ label, value }: { label: string; value: number }) {
 /* ── Main Component ── */
 export default function CreatorScoreCard() {
   const score = useCreatorScore();
+  const { t } = useLang();
   const isStreakActive = score.weekStreak >= 2;
 
   return (
@@ -104,8 +74,8 @@ export default function CreatorScoreCard() {
             <Zap className="h-5 w-5 text-[hsl(var(--score-electric-purple))]" />
           </div>
           <div>
-            <h2 className="font-playfair text-base font-semibold text-foreground">Creator Score</h2>
-            <p className="text-xs text-muted-foreground">Ihr Fortschritt als LinkedIn Creator</p>
+            <h2 className="font-playfair text-base font-semibold text-foreground">{t('score.title')}</h2>
+            <p className="text-xs text-muted-foreground">{t('score.subtitle')}</p>
           </div>
         </div>
 
@@ -153,11 +123,10 @@ export default function CreatorScoreCard() {
           <p className="text-xs text-muted-foreground mt-1">{score.currentLevel.description}</p>
           {score.nextLevel && (
             <p className="text-[11px] text-muted-foreground mt-1">
-              Noch{' '}
               <span className="font-semibold text-foreground">
                 {score.xpToNext.toLocaleString()} XP
               </span>{' '}
-              bis Level {score.nextLevel.level}
+              {t('score.until_level')} {score.nextLevel.level}
             </p>
           )}
         </div>
@@ -241,8 +210,8 @@ export default function CreatorScoreCard() {
                   >
                     {isLocked ? (
                       <p className="text-xs">
-                        Benötigt Level {level.level}
-                        {needsStreak && ` und einen ${level.streakRequired}-Wochen-Streak`}
+                        {t('score.needs_level')} {level.level}
+                        {needsStreak && ` ${t('score.and_streak')} ${level.streakRequired}-${t('score.week_streak')}`}
                       </p>
                     ) : (
                       <p className="text-xs">{level.description}</p>
