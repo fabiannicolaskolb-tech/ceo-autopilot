@@ -44,6 +44,12 @@ export default function OnboardingPage() {
   const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { theme } = useTheme();
+  const [burstKey, setBurstKey] = useState(0);
+
+  useEffect(() => {
+    setBurstKey(k => k + 1);
+  }, [step]);
 
   const totalSteps = 6;
   const progress = (step / totalSteps) * 100;
