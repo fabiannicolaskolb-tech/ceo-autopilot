@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 const TONES = [
   { value: 'authoritative', label: 'Autoritär & bestimmt' },
@@ -91,7 +92,7 @@ export default function OnboardingPage() {
       case 3: return avatarUrls.every(url => url !== null);
       case 4: return targetAudience.trim() !== '' && tone.trim() !== '';
       case 5: return focusTopics.length > 0;
-      case 6: return voiceSamples.filter(s => s.trim()).length >= 3;
+      case 6: return voiceSamples.filter(s => s.trim().length >= 500 && s.trim().length <= 3000).length >= 3;
       default: return true;
     }
   })();
@@ -332,8 +333,8 @@ export default function OnboardingPage() {
         {step === 6 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h1 className="font-playfair text-2xl font-bold">Voice Training</h1>
-              <p className="mt-1 text-muted-foreground">Fügen Sie 3-5 Ihrer besten LinkedIn-Posts ein</p>
+              <h1 className="font-playfair text-2xl font-bold">What's your tone?</h1>
+              <p className="mt-1 text-muted-foreground">Fügen Sie 3-5 Ihrer besten LinkedIn-Posts ein (500–3.000 Zeichen pro Post)</p>
             </div>
             <div className="space-y-4">
               {voiceSamples.map((sample, i) => (
@@ -348,7 +349,14 @@ export default function OnboardingPage() {
                     }}
                     placeholder="Fügen Sie hier einen LinkedIn-Post ein..."
                     className="min-h-[100px] bg-card"
+                    minLength={500}
+                    maxLength={3000}
                   />
+                  {sample.trim().length > 0 && (
+                    <p className={cn("text-xs", sample.trim().length < 500 ? "text-destructive" : "text-muted-foreground")}>
+                      {sample.trim().length} / 3.000 Zeichen {sample.trim().length < 500 && '(min. 500)'}
+                    </p>
+                  )}
                 </div>
               ))}
               {voiceSamples.length < 5 && (
