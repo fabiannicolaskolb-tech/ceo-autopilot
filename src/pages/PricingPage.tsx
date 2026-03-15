@@ -169,15 +169,29 @@ export default function PricingPage() {
                 <div className="my-7 h-px bg-border/60" />
 
                 {/* Features */}
-                <ul className="flex-1 space-y-4">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
-                        <Check className="h-3 w-3 text-emerald-500" strokeWidth={3} />
-                      </div>
-                      <span className="text-sm leading-snug text-foreground/80">{feature}</span>
-                    </li>
-                  ))}
+                <ul className="flex-1 space-y-3.5">
+                  {allFeatures.map((feature) => {
+                    const value = plan.featureDetails[feature];
+                    const included = value === true || (typeof value === 'string');
+                    const label = typeof value === 'string' ? `${value} ${feature}` : feature;
+
+                    return (
+                      <li key={feature} className="flex items-start gap-3">
+                        {included ? (
+                          <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
+                            <Check className="h-3 w-3 text-emerald-500" strokeWidth={3} />
+                          </div>
+                        ) : (
+                          <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-destructive/10">
+                            <X className="h-3 w-3 text-destructive/70" strokeWidth={3} />
+                          </div>
+                        )}
+                        <span className={`text-sm leading-snug ${included ? 'text-foreground/80' : 'text-muted-foreground/50 line-through'}`}>
+                          {label}
+                        </span>
+                      </li>
+                    );
+                  })}
                 </ul>
 
                 {/* CTA */}
