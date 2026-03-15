@@ -175,24 +175,49 @@ export default function LandingPage() {
           </div>
 
           <div className="grid gap-8 sm:grid-cols-3">
-            {features.map((f) => (
-              <div
-                key={f.title}
-                className="group relative overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-all duration-300 hover:-translate-y-[5px] hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)]"
-              >
-                <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
-                <div className="flex flex-col items-center p-8 pt-7 text-center">
-                  <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--feature-icon-bg))]">
-                    <f.icon className="h-7 w-7 text-[hsl(var(--feature-icon))]" />
+            {features.map((f) => {
+              const isAnalytics = f.title === 'Analytics';
+              const isExpanded = expandedFeature === f.title;
+              return (
+                <div
+                  key={f.title}
+                  onClick={() => isAnalytics && setExpandedFeature(isExpanded ? null : f.title)}
+                  className={`group relative overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-all duration-300 hover:-translate-y-[5px] hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] ${isAnalytics ? 'cursor-pointer' : ''}`}
+                >
+                  <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
+                  <div className="flex flex-col items-center p-8 pt-7 text-center">
+                    <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--feature-icon-bg))]">
+                      <f.icon className="h-7 w-7 text-[hsl(var(--feature-icon))]" />
+                    </div>
+                    <h3 className="font-playfair text-lg font-bold text-foreground">{f.headline}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
+                    <span className="mt-5 inline-block text-xs font-medium tracking-wide text-[hsl(var(--feature-accent))] transition-all group-hover:underline">
+                      {isAnalytics ? (isExpanded ? 'Schließen ↑' : 'Vorschau ansehen →') : 'Mehr erfahren →'}
+                    </span>
                   </div>
-                  <h3 className="font-playfair text-lg font-bold text-foreground">{f.headline}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
-                  <span className="mt-5 inline-block text-xs font-medium tracking-wide text-[hsl(var(--feature-accent))] transition-all group-hover:underline">
-                    Mehr erfahren →
-                  </span>
+                  <AnimatePresence>
+                    {isAnalytics && isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-4 pb-6">
+                          <img
+                            src={calendarPreview}
+                            alt="Analytics Kalender Vorschau"
+                            className="w-full rounded-lg border border-border shadow-sm dark:brightness-90 dark:contrast-110"
+                            draggable={false}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
