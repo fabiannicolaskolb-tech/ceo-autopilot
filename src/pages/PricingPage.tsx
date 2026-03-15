@@ -8,12 +8,8 @@ import { useTheme } from '@/hooks/useTheme';
 const allFeatures = [
   'AI posts/month',
   'Voice learning',
-  'Basic analytics',
   'AI image generation',
   'Auto-scheduling',
-  'Performance insights',
-  'Multi-executive seats',
-  'White-label option',
   'Dedicated support',
 ];
 
@@ -25,12 +21,8 @@ const plans = [
     featureDetails: {
       'AI posts/month': '10',
       'Voice learning': true,
-      'Basic analytics': true,
       'AI image generation': false,
       'Auto-scheduling': false,
-      'Performance insights': false,
-      'Multi-executive seats': false,
-      'White-label option': false,
       'Dedicated support': false,
     } as Record<string, boolean | string>,
   },
@@ -41,12 +33,8 @@ const plans = [
     featureDetails: {
       'AI posts/month': '30',
       'Voice learning': true,
-      'Basic analytics': true,
       'AI image generation': true,
       'Auto-scheduling': true,
-      'Performance insights': true,
-      'Multi-executive seats': false,
-      'White-label option': false,
       'Dedicated support': false,
     } as Record<string, boolean | string>,
   },
@@ -57,12 +45,8 @@ const plans = [
     featureDetails: {
       'AI posts/month': 'Unlimited',
       'Voice learning': true,
-      'Basic analytics': true,
       'AI image generation': true,
       'Auto-scheduling': true,
-      'Performance insights': true,
-      'Multi-executive seats': true,
-      'White-label option': true,
       'Dedicated support': true,
     } as Record<string, boolean | string>,
   },
