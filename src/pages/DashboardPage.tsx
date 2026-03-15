@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FileText, TrendingUp, CalendarDays, Rocket, Loader2, Brain, ArrowUpRight, ArrowDownRight, Lightbulb, GalleryHorizontalEnd, BarChart3, ChevronDown } from 'lucide-react';
-
+import DailyBriefing from '@/components/DailyBriefing';
 import { useAuth } from '@/hooks/useAuth';
 import { usePosts, usePipelineStatus } from '@/hooks/useRealtime';
 import { Badge } from '@/components/ui/badge';
