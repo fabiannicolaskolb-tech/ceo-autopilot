@@ -396,6 +396,7 @@ export default function PostLibraryPage() {
   const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar'>('list');
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const pendingApproval = useMemo(() => posts.filter(p => p.status === 'draft'), [posts, refreshKey]);
   const drafts = useMemo(() => posts.filter(p => ['draft', 'approved', 'scheduled'].includes(p.status)), [posts, refreshKey]);
   const published = useMemo(() => posts.filter(p => ['posted', 'analyzed'].includes(p.status)), [posts, refreshKey]);
 
