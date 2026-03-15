@@ -354,7 +354,10 @@ export default function AnalyticsPage() {
   const {
     posts, kpis, timelineData, contentTypeData, sentimentData,
     bestTimeData, loading, hasData, timeRange, setTimeRange,
+    customRange, setCustomRange,
   } = useAnalytics();
+  const [customFrom, setCustomFrom] = useState<Date | undefined>(customRange?.from);
+  const [customTo, setCustomTo] = useState<Date | undefined>(customRange?.to);
 
   const kpiIcons = [Eye, TrendingUp, Users];
 
