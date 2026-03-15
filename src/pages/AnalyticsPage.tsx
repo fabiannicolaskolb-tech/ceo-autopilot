@@ -380,16 +380,73 @@ export default function AnalyticsPage() {
             <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Analytics</h1>
             <p className="text-sm text-muted-foreground mt-0.5">Performance-Übersicht Ihres LinkedIn-Auftritts</p>
           </div>
-          <Tabs value={timeRange} onValueChange={v => setTimeRange(v as TimeRange)}>
-            <TabsList>
-              <TabsTrigger value="7d">7T</TabsTrigger>
-              <TabsTrigger value="30d">30T</TabsTrigger>
-              <TabsTrigger value="90d">90T</TabsTrigger>
-              <TabsTrigger value="ytd">YTD</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-      </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Tabs value={timeRange} onValueChange={v => {
+              setTimeRange(v as TimeRange);
+              if (v !== 'custom') setCustomRange(null);
+            }}>
+              <TabsList>
+                <TabsTrigger value="7d">7T</TabsTrigger>
+                <TabsTrigger value="30d">30T</TabsTrigger>
+                <TabsTrigger value="90d">90T</TabsTrigger>
+                <TabsTrigger value="custom" className="gap-1">
+                  <CalendarIcon className="h-3 w-3" />
+                  {timeRange === 'custom' && customRange
+                    ? `${format(customRange.from, 'dd.MM', { locale: de })} – ${format(customRange.to, 'dd.MM', { locale: de })}`
+                    : 'Zeitraum'}
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            {timeRange === 'custom' && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="text-xs h-8 gap-1.5">
+                    <CalendarIcon className="h-3 w-3" />
+                    {customRange
+                      ? `${format(customRange.from, 'dd.MM.yy', { locale: de })} – ${format(customRange.to, 'dd.MM.yy', { locale: de })}`
+                      : 'Zeitraum wählen'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-4 space-y-3" align="end">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-medium text-muted-foreground">Von</p>
+                      <Calendar
+                        mode="single"
+                        selected={customFrom}
+                        onSelect={setCustomFrom}
+                        disabled={(date) => date > new Date() || (customTo ? date > customTo : false)}
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-medium text-muted-foreground">Bis</p>
+                      <Calendar
+                        mode="single"
+                        selected={customTo}
+                        onSelect={setCustomTo}
+                        disabled={(date) => date > new Date() || (customFrom ? date < customFrom : false)}
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    disabled={!customFrom || !customTo}
+                    onClick={() => {
+                      if (customFrom && customTo) {
+                        setCustomRange({ from: customFrom, to: customTo });
+                      }
+                    }}
+                  >
+                    Anwenden
+                  </Button>
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
 
       {!hasData ? (
         <EmptyState />
