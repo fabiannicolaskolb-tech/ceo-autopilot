@@ -223,20 +223,30 @@ export default function DashboardPage() {
               <FileText className="h-5 w-5 text-primary" />
             </div>
           <p className="text-3xl font-bold text-foreground tracking-tight mt-4">{draftCount}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">Entwürfe</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Entwürfe</p>
+          </div>
         </div>
 
         {/* Published */}
-        <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
-          <div className="rounded-[12px] bg-success/10 p-2.5 w-fit">
-            <TrendingUp className="h-5 w-5 text-success" />
+        <div className="relative rounded-[24px] bg-card/60 backdrop-blur-2xl p-6 border border-white/20 dark:border-white/10 shadow-[0_8px_32px_-8px_hsl(var(--primary)/0.12)] overflow-hidden group">
+          {/* Liquid glass overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-white/10 dark:from-white/10 dark:via-transparent dark:to-white/5 pointer-events-none rounded-[24px]" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/60 dark:via-white/30 to-transparent rounded-t-[24px]" />
+          <div className="relative z-10">
+            <div className="rounded-[12px] bg-success/20 p-2.5 backdrop-blur-sm w-fit">
+              <TrendingUp className="h-5 w-5 text-success" />
+            </div>
+            <p className="text-3xl font-bold text-foreground tracking-tight mt-4">{postCount}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Veröffentlicht</p>
           </div>
-          <p className="text-3xl font-bold text-foreground tracking-tight mt-4">{postCount}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">Veröffentlicht</p>
         </div>
 
         {/* Next Scheduled - spans 2 cols on lg */}
-        <div className="sm:col-span-2 rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]">
+        <div className="relative sm:col-span-2 rounded-[24px] bg-card/60 backdrop-blur-2xl p-6 border border-white/20 dark:border-white/10 shadow-[0_8px_32px_-8px_hsl(var(--primary)/0.12)] overflow-hidden transition-all duration-300 hover:shadow-[0_16px_48px_-12px_hsl(var(--primary)/0.2)]">
+          {/* Liquid glass overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-white/10 dark:from-white/10 dark:via-transparent dark:to-white/5 pointer-events-none rounded-[24px]" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/60 dark:via-white/30 to-transparent rounded-t-[24px]" />
+          <div className="relative z-10">
           <div className="flex items-center gap-2 mb-4">
             <div className="rounded-[12px] bg-[hsl(40_70%_48%/0.1)] p-2.5">
               <CalendarDays className="h-5 w-5 text-warning" />
