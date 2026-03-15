@@ -213,7 +213,7 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-2xl px-4 py-10">
+      <div className="relative z-10 mx-auto max-w-2xl px-4 py-10 pb-28">
         {step === 1 && (
           <div className="space-y-8">
             <div className="text-center">
