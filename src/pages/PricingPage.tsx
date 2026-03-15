@@ -8,12 +8,8 @@ import { useTheme } from '@/hooks/useTheme';
 const allFeatures = [
   'AI posts/month',
   'Voice learning',
-  'Basic analytics',
   'AI image generation',
   'Auto-scheduling',
-  'Performance insights',
-  'Multi-executive seats',
-  'White-label option',
   'Dedicated support',
 ];
 
