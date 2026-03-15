@@ -198,19 +198,47 @@ export default function ProfilePage() {
 
       <div className={cn(GLASS_CARD, 'p-6')}>
         <h2 className="font-playfair text-base font-semibold text-foreground mb-4">LinkedIn Verbindung</h2>
-        <div className="flex items-center gap-3">
-          {profile?.linkedin_connected ? (
-            <>
-              <Wifi className="h-5 w-5 text-success" />
-              <span className="text-sm text-foreground">Verbunden</span>
-            </>
-          ) : (
-            <>
-              <WifiOff className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Nicht verbunden</span>
-              <Button size="sm" variant="outline" disabled>Verbinden (in Kürze verfügbar)</Button>
-            </>
-          )}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>LinkedIn-Profil URL</Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={linkedinUrl}
+                  onChange={e => setLinkedinUrl(e.target.value)}
+                  placeholder="https://linkedin.com/in/dein-name"
+                  className="bg-card/60 pl-9"
+                />
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleScrapeProfile}
+                disabled={scraping || !linkedinUrl.trim()}
+                className="shrink-0"
+              >
+                {scraping ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <Download className="h-4 w-4 mr-1.5" />}
+                {scraping ? 'Importiere...' : 'Profil importieren'}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Importiert Name, Bio und Profilbild von LinkedIn. Die URL wird auch für den Post-Import auf der Analytics-Seite verwendet.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {linkedinUrl ? (
+              <>
+                <Wifi className="h-4 w-4 text-success" />
+                <span className="text-sm text-success">LinkedIn-URL hinterlegt</span>
+              </>
+            ) : (
+              <>
+                <WifiOff className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Keine LinkedIn-URL hinterlegt</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
