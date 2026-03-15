@@ -71,7 +71,31 @@ Deno.serve(async (req) => {
       throw new Error(`n8n webhook failed [${n8nResponse.status}]: ${errorBody}`);
     }
 
-    const concepts = await n8nResponse.json();
+    const responseText = await n8nResponse.text();
+    
+    if (!responseText || responseText.trim().length === 0) {
+      throw new Error("n8n returned an empty response");
+    }
+
+    let concepts: unknown;
+    try {
+      concepts = JSON.parse(responseText);
+    } catch {
+      // Attempt to recover truncated JSON arrays
+      const lastBrace = responseText.lastIndexOf("}");
+      if (lastBrace > 0) {
+        try {
+          concepts = JSON.parse(responseText.substring(0, lastBrace + 1) + "]");
+          console.warn("Recovered truncated JSON from n8n response");
+        } catch {
+          console.error("Raw n8n response (first 500 chars):", responseText.substring(0, 500));
+          throw new Error("n8n returned invalid JSON");
+        }
+      } else {
+        console.error("Raw n8n response (first 500 chars):", responseText.substring(0, 500));
+        throw new Error("n8n returned invalid JSON");
+      }
+    }
 
     return new Response(JSON.stringify({ concepts }), {
       status: 200,
