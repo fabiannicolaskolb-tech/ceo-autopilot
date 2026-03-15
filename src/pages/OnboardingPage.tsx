@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X, Upload, Loader2, AlertTriangle } from 'lucide-react';
+import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X, Upload, Loader2, Linkedin } from 'lucide-react';
 import { Particles } from '@/components/ui/particles';
 import { useTheme } from '@/hooks/useTheme';
 import ShimmerText from '@/components/ui/shimmer-text';
@@ -15,7 +15,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
@@ -30,7 +29,7 @@ const TONES = [
   { value: 'inspirational', label: 'Inspirierend & motivierend' },
 ];
 
-const STEP_LABELS = ['Start', 'Basis', 'Fotos', 'Strategie', 'Themen', 'Voice'];
+const STEP_LABELS = ['Start', 'Basis', 'Fotos', 'Strategie', 'Themen'];
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(1);
@@ -38,16 +37,16 @@ export default function OnboardingPage() {
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
   const [industry, setIndustry] = useState('');
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [scrapingLinkedin, setScrapingLinkedin] = useState(false);
   const [targetAudience, setTargetAudience] = useState('');
   const [tone, setTone] = useState('visionary');
   const [focusTopics, setFocusTopics] = useState<string[]>([]);
   const [noGoTopics, setNoGoTopics] = useState<string[]>([]);
   const [focusInput, setFocusInput] = useState('');
   const [noGoInput, setNoGoInput] = useState('');
-  const [voiceSamples, setVoiceSamples] = useState<string[]>(['', '', '']);
   const [avatarUrls, setAvatarUrls] = useState<(string | null)[]>([null, null, null]);
   const [saving, setSaving] = useState(false);
-  const [showVoiceWarning, setShowVoiceWarning] = useState(false);
   const [parsingCv, setParsingCv] = useState(false);
   const cvInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -80,6 +79,34 @@ export default function OnboardingPage() {
     if (cvInputRef.current) cvInputRef.current.value = '';
   };
 
+  const handleLinkedinScrape = async () => {
+    if (!linkedinUrl.trim()) return;
+    setScrapingLinkedin(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/scrape-linkedin`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ linkedin_url: linkedinUrl.trim() }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'LinkedIn-Profil konnte nicht geladen werden');
+      if (data.name) setName(data.name);
+      if (data.company) setCompany(data.company);
+      if (data.role) setRole(data.role);
+      if (data.industry) setIndustry(data.industry);
+      toast({ title: 'LinkedIn-Profil erfolgreich importiert!' });
+    } catch (err: any) {
+      toast({ title: 'LinkedIn-Import fehlgeschlagen', description: err?.message, variant: 'destructive' });
+    }
+    setScrapingLinkedin(false);
+  };
+
   const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -97,12 +124,11 @@ export default function OnboardingPage() {
       case 3: return avatarUrls.filter(url => url !== null).length >= 2;
       case 4: return targetAudience.trim() !== '' && tone.trim() !== '';
       case 5: return focusTopics.length > 0;
-      case 6: return true;
       default: return true;
     }
   })();
 
-  const totalSteps = 6;
+  const totalSteps = 5;
   const progress = (step / totalSteps) * 100;
 
   const addTopic = (type: 'focus' | 'nogo') => {
@@ -121,29 +147,18 @@ export default function OnboardingPage() {
     if (e.key === 'Enter') { e.preventDefault(); addTopic(type); }
   };
 
-  const addVoiceSample = () => setVoiceSamples(prev => [...prev, '']);
-
   const handleComplete = async () => {
     if (!user) return;
     setSaving(true);
     try {
-      // Update profile
       await updateProfile({
         name, company, role, industry, target_audience: targetAudience, tone,
         onboarding_completed: true,
         avatar_url_1: avatarUrls[0],
         avatar_url_2: avatarUrls[1],
         avatar_url_3: avatarUrls[2],
+        linkedin_url: linkedinUrl.trim() || null,
       });
-
-      // Insert voice samples
-      const samples = voiceSamples.filter(s => s.trim());
-      if (samples.length > 0) {
-        const { error: samplesErr } = await supabase.from('voice_samples').insert(
-          samples.map(content => ({ user_id: user.id, content }))
-        );
-        if (samplesErr) throw samplesErr;
-      }
 
       // Insert topics
       const allTopics = [
@@ -229,6 +244,34 @@ export default function OnboardingPage() {
               <h1 className="font-playfair text-2xl font-bold">Basis-Informationen</h1>
               <p className="mt-1 text-muted-foreground">Erzählen Sie uns von sich</p>
             </div>
+
+            {/* LinkedIn Import */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Linkedin className="h-4 w-4 text-[#0A66C2]" />
+                LinkedIn-Profil importieren
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  value={linkedinUrl}
+                  onChange={e => setLinkedinUrl(e.target.value)}
+                  placeholder="https://linkedin.com/in/ihr-profil"
+                  className="bg-card"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="shrink-0 gap-2"
+                  disabled={scrapingLinkedin || !linkedinUrl.trim()}
+                  onClick={handleLinkedinScrape}
+                >
+                  {scrapingLinkedin ? <Loader2 className="h-4 w-4 animate-spin" /> : <Linkedin className="h-4 w-4" />}
+                  {scrapingLinkedin ? 'Importiere...' : 'Importieren'}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">Felder werden automatisch ausgefüllt</p>
+            </div>
+
             <div className="flex justify-center">
               <input
                 ref={cvInputRef}
@@ -355,44 +398,6 @@ export default function OnboardingPage() {
             </div>
           </div>
         )}
-
-        {step === 6 && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h1 className="font-playfair text-2xl font-bold">Your Voice DNA</h1>
-              <p className="mt-1 text-muted-foreground">Fügen Sie 3-5 Ihrer besten LinkedIn-Posts ein</p>
-            </div>
-            <div className="space-y-4">
-              {voiceSamples.map((sample, i) => (
-                <div key={i} className="space-y-1">
-                  <Label>Sample {i + 1}</Label>
-                  <div className="relative">
-                    <Textarea
-                      value={sample}
-                      onChange={e => {
-                        const updated = [...voiceSamples];
-                        updated[i] = e.target.value;
-                        setVoiceSamples(updated);
-                      }}
-                      placeholder="Fügen Sie hier einen LinkedIn-Post ein..."
-                      className="min-h-[100px] bg-card pb-7"
-                      minLength={500}
-                      maxLength={3000}
-                    />
-                    <span className={cn("absolute bottom-2 right-3 text-xs pointer-events-none", sample.trim().length > 0 && sample.trim().length < 500 ? "text-destructive" : "text-muted-foreground")}>
-                      {sample.trim().length} / 3.000{sample.trim().length > 0 && sample.trim().length < 500 ? ' (min. 500)' : ''}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              {voiceSamples.length < 5 && (
-                <Button type="button" variant="outline" onClick={addVoiceSample} className="gap-2">
-                  <Plus className="h-4 w-4" /> Weiteres Sample hinzufügen
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="sticky bottom-0 z-10 border-t border-border bg-card px-6 py-4">
@@ -407,14 +412,7 @@ export default function OnboardingPage() {
               shimmerColor="hsl(var(--primary))"
               background="hsl(var(--primary))"
               className="text-primary-foreground text-sm font-medium"
-              onClick={() => {
-                const validSamples = voiceSamples.filter(s => s.trim().length >= 500 && s.trim().length <= 3000).length;
-                if (validSamples < 3) {
-                  setShowVoiceWarning(true);
-                } else {
-                  handleComplete();
-                }
-              }}
+              onClick={handleComplete}
               disabled={saving || !isStepValid}
             >
               {saving ? 'Wird gespeichert...' : 'Abschließen ✨'}
@@ -422,30 +420,6 @@ export default function OnboardingPage() {
           )}
         </div>
       </div>
-
-      <Dialog open={showVoiceWarning} onOpenChange={setShowVoiceWarning}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-500" />
-              Voice Samples unvollständig
-            </DialogTitle>
-            <DialogDescription className="pt-2 text-sm leading-relaxed">
-              Ohne mindestens 3 ausgefüllte Voice Samples (je 500–3.000 Zeichen) kann die KI Ihren Schreibstil nicht optimal erfassen. Die Qualität Ihrer generierten Inhalte könnte darunter leiden.
-              <br /><br />
-              Sie können die Voice Samples jederzeit nachträglich in den <strong>Profileinstellungen</strong> ergänzen.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setShowVoiceWarning(false)}>
-              Zurück zum Ausfüllen
-            </Button>
-            <Button variant="default" onClick={() => { setShowVoiceWarning(false); handleComplete(); }}>
-              Trotzdem abschließen
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

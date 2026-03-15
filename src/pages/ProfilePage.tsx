@@ -49,16 +49,6 @@ export default function ProfilePage() {
     }
   }, [profile]);
 
-  const { data: voiceSamples = [] } = useQuery({
-    queryKey: ['voice_samples', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('voice_samples').select('*').eq('user_id', user!.id).order('created_at');
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user,
-  });
-
   const { data: topics = [] } = useQuery({
     queryKey: ['topics', user?.id],
     queryFn: async () => {
@@ -71,13 +61,6 @@ export default function ProfilePage() {
 
   const focusTopics = topics.filter(t => t.type === 'focus');
   const noGoTopics = topics.filter(t => t.type === 'no-go');
-
-  const [sampleTexts, setSampleTexts] = useState<string[]>([]);
-  useEffect(() => {
-    const texts = voiceSamples.map(s => s.content);
-    while (texts.length < 5) texts.push('');
-    setSampleTexts(texts.slice(0, 5));
-  }, [voiceSamples]);
 
   const addTopicMutation = useMutation({
     mutationFn: async ({ name, type }: { name: string; type: string }) => {
@@ -105,13 +88,6 @@ export default function ProfilePage() {
   const save = async () => {
     try {
       await updateProfile({ name, company, role, industry, target_audience: targetAudience, tone });
-
-      await supabase.from('voice_samples').delete().eq('user_id', user!.id);
-      const newSamples = sampleTexts.filter(s => s.trim());
-      if (newSamples.length > 0) {
-        await supabase.from('voice_samples').insert(newSamples.map(content => ({ user_id: user!.id, content })));
-      }
-      queryClient.invalidateQueries({ queryKey: ['voice_samples'] });
       toast({ title: 'Profil gespeichert' });
     } catch (err: any) {
       toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
@@ -133,13 +109,11 @@ export default function ProfilePage() {
     <div className="relative space-y-6 pb-20">
       <MeshBackground />
 
-      {/* Header */}
       <div className={cn(GLASS_CARD, 'p-6 sm:p-8')}>
         <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Profil</h1>
         <p className="text-sm text-muted-foreground mt-0.5">Verwalten Sie Ihr Profil und Ihre LinkedIn-Strategie</p>
       </div>
 
-      {/* Grundinformationen */}
       <div className={cn(GLASS_CARD, 'p-6')}>
         <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Grundinformationen</h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -150,7 +124,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* KI-Konfiguration */}
       <div className={cn(GLASS_CARD, 'p-6')}>
         <h2 className="font-playfair text-base font-semibold text-foreground mb-4">KI-Konfiguration</h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -162,7 +135,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Content-Steuerung / Topics */}
       <div className={cn(GLASS_CARD, 'p-6')}>
         <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Content-Steuerung</h2>
         <div className="space-y-4">
@@ -185,17 +157,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Voice Samples */}
-      <div className={cn(GLASS_CARD, 'p-6')}>
-        <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Voice Library</h2>
-        <div className="space-y-3">
-          {sampleTexts.map((s, i) => (
-            <Textarea key={i} value={s} onChange={e => { const u = [...sampleTexts]; u[i] = e.target.value; setSampleTexts(u); }} placeholder={`Voice Sample ${i + 1}`} className="min-h-[80px] bg-card/60" />
-          ))}
-        </div>
-      </div>
-
-      {/* Profilfotos */}
       <div className={cn(GLASS_CARD, 'p-6')}>
         <h2 className="font-playfair text-base font-semibold text-foreground mb-2">Profilfotos</h2>
         <p className="text-xs text-muted-foreground mb-4">Drag & Drop zum Umsortieren — das erste Bild ist Ihr Hauptprofilbild</p>
@@ -207,7 +168,6 @@ export default function ProfilePage() {
         />
       </div>
 
-      {/* LinkedIn Verbindung */}
       <div className={cn(GLASS_CARD, 'p-6')}>
         <h2 className="font-playfair text-base font-semibold text-foreground mb-4">LinkedIn Verbindung</h2>
         <div className="flex items-center gap-3">
@@ -226,7 +186,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Account & Sicherheit */}
       <div className={cn(GLASS_CARD, 'p-6')}>
         <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Account & Sicherheit</h2>
         <div className="space-y-4">
@@ -242,7 +201,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Sticky Save Button */}
       <div className="fixed bottom-6 right-6 z-50">
         <Button onClick={save} className="rounded-full shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.15)] px-6">Alle Änderungen speichern</Button>
       </div>

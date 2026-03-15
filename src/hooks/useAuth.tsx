@@ -16,6 +16,7 @@ interface Profile {
   avatar_url_1: string | null;
   avatar_url_2: string | null;
   avatar_url_3: string | null;
+  linkedin_url: string | null;
 }
 
 interface AuthContextType {
