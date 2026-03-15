@@ -519,7 +519,14 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
             </div>
           </div>
         ) : (
-          <p className="text-sm text-foreground line-clamp-4 whitespace-pre-line leading-relaxed">{post.content || '—'}</p>
+          <div>
+            <p className={cn('text-sm text-foreground whitespace-pre-line leading-relaxed', !expanded && isLong && 'line-clamp-4')}>{contentText}</p>
+            {isLong && (
+              <button onClick={() => setExpanded(!expanded)} className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                {expanded ? <><ChevronUp className="h-3 w-3" /> Weniger anzeigen</> : <><ChevronDown className="h-3 w-3" /> Mehr anzeigen</>}
+              </button>
+            )}
+          </div>
         )}
 
         {/* Actions */}
