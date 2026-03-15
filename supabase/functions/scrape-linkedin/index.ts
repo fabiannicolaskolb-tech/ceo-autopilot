@@ -36,13 +36,12 @@ Deno.serve(async (req) => {
 
     // Start Apify actor run (LinkedIn Profile Scraper)
     const runResponse = await fetch(
-      `https://api.apify.com/v2/acts/anchor~linkedin-profile-scraper/run-sync-get-dataset-items?token=${apiKey}`,
+      `https://api.apify.com/v2/acts/curious_coder~linkedin-profile-scraper/run-sync-get-dataset-items?token=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          startUrls: [{ url: profileUrl }],
-          proxyConfiguration: { useApifyProxy: true },
+          urls: [profileUrl],
         }),
       }
     );
