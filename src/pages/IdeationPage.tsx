@@ -474,7 +474,7 @@ export default function IdeationPage() {
                 ) : (
                   <Sparkles className="h-3 w-3" />
                 )}
-                {generatingTemplates ? 'Generiere...' : 'Neue Vorlagen generieren'}
+                {generatingTemplates ? 'Generiere...' : 'Neue Inspirationen generieren'}
               </Button>
 
               {topics.length > 0 && (
