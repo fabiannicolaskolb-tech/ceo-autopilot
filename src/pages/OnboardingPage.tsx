@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import PhotoUpload from '@/components/PhotoUpload';
 import { Button } from '@/components/ui/button';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
+import { ShimmerButton } from '@/components/ui/shimmer-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -402,16 +403,22 @@ export default function OnboardingPage() {
           {step < totalSteps ? (
             <InteractiveHoverButton onClick={() => setStep(s => s + 1)} disabled={!isStepValid}>Weiter</InteractiveHoverButton>
           ) : (
-            <InteractiveHoverButton onClick={() => {
-              const validSamples = voiceSamples.filter(s => s.trim().length >= 500 && s.trim().length <= 3000).length;
-              if (validSamples < 3) {
-                setShowVoiceWarning(true);
-              } else {
-                handleComplete();
-              }
-            }} disabled={saving || !isStepValid}>
-              {saving ? 'Wird gespeichert...' : 'Abschließen'}
-            </InteractiveHoverButton>
+            <ShimmerButton
+              shimmerColor="hsl(var(--primary))"
+              background="hsl(var(--primary))"
+              className="text-primary-foreground text-sm font-medium"
+              onClick={() => {
+                const validSamples = voiceSamples.filter(s => s.trim().length >= 500 && s.trim().length <= 3000).length;
+                if (validSamples < 3) {
+                  setShowVoiceWarning(true);
+                } else {
+                  handleComplete();
+                }
+              }}
+              disabled={saving || !isStepValid}
+            >
+              {saving ? 'Wird gespeichert...' : 'Abschließen ✨'}
+            </ShimmerButton>
           )}
         </div>
       </div>
