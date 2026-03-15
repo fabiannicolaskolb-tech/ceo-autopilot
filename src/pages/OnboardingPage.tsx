@@ -297,7 +297,7 @@ export default function OnboardingPage() {
         )}
       </div>
 
-      <div className="sticky bottom-0 border-t border-border bg-card px-6 py-4">
+      <div className="sticky bottom-0 z-10 border-t border-border bg-card px-6 py-4">
         <div className="mx-auto flex max-w-2xl justify-between">
           <Button variant="outline" onClick={() => setStep(s => s - 1)} disabled={step === 1}>
             Zurück
