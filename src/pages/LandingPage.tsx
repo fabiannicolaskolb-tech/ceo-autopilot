@@ -195,7 +195,7 @@ export default function LandingPage() {
       </section>
 
       {/* Trust */}
-      <section className="border-t border-border bg-card">
+      <section className="bg-[hsl(var(--feature-bg))]">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
           <div className="mb-12 text-center">
             <h2 className="font-playfair text-3xl font-bold text-foreground sm:text-4xl">
@@ -207,14 +207,14 @@ export default function LandingPage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-3">
             {trustItems.map((item) =>
-            <div key={item.title} className="flex flex-col items-center text-center">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                  <item.icon className="h-6 w-6 text-primary" />
+              <div key={item.title} className="rounded-2xl bg-[hsl(var(--feature-card))] p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_28px_-4px_hsl(220_55%_20%/0.14)]">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[hsl(var(--feature-icon-bg))]">
+                  <item.icon className="h-6 w-6 text-foreground/70" />
                 </div>
-                <h3 className="font-playfair text-base font-semibold text-foreground">
+                <h3 className="font-playfair text-base font-bold text-foreground">
                   {item.title}
                 </h3>
-                <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
               </div>
             )}
           </div>
