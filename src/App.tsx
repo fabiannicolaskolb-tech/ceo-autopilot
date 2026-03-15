@@ -45,6 +45,7 @@ const App = () => (
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 
               </Route>
+              <Route path="/post-queue" element={<Navigate to="/post-library" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
