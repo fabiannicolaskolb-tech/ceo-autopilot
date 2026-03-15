@@ -121,7 +121,7 @@ export default function OnboardingPage() {
   const isStepValid = (() => {
     switch (step) {
       case 1:return true;
-      case 2:return name.trim() !== '' && company.trim() !== '' && role.trim() !== '' && industry.trim() !== '';
+      case 2:return cvUploaded && name.trim() !== '' && company.trim() !== '' && role.trim() !== '' && industry.trim() !== '';
       case 3:return avatarUrls.filter((url) => url !== null).length >= 2;
       case 4:return targetAudience.trim() !== '' && tone.trim() !== '';
       case 5:return focusTopics.length > 0;
