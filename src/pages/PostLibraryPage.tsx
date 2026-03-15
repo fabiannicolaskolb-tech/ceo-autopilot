@@ -440,6 +440,9 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content || '');
   const [saving, setSaving] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const contentText = post.content || '—';
+  const isLong = contentText.length > 200;
 
   const handleApprove = async () => {
     const { error } = await supabase.from('posts').update({ status: 'approved' }).eq('id', post.id);
