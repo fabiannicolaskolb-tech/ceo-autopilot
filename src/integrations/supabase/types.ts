@@ -202,6 +202,7 @@ export type Database = {
           bio: string | null
           company: string | null
           created_at: string
+          cv_context: string | null
           id: string
           industry: string | null
           linkedin_connected: boolean
@@ -220,6 +221,7 @@ export type Database = {
           bio?: string | null
           company?: string | null
           created_at?: string
+          cv_context?: string | null
           id: string
           industry?: string | null
           linkedin_connected?: boolean
@@ -238,6 +240,7 @@ export type Database = {
           bio?: string | null
           company?: string | null
           created_at?: string
+          cv_context?: string | null
           id?: string
           industry?: string | null
           linkedin_connected?: boolean

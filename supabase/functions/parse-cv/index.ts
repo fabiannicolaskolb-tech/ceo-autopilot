@@ -93,11 +93,11 @@ serve(async (req) => {
           {
             role: "system",
             content:
-              "You are a CV/resume parser. Extract structured information from the provided CV text. Always call the extract_cv_data tool with the extracted information. If a field is not found, use an empty string.",
+              "You are a CV/resume parser. Extract structured information from the provided CV text. Always call the extract_cv_data tool with the extracted information. If a field is not found, use an empty string. For professional_context, write a comprehensive German-language summary (300-500 words) covering: Kernkompetenzen, relevante Berufserfahrung, bemerkenswerte Erfolge, and Fachgebiete. This context will be used for LinkedIn content generation.",
           },
           {
             role: "user",
-            content: `Extract the person's name, company, job title/role, and industry from this CV:\n\n${textContent.slice(0, 12000)}`,
+            content: `Extract the person's name, company, job title/role, industry, and a comprehensive professional context summary from this CV:\n\n${textContent.slice(0, 12000)}`,
           },
         ],
         tools: [
@@ -113,8 +113,9 @@ serve(async (req) => {
                   company: { type: "string", description: "Current or most recent company/employer" },
                   role: { type: "string", description: "Current or most recent job title/position" },
                   industry: { type: "string", description: "Industry or field of work" },
+                  professional_context: { type: "string", description: "Comprehensive professional summary in German (300-500 words) covering: Kernkompetenzen, relevante Berufserfahrung, bemerkenswerte Erfolge, Fachgebiete. This will be used as context for LinkedIn content generation." },
                 },
-                required: ["name", "company", "role", "industry"],
+                required: ["name", "company", "role", "industry", "professional_context"],
                 additionalProperties: false,
               },
             },

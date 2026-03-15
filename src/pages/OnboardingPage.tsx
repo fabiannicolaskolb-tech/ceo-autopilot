@@ -65,11 +65,19 @@ export default function OnboardingPage() {
       if (error) throw new Error(error.message || 'Fehler beim Parsen');
       if (!data || typeof data !== 'object') throw new Error('Ungültige Antwort vom CV-Parser');
 
-      const parsed = data as Partial<Record<'name' | 'company' | 'role' | 'industry', string>>;
+      const parsed = data as Partial<Record<'name' | 'company' | 'role' | 'industry' | 'professional_context', string>>;
       if (parsed.name) setName(parsed.name);
       if (parsed.company) setCompany(parsed.company);
       if (parsed.role) setRole(parsed.role);
       if (parsed.industry) setIndustry(parsed.industry);
+
+      // Save professional context to Supabase profile
+      if (parsed.professional_context && user?.id) {
+        await supabase.from('profiles').update({
+          cv_context: parsed.professional_context,
+        } as any).eq('id', user.id);
+      }
+
       toast({ title: 'CV erfolgreich ausgelesen!' });
     } catch (err: any) {
       toast({ title: 'CV konnte nicht ausgelesen werden', description: err?.message, variant: 'destructive' });
