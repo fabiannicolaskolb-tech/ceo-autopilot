@@ -273,7 +273,7 @@ export default function OnboardingPage() {
               <p className="text-xs text-muted-foreground">Felder werden automatisch ausgefüllt</p>
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center">
               <input
               ref={cvInputRef}
               type="file"
@@ -292,7 +292,7 @@ export default function OnboardingPage() {
                 {parsingCv ? 'CV wird analysiert...' : cvUploaded ? 'CV erfolgreich hochgeladen ✓' : 'CV hochladen & automatisch ausfüllen'}
               </Button>
               {!cvUploaded && (
-                <p className="text-xs text-destructive mt-1">Bitte laden Sie Ihren CV hoch, um fortzufahren</p>
+                <p className="text-xs text-muted-foreground mt-2">Bitte laden Sie Ihren CV hoch, um fortzufahren</p>
               )}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
