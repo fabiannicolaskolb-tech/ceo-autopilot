@@ -136,7 +136,10 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-import DailyBriefing from '@/components/DailyBriefing';
+
+      {/* Daily Briefing */}
+      <DailyBriefing />
+
       {/* Quick Navigation */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
