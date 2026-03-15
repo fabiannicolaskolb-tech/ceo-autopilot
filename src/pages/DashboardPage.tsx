@@ -211,13 +211,17 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Stats */}
+      {/* Stats - Liquid Glass Cards */}
       <div className="grid gap-5 grid-cols-2 lg:grid-cols-4">
         {/* Drafts */}
-        <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
-          <div className="rounded-[12px] p-2.5 bg-muted/50 w-fit">
-            <FileText className="h-5 w-5 text-primary" />
-          </div>
+        <div className="relative rounded-[24px] bg-card/60 backdrop-blur-2xl p-6 border border-white/20 dark:border-white/10 shadow-[0_8px_32px_-8px_hsl(var(--primary)/0.12)] overflow-hidden group">
+          {/* Liquid glass overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-white/10 dark:from-white/10 dark:via-transparent dark:to-white/5 pointer-events-none rounded-[24px]" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/60 dark:via-white/30 to-transparent rounded-t-[24px]" />
+          <div className="relative z-10">
+            <div className="rounded-[12px] p-2.5 bg-white/30 dark:bg-white/10 backdrop-blur-sm w-fit">
+              <FileText className="h-5 w-5 text-primary" />
+            </div>
           <p className="text-3xl font-bold text-foreground tracking-tight mt-4">{draftCount}</p>
           <p className="text-xs text-muted-foreground mt-0.5">Entwürfe</p>
         </div>
