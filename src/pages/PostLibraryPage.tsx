@@ -403,27 +403,6 @@ export default function PostLibraryPage() {
 
   const handleMutate = () => setRefreshKey(k => k + 1);
 
-  // n8n trigger
-  const triggerGenericMutation = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.functions.invoke('trigger-n8n-generic', {
-        body: {
-          user_id: user?.id,
-          request_id: crypto.randomUUID(),
-          command: 'orchestrate',
-          cycle_number: 1,
-        },
-      });
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      toast({ title: 'Workflow gestartet', description: 'n8n wurde erfolgreich getriggert.' });
-    },
-    onError: (err: Error) => {
-      toast({ title: 'Fehler', description: err.message, variant: 'destructive' });
-    },
-  });
 
   // Dummy handler for gallery/calendar clicks (scrolls to card view)
   const handlePostClick = (_post: any) => {
@@ -442,21 +421,6 @@ export default function PostLibraryPage() {
             <p className="text-sm text-muted-foreground mt-0.5">Verwalten, planen und visualisieren Sie Ihre LinkedIn-Posts</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            {/* n8n trigger */}
-            <Button
-              onClick={() => triggerGenericMutation.mutate()}
-              disabled={triggerGenericMutation.isPending}
-              variant="outline"
-              className="gap-2 rounded-xl text-xs h-9"
-            >
-              {triggerGenericMutation.isPending ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <Zap className="h-3.5 w-3.5" />
-              )}
-              n8n starten
-            </Button>
-
             {/* View mode toggle */}
             <Tabs value={viewMode} onValueChange={v => setViewMode(v as any)}>
               <TabsList className="h-9">
