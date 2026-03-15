@@ -62,13 +62,11 @@ export default function LandingPage() {
 
   const handleFeatureClick = (title: string) => {
     if (expandedFeature === title) {
-      // Step 1: collapse image
+      // Closing: first collapse image, then after delay remove col-span & show others
       setExpandedFeature(null);
-      // Step 2: after image collapsed, show other cards (but keep col-span)
-      setTimeout(() => {
-        setColSpanFeature(null);
-      }, 1200);
+      setTimeout(() => setColSpanFeature(null), 700);
     } else {
+      // Opening: set col-span immediately, then expand
       setColSpanFeature(title);
       setExpandedFeature(title);
     }
@@ -194,7 +192,7 @@ export default function LandingPage() {
             {features.map((f) => {
               const isExpanded = expandedFeature === f.title;
               const hasColSpan = colSpanFeature === f.title;
-              const isHidden = expandedFeature != null && expandedFeature !== f.title;
+              const isHidden = (expandedFeature != null && expandedFeature !== f.title) || (colSpanFeature != null && colSpanFeature !== f.title);
               const previewImage = f.title === 'Analytics' ? calendarPreview : f.title === 'Planning' ? plannerPreview : ideationPreview;
 
               return (
