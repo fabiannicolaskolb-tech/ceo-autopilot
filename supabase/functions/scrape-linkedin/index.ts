@@ -1,7 +1,9 @@
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
+
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -67,18 +69,51 @@ Deno.serve(async (req) => {
 
     // Extract relevant fields
     const extracted = {
-      name: profileData.fullName || profileData.firstName && profileData.lastName
+      name: profileData.fullName || (profileData.firstName && profileData.lastName
         ? `${profileData.firstName || ''} ${profileData.lastName || ''}`.trim()
-        : null,
-      company: profileData.company?.name || profileData.positions?.[0]?.companyName || null,
-      role: profileData.headline || profileData.positions?.[0]?.title || null,
-      industry: profileData.industry || null,
-      bio: profileData.summary || profileData.about || null,
-      profile_image_url: profileData.profilePicture || profileData.photo || null,
+        : null),
+      company: profileData.company?.name || profileData.positions?.[0]?.companyName || profileData.companyName || null,
+      role: profileData.headline || profileData.positions?.[0]?.title || profileData.title || null,
+      industry: profileData.industry || profileData.industryName || null,
+      bio: profileData.summary || profileData.about || profileData.description || null,
+      profile_image_url: profileData.profilePicture || profileData.photo || profileData.profilePicUrl || profileData.avatar || null,
       recent_posts: (profileData.posts || profileData.activities || []).slice(0, 10),
     };
 
     console.log('Extracted profile data:', JSON.stringify(extracted, null, 2));
+
+    // If user_id provided, save profile data to profiles table
+    const body = await req.clone().json().catch(() => ({}));
+    const userId = body.user_id;
+    if (userId && (extracted.bio || extracted.profile_image_url || extracted.name)) {
+      try {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+        const updates: Record<string, string> = {};
+        if (extracted.bio) updates.bio = extracted.bio;
+        if (extracted.profile_image_url) updates.avatar_url_1 = extracted.profile_image_url;
+        if (extracted.name) updates.name = extracted.name;
+        if (extracted.company) updates.company = extracted.company;
+        if (extracted.role) updates.role = extracted.role;
+        if (extracted.industry) updates.industry = extracted.industry;
+
+        if (Object.keys(updates).length > 0) {
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update(updates)
+            .eq('id', userId);
+          if (updateError) {
+            console.error('Failed to update profile:', updateError.message);
+          } else {
+            console.log('Profile updated with scraped data');
+          }
+        }
+      } catch (e) {
+        console.error('Error updating profile:', e);
+      }
+    }
 
     return new Response(
       JSON.stringify(extracted),

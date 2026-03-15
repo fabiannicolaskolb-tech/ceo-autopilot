@@ -3,6 +3,7 @@ import {
   Eye, TrendingUp, TrendingDown, Users, ArrowUpRight, ArrowDownRight,
   BarChart3, Clock, MessageCircle, Heart, Share2, Lightbulb, Minus, Rocket,
   Upload, Image as ImageIcon, Save, Brain, Zap, ArrowRight, CalendarIcon,
+  RefreshCw, Linkedin,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -349,13 +350,60 @@ const SENTIMENT_COLORS = [
 
 // ──── Main Page ────
 export default function AnalyticsPage() {
+  const { user } = useAuth();
   const {
     posts, kpis, timelineData, contentTypeData, sentimentData,
     bestTimeData, loading, hasData, timeRange, setTimeRange,
     customRange, setCustomRange,
   } = useAnalytics();
+  const [importLoading, setImportLoading] = useState(false);
   const [customFrom, setCustomFrom] = useState<Date | undefined>(customRange?.from);
   const [customTo, setCustomTo] = useState<Date | undefined>(customRange?.to);
+
+  const handleLinkedInImport = async () => {
+    if (!user) return;
+    setImportLoading(true);
+    try {
+      // Get linkedin_url from profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('linkedin_url')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.linkedin_url) {
+        toast({
+          title: 'LinkedIn-URL fehlt',
+          description: 'Bitte hinterlegen Sie Ihre LinkedIn-URL in Ihrem Profil.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('scrape-linkedin-posts', {
+        body: { linkedin_url: profile.linkedin_url, user_id: user.id },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'LinkedIn-Import abgeschlossen',
+        description: `${data.imported} Posts importiert, ${data.skipped || 0} übersprungen.`,
+      });
+
+      // Reload page to refresh analytics
+      window.location.reload();
+    } catch (err: any) {
+      console.error('LinkedIn import error:', err);
+      toast({
+        title: 'Import fehlgeschlagen',
+        description: err.message || 'Bitte versuchen Sie es erneut.',
+        variant: 'destructive',
+      });
+    } finally {
+      setImportLoading(false);
+    }
+  };
 
   const kpiIcons = [Eye, TrendingUp, Users];
 
@@ -379,6 +427,20 @@ export default function AnalyticsPage() {
             <p className="text-sm text-muted-foreground mt-0.5">Performance-Übersicht Ihres LinkedIn-Auftritts</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLinkedInImport}
+              disabled={importLoading}
+              className="gap-2"
+            >
+              {importLoading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Linkedin className="h-4 w-4" />
+              )}
+              {importLoading ? 'Importiere…' : 'Posts importieren'}
+            </Button>
             <Tabs value={timeRange} onValueChange={v => {
               setTimeRange(v as TimeRange);
               if (v !== 'custom') setCustomRange(null);
