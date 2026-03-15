@@ -556,6 +556,8 @@ export default function PostLibraryPage() {
         <div className={cn(GLASS_CARD, 'p-6')}>
           <CalendarView posts={posts} onPostClick={handlePostClick} />
         </div>
+      ) : viewMode === 'feed' ? (
+        <FeedView posts={currentPosts} profile={profile} />
       ) : viewMode === 'gallery' ? (
         posts.length === 0 ? (
           <EmptyState tab={tab} />
