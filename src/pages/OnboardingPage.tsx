@@ -57,20 +57,19 @@ export default function OnboardingPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-cv`,
-        {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
-          body: formData,
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Fehler beim Parsen');
-      if (data.name) setName(data.name);
-      if (data.company) setCompany(data.company);
-      if (data.role) setRole(data.role);
-      if (data.industry) setIndustry(data.industry);
+
+      const { data, error } = await supabase.functions.invoke('parse-cv', {
+        body: formData,
+      });
+
+      if (error) throw new Error(error.message || 'Fehler beim Parsen');
+      if (!data || typeof data !== 'object') throw new Error('Ungültige Antwort vom CV-Parser');
+
+      const parsed = data as Partial<Record<'name' | 'company' | 'role' | 'industry', string>>;
+      if (parsed.name) setName(parsed.name);
+      if (parsed.company) setCompany(parsed.company);
+      if (parsed.role) setRole(parsed.role);
+      if (parsed.industry) setIndustry(parsed.industry);
       toast({ title: 'CV erfolgreich ausgelesen!' });
     } catch (err: any) {
       toast({ title: 'CV konnte nicht ausgelesen werden', description: err?.message, variant: 'destructive' });

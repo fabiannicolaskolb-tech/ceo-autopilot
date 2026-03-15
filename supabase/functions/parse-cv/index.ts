@@ -1,10 +1,32 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getDocument } from "npm:pdfjs-dist@4.10.38/legacy/build/pdf.mjs";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const sanitizeText = (value: string) =>
+  value.replace(/[^\x20-\x7E\xC0-\xFF\n\r\t äöüÄÖÜß]/g, " ").replace(/\s{2,}/g, " ").trim();
+
+async function extractPdfText(bytes: Uint8Array): Promise<string> {
+  const loadingTask = getDocument({ data: bytes, isEvalSupported: false, useWorkerFetch: false });
+  const pdf = await loadingTask.promise;
+  const maxPages = Math.min(pdf.numPages, 10);
+  const chunks: string[] = [];
+
+  for (let pageNumber = 1; pageNumber <= maxPages; pageNumber++) {
+    const page = await pdf.getPage(pageNumber);
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items
+      .map((item: { str?: string }) => item.str ?? "")
+      .join(" ");
+    if (pageText) chunks.push(pageText);
+  }
+
+  return sanitizeText(chunks.join("\n"));
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -24,46 +46,41 @@ serve(async (req) => {
       });
     }
 
-    // Read file content
     const arrayBuffer = await file.arrayBuffer();
     const bytes = new Uint8Array(arrayBuffer);
-
-    // For PDF files, send as base64 to vision model; for text files, decode directly
     const fileName = file.name.toLowerCase();
-    let textContent = "";
+    const mimeType = (file.type || "").toLowerCase();
+
     const isTextFile = fileName.endsWith(".txt") || fileName.endsWith(".md");
+    const isPdfFile = fileName.endsWith(".pdf") || mimeType.includes("pdf");
+
+    let textContent = "";
 
     if (isTextFile) {
-      textContent = new TextDecoder().decode(bytes);
-    } else {
-      // For PDF/DOCX, encode as base64 and use as context
-      let binary = "";
-      const chunkSize = 8192;
-      for (let i = 0; i < bytes.length; i += chunkSize) {
-        const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
-        for (let j = 0; j < chunk.length; j++) {
-          binary += String.fromCharCode(chunk[j]);
-        }
-      }
-      const base64 = btoa(binary);
-      // We'll pass raw text extraction attempt + base64 hint
+      textContent = sanitizeText(new TextDecoder().decode(bytes));
+    } else if (isPdfFile) {
       try {
-        textContent = new TextDecoder().decode(bytes);
-        // Filter out non-printable characters for a rough text extraction
-        textContent = textContent.replace(/[^\x20-\x7E\xC0-\xFF\n\r\t äöüÄÖÜß]/g, " ").replace(/\s{3,}/g, " ");
+        textContent = await extractPdfText(bytes);
+      } catch (pdfError) {
+        console.error("PDF extraction failed:", pdfError);
+      }
+    }
+
+    if (!textContent) {
+      try {
+        textContent = sanitizeText(new TextDecoder().decode(bytes));
       } catch {
         textContent = "";
       }
     }
 
-    if (!textContent || textContent.trim().length < 20) {
+    if (!textContent || textContent.length < 40) {
       return new Response(
-        JSON.stringify({ error: "Could not extract text from this file. Please use a .txt or text-based PDF." }),
+        JSON.stringify({ error: "Could not extract enough text from this file. Please use a text-based PDF or TXT file." }),
         { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Use Lovable AI Gateway with tool calling for structured extraction
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -80,7 +97,7 @@ serve(async (req) => {
           },
           {
             role: "user",
-            content: `Extract the person's name, company, job title/role, and industry from this CV:\n\n${textContent.slice(0, 8000)}`,
+            content: `Extract the person's name, company, job title/role, and industry from this CV:\n\n${textContent.slice(0, 12000)}`,
           },
         ],
         tools: [
