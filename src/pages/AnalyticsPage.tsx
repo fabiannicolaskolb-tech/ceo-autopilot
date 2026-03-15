@@ -811,6 +811,8 @@ function AILearningInsights() {
     return recs.slice(0, 5);
   }, [analyzed]);
 
+  if (analyzed.length === 0) return null;
+
   return (
     <div className={cn(GLASS_CARD, 'p-6')}>
       <h2 className="font-playfair text-base font-semibold text-foreground mb-4 flex items-center gap-2">
