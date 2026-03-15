@@ -159,6 +159,7 @@ interface PostCardProps {
 }
 
 function PostCard({ post, tab, onMutate }: PostCardProps) {
+  const { profile } = useAuth();
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content || '');
@@ -214,155 +215,173 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
   const contentPreview = post.content || '';
   const isLong = contentPreview.length > 200;
 
+  const userName = profile?.name || 'Du';
+  const typeLabel = post.type || post.content_category || 'Post';
+
   return (
-    <div className={cn(GLASS_CARD, 'p-5 space-y-3 transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]')}>
-      {/* Header */}
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-2">
-          <StatusBadge status={post.status} />
-          {post.cycle_number && post.cycle_number > 0 && (
-            <Badge variant="outline" className="text-[10px] rounded-full">Zyklus {post.cycle_number}</Badge>
+    <div className={cn(GLASS_CARD, 'overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]')}>
+      {/* LinkedIn-style Header */}
+      <div className="p-5 pb-0 space-y-3">
+        <div className="flex items-center gap-3">
+          {profile?.avatar_url_1 ? (
+            <img src={profile.avatar_url_1} alt={userName} className="h-10 w-10 rounded-full object-cover ring-2 ring-border" />
+          ) : (
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
+              {userName.charAt(0).toUpperCase()}
+            </div>
           )}
-          {post.type && <Badge variant="outline" className="text-xs rounded-full">{post.type}</Badge>}
-          {post.angle && <Badge variant="outline" className="text-xs rounded-full">{post.angle}</Badge>}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-foreground truncate">{userName}</span>
+              <span className="text-xs text-muted-foreground">·</span>
+              <span className="text-xs text-muted-foreground">
+                {post.posted_at ? format(new Date(post.posted_at), 'dd. MMM', { locale: de }) : format(new Date(post.created_at), 'dd. MMM', { locale: de })}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground truncate">
+              {typeLabel} · {post.angle || 'shared'}
+            </p>
+          </div>
+          <StatusBadge status={post.status} />
         </div>
-        <span className="text-[11px] text-muted-foreground">
-          {post.posted_at ? format(new Date(post.posted_at), 'dd.MM.yyyy', { locale: de }) : format(new Date(post.created_at), 'dd.MM.yyyy', { locale: de })}
-        </span>
+
+        {/* Content */}
+        {editing ? (
+          <div className="space-y-2">
+            <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} />
+            <div className="flex gap-2">
+              <Button size="sm" onClick={handleSaveEdit} disabled={saving}>Speichern</Button>
+              <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Abbrechen</Button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <p className={cn('text-sm text-foreground leading-relaxed whitespace-pre-line', !expanded && isLong && 'line-clamp-4')}>
+              {contentPreview}
+            </p>
+            {isLong && (
+              <button onClick={() => setExpanded(!expanded)} className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                {expanded ? <><ChevronUp className="h-3 w-3" /> Weniger anzeigen</> : <><ChevronDown className="h-3 w-3" /> Mehr anzeigen</>}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Hashtags */}
+        {hashtags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {hashtags.map((tag, i) => (
+              <span key={i} className="text-[11px] text-primary/70">{tag.startsWith('#') ? tag : `#${tag}`}</span>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Content */}
-      {editing ? (
-        <div className="space-y-2">
-          <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} />
-          <div className="flex gap-2">
-            <Button size="sm" onClick={handleSaveEdit} disabled={saving}>Speichern</Button>
-            <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Abbrechen</Button>
-          </div>
-        </div>
-      ) : (
-        <div>
-          <p className={cn('text-sm text-foreground leading-relaxed whitespace-pre-line', !expanded && isLong && 'line-clamp-3')}>
-            {contentPreview}
-          </p>
-          {isLong && (
-            <button onClick={() => setExpanded(!expanded)} className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
-              {expanded ? <><ChevronUp className="h-3 w-3" /> Weniger anzeigen</> : <><ChevronDown className="h-3 w-3" /> Mehr anzeigen</>}
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Post Image */}
+      {/* Post Image — full width, below content */}
       {post.image_url && (
-        <div className="rounded-lg overflow-hidden border border-border/50">
+        <div className="mt-3 border-t border-border/30">
           <img
             src={post.image_url}
             alt="Post Bild"
-            className="w-full aspect-square object-cover"
+            className="w-full object-cover max-h-[400px]"
             loading="lazy"
           />
         </div>
       )}
-      {/* Hashtags */}
-      {hashtags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {hashtags.map((tag, i) => (
-            <span key={i} className="text-[11px] text-primary/70 bg-primary/5 rounded-full px-2 py-0.5">{tag.startsWith('#') ? tag : `#${tag}`}</span>
-          ))}
-        </div>
-      )}
 
-      {/* Mini Metrics for Published */}
-      {tab === 'published' && hasMetrics && (
-        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground pt-1 border-t border-border/50">
-          {metrics.impressions != null && <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{Number(metrics.impressions).toLocaleString()}</span>}
-          {metrics.likes != null && <span className="flex items-center gap-1"><Heart className="h-3 w-3" />{metrics.likes}</span>}
-          {metrics.comments != null && <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" />{metrics.comments}</span>}
-          {metrics.shares != null && <span className="flex items-center gap-1"><Share2 className="h-3 w-3" />{metrics.shares}</span>}
-          {metrics.engagement_rate != null && <span className="flex items-center gap-1"><BarChart3 className="h-3 w-3" />{metrics.engagement_rate}%</span>}
-          {metrics.score != null && (
-            <Badge variant="secondary" className="text-[10px] rounded-full bg-warning/15 text-warning">Score: {metrics.score}/10</Badge>
-          )}
-        </div>
-      )}
-
-      {/* Expanded AI Insights for Published */}
-      {tab === 'published' && expanded && metrics && (
-        <div className="space-y-2 pt-2 border-t border-border/50">
-          {metrics.performance_summary && (
-            <div className="rounded-xl bg-muted/40 p-3">
-              <p className="text-xs font-medium text-foreground mb-1 flex items-center gap-1"><Sparkles className="h-3 w-3" /> Performance Summary</p>
-              <p className="text-xs text-muted-foreground">{metrics.performance_summary}</p>
-            </div>
-          )}
-          {metrics.what_worked && (
-            <div className="rounded-xl bg-success/5 p-3">
-              <p className="text-xs font-medium text-success mb-1">✓ Was funktioniert hat</p>
-              <p className="text-xs text-muted-foreground">{metrics.what_worked}</p>
-            </div>
-          )}
-          {metrics.what_to_improve && (
-            <div className="rounded-xl bg-warning/5 p-3">
-              <p className="text-xs font-medium text-warning mb-1">↗ Verbesserungspotenzial</p>
-              <p className="text-xs text-muted-foreground">{metrics.what_to_improve}</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="flex items-center gap-2 flex-wrap pt-1">
-        {tab === 'drafts' && (
-          <>
-            {post.status === 'draft' && (
-              <Button size="sm" variant="default" className="text-xs h-8" onClick={handleApprove}>
-                <Check className="h-3 w-3 mr-1" /> Freigeben
-              </Button>
+      {/* Metrics & Actions */}
+      <div className="p-5 pt-3 space-y-3">
+        {/* Mini Metrics for Published */}
+        {tab === 'published' && hasMetrics && (
+          <div className="flex flex-wrap gap-4 text-xs text-muted-foreground pt-1 border-t border-border/50">
+            {metrics.impressions != null && <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{Number(metrics.impressions).toLocaleString()}</span>}
+            {metrics.likes != null && <span className="flex items-center gap-1"><Heart className="h-3 w-3" />{metrics.likes}</span>}
+            {metrics.comments != null && <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" />{metrics.comments}</span>}
+            {metrics.shares != null && <span className="flex items-center gap-1"><Share2 className="h-3 w-3" />{metrics.shares}</span>}
+            {metrics.engagement_rate != null && <span className="flex items-center gap-1"><BarChart3 className="h-3 w-3" />{metrics.engagement_rate}%</span>}
+            {metrics.score != null && (
+              <Badge variant="secondary" className="text-[10px] rounded-full bg-warning/15 text-warning">Score: {metrics.score}/10</Badge>
             )}
-            {post.status === 'approved' && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button size="sm" variant="default" className="text-xs h-8">
-                    <CalendarDays className="h-3 w-3 mr-1" /> Planen
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-3 space-y-3" align="start">
-                  <Calendar mode="single" selected={scheduleDate} onSelect={setScheduleDate} className="p-3 pointer-events-auto" />
-                  <div className="flex items-center gap-2">
-                    <Input type="time" value={scheduleTime} onChange={e => setScheduleTime(e.target.value)} className="w-28 h-8 text-xs" />
-                    <Button size="sm" className="text-xs h-8" onClick={handleSchedule} disabled={!scheduleDate}>Bestätigen</Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
+          </div>
+        )}
+
+        {/* Expanded AI Insights for Published */}
+        {tab === 'published' && expanded && metrics && (
+          <div className="space-y-2 pt-2 border-t border-border/50">
+            {metrics.performance_summary && (
+              <div className="rounded-xl bg-muted/40 p-3">
+                <p className="text-xs font-medium text-foreground mb-1 flex items-center gap-1"><Sparkles className="h-3 w-3" /> Performance Summary</p>
+                <p className="text-xs text-muted-foreground">{metrics.performance_summary}</p>
+              </div>
             )}
-            <Button size="sm" variant="ghost" className="text-xs h-8" onClick={() => { setEditing(true); setEditContent(post.content || ''); }}>
-              <Pencil className="h-3 w-3 mr-1" /> Bearbeiten
-            </Button>
-          </>
+            {metrics.what_worked && (
+              <div className="rounded-xl bg-success/5 p-3">
+                <p className="text-xs font-medium text-success mb-1">✓ Was funktioniert hat</p>
+                <p className="text-xs text-muted-foreground">{metrics.what_worked}</p>
+              </div>
+            )}
+            {metrics.what_to_improve && (
+              <div className="rounded-xl bg-warning/5 p-3">
+                <p className="text-xs font-medium text-warning mb-1">↗ Verbesserungspotenzial</p>
+                <p className="text-xs text-muted-foreground">{metrics.what_to_improve}</p>
+              </div>
+            )}
+          </div>
         )}
-        <Button size="sm" variant="ghost" className="text-xs h-8" onClick={handleCopy}>
-          <Copy className="h-3 w-3 mr-1" /> Kopieren
-        </Button>
-        {tab === 'drafts' && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
-                <Trash2 className="h-3 w-3 mr-1" /> Löschen
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-border/30">
+          {tab === 'drafts' && (
+            <>
+              {post.status === 'draft' && (
+                <Button size="sm" variant="default" className="text-xs h-8" onClick={handleApprove}>
+                  <Check className="h-3 w-3 mr-1" /> Freigeben
+                </Button>
+              )}
+              {post.status === 'approved' && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button size="sm" variant="default" className="text-xs h-8">
+                      <CalendarDays className="h-3 w-3 mr-1" /> Planen
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-3 space-y-3" align="start">
+                    <Calendar mode="single" selected={scheduleDate} onSelect={setScheduleDate} className="p-3 pointer-events-auto" />
+                    <div className="flex items-center gap-2">
+                      <Input type="time" value={scheduleTime} onChange={e => setScheduleTime(e.target.value)} className="w-28 h-8 text-xs" />
+                      <Button size="sm" className="text-xs h-8" onClick={handleSchedule} disabled={!scheduleDate}>Bestätigen</Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
+              <Button size="sm" variant="ghost" className="text-xs h-8" onClick={() => { setEditing(true); setEditContent(post.content || ''); }}>
+                <Pencil className="h-3 w-3 mr-1" /> Bearbeiten
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Post löschen?</AlertDialogTitle>
-                <AlertDialogDescription>Diese Aktion kann nicht rückgängig gemacht werden.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>Löschen</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
+            </>
+          )}
+          <Button size="sm" variant="ghost" className="text-xs h-8" onClick={handleCopy}>
+            <Copy className="h-3 w-3 mr-1" /> Kopieren
+          </Button>
+          {tab === 'drafts' && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
+                  <Trash2 className="h-3 w-3 mr-1" /> Löschen
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Post löschen?</AlertDialogTitle>
+                  <AlertDialogDescription>Diese Aktion kann nicht rückgängig gemacht werden.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>Löschen</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
       </div>
     </div>
   );
