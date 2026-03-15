@@ -80,6 +80,7 @@ export default function OnboardingPage() {
       }
 
       toast({ title: 'CV erfolgreich ausgelesen!' });
+      setCvUploaded(true);
     } catch (err: any) {
       toast({ title: 'CV konnte nicht ausgelesen werden', description: err?.message, variant: 'destructive' });
     }
