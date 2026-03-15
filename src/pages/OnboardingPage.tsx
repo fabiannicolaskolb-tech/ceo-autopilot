@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X, Upload, Loader2, Linkedin, Check } from 'lucide-react';
+import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X, Upload, Loader2, Linkedin } from 'lucide-react';
 import { Particles } from '@/components/ui/particles';
 import { useTheme } from '@/hooks/useTheme';
 import ShimmerText from '@/components/ui/shimmer-text';
@@ -22,12 +22,12 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 const TONES = [
-  { value: 'authoritative', label: 'Autoritär & bestimmt' },
-  { value: 'conversational', label: 'Locker & gesprächig' },
-  { value: 'visionary', label: 'Visionär & zukunftsorientiert' },
-  { value: 'technical', label: 'Fachlich & analytisch' },
-  { value: 'inspirational', label: 'Inspirierend & motivierend' },
-];
+{ value: 'authoritative', label: 'Autoritär & bestimmt' },
+{ value: 'conversational', label: 'Locker & gesprächig' },
+{ value: 'visionary', label: 'Visionär & zukunftsorientiert' },
+{ value: 'technical', label: 'Fachlich & analytisch' },
+{ value: 'inspirational', label: 'Inspirierend & motivierend' }];
+
 
 const STEP_LABELS = ['Start', 'Basis', 'Fotos', 'Strategie', 'Themen'];
 
@@ -48,7 +48,6 @@ export default function OnboardingPage() {
   const [avatarUrls, setAvatarUrls] = useState<(string | null)[]>([null, null, null]);
   const [saving, setSaving] = useState(false);
   const [parsingCv, setParsingCv] = useState(false);
-  const [cvUploaded, setCvUploaded] = useState(false);
   const cvInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,27 +59,18 @@ export default function OnboardingPage() {
       formData.append('file', file);
 
       const { data, error } = await supabase.functions.invoke('parse-cv', {
-        body: formData,
+        body: formData
       });
 
       if (error) throw new Error(error.message || 'Fehler beim Parsen');
       if (!data || typeof data !== 'object') throw new Error('Ungültige Antwort vom CV-Parser');
 
-      const parsed = data as Partial<Record<'name' | 'company' | 'role' | 'industry' | 'professional_context', string>>;
+      const parsed = data as Partial<Record<'name' | 'company' | 'role' | 'industry', string>>;
       if (parsed.name) setName(parsed.name);
       if (parsed.company) setCompany(parsed.company);
       if (parsed.role) setRole(parsed.role);
       if (parsed.industry) setIndustry(parsed.industry);
-
-      // Save professional context to Supabase profile
-      if (parsed.professional_context && user?.id) {
-        await supabase.from('profiles').update({
-          cv_context: parsed.professional_context,
-        } as any).eq('id', user.id);
-      }
-
       toast({ title: 'CV erfolgreich ausgelesen!' });
-      setCvUploaded(true);
     } catch (err: any) {
       toast({ title: 'CV konnte nicht ausgelesen werden', description: err?.message, variant: 'destructive' });
     }
@@ -98,9 +88,9 @@ export default function OnboardingPage() {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ linkedin_url: linkedinUrl.trim() }),
+          body: JSON.stringify({ linkedin_url: linkedinUrl.trim() })
         }
       );
       const data = await res.json();
@@ -123,37 +113,37 @@ export default function OnboardingPage() {
   const [burstKey, setBurstKey] = useState(0);
 
   useEffect(() => {
-    setBurstKey(k => k + 1);
+    setBurstKey((k) => k + 1);
   }, [step]);
 
   const isStepValid = (() => {
     switch (step) {
-      case 1: return true;
-      case 2: return name.trim() !== '' && company.trim() !== '' && role.trim() !== '' && industry.trim() !== '' && cvUploaded;
-      case 3: return avatarUrls.filter(url => url !== null).length >= 2;
-      case 4: return targetAudience.trim() !== '' && tone.trim() !== '';
-      case 5: return focusTopics.length > 0;
-      default: return true;
+      case 1:return true;
+      case 2:return name.trim() !== '' && company.trim() !== '' && role.trim() !== '' && industry.trim() !== '';
+      case 3:return avatarUrls.filter((url) => url !== null).length >= 2;
+      case 4:return targetAudience.trim() !== '' && tone.trim() !== '';
+      case 5:return focusTopics.length > 0;
+      default:return true;
     }
   })();
 
   const totalSteps = 5;
-  const progress = (step / totalSteps) * 100;
+  const progress = step / totalSteps * 100;
 
   const addTopic = (type: 'focus' | 'nogo') => {
     const input = type === 'focus' ? focusInput : noGoInput;
     if (!input.trim()) return;
     if (type === 'focus') {
-      setFocusTopics(prev => [...prev, input.trim()]);
+      setFocusTopics((prev) => [...prev, input.trim()]);
       setFocusInput('');
     } else {
-      setNoGoTopics(prev => [...prev, input.trim()]);
+      setNoGoTopics((prev) => [...prev, input.trim()]);
       setNoGoInput('');
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, type: 'focus' | 'nogo') => {
-    if (e.key === 'Enter') { e.preventDefault(); addTopic(type); }
+    if (e.key === 'Enter') {e.preventDefault();addTopic(type);}
   };
 
   const handleComplete = async () => {
@@ -166,14 +156,14 @@ export default function OnboardingPage() {
         avatar_url_1: avatarUrls[0],
         avatar_url_2: avatarUrls[1],
         avatar_url_3: avatarUrls[2],
-        linkedin_url: linkedinUrl.trim() || null,
+        linkedin_url: linkedinUrl.trim() || null
       });
 
       // Insert topics
       const allTopics = [
-        ...focusTopics.map(t => ({ user_id: user.id, name: t, type: 'focus' as const })),
-        ...noGoTopics.map(t => ({ user_id: user.id, name: t, type: 'no-go' as const })),
-      ];
+      ...focusTopics.map((t) => ({ user_id: user.id, name: t, type: 'focus' as const })),
+      ...noGoTopics.map((t) => ({ user_id: user.id, name: t, type: 'no-go' as const }))];
+
       if (allTopics.length > 0) {
         const { error: topicsErr } = await supabase.from('topics').insert(allTopics);
         if (topicsErr) throw topicsErr;
@@ -210,45 +200,45 @@ export default function OnboardingPage() {
                 onClick={() => setStep(s)}
                 className={cn(
                   "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
-              >
+                  isActive ?
+                  "bg-primary text-primary-foreground shadow-sm" :
+                  "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                )}>
+                
                 {label}
-              </button>
-            );
+              </button>);
+
           })}
         </div>
       </div>
 
       <div className="relative z-10 mx-auto max-w-2xl px-4 py-10 pb-28">
-        {step === 1 && (
-          <div className="space-y-8">
+        {step === 1 &&
+        <div className="space-y-8">
             <div className="text-center">
               <ShimmerText className="font-playfair text-3xl font-bold text-foreground">Willkommen bei CEO Autopilot</ShimmerText>
               <p className="mt-2 text-muted-foreground">Ihr LinkedIn-Autopilot für strategische Sichtbarkeit</p>
             </div>
             <div className="grid gap-6 sm:grid-cols-3">
               {[
-                { icon: Lightbulb, title: 'Ideation Lab', desc: 'KI-gestützte Content-Ideen aus Ihrem Alltag' },
-                { icon: CalendarDays, title: 'Content Gallery', desc: 'Strategische Planung Ihres LinkedIn-Auftritts' },
-                { icon: BarChart3, title: 'AI Analytics', desc: 'Datengetriebene Optimierung Ihrer Reichweite' },
-              ].map(f => (
-                <GlowingShadow key={f.title}>
+            { icon: Lightbulb, title: 'Ideation Lab', desc: 'KI-gestützte Content-Ideen aus Ihrem Alltag' },
+            { icon: CalendarDays, title: 'Content Gallery', desc: 'Strategische Planung Ihres LinkedIn-Auftritts' },
+            { icon: BarChart3, title: 'AI Analytics', desc: 'Datengetriebene Optimierung Ihrer Reichweite' }].
+            map((f) =>
+            <GlowingShadow key={f.title}>
                   <div className="flex flex-col items-center p-10 text-center">
                     <f.icon className="mb-4 h-12 w-12 text-primary" />
                     <h3 className="font-playfair text-base font-semibold">{f.title}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{f.desc}</p>
                   </div>
                 </GlowingShadow>
-              ))}
+            )}
             </div>
           </div>
-        )}
+        }
 
-        {step === 2 && (
-          <div className="space-y-6">
+        {step === 2 &&
+        <div className="space-y-6">
             <div className="text-center">
               <h1 className="font-playfair text-2xl font-bold">Basis-Informationen</h1>
               <p className="mt-1 text-muted-foreground">Erzählen Sie uns von sich</p>
@@ -262,18 +252,18 @@ export default function OnboardingPage() {
               </Label>
               <div className="flex gap-2">
                 <Input
-                  value={linkedinUrl}
-                  onChange={e => setLinkedinUrl(e.target.value)}
-                  placeholder="https://linkedin.com/in/ihr-profil"
-                  className="bg-card"
-                />
+                value={linkedinUrl}
+                onChange={(e) => setLinkedinUrl(e.target.value)}
+                placeholder="https://linkedin.com/in/ihr-profil"
+                className="bg-card" />
+              
                 <Button
-                  type="button"
-                  variant="outline"
-                  className="shrink-0 gap-2"
-                  disabled={scrapingLinkedin || !linkedinUrl.trim()}
-                  onClick={handleLinkedinScrape}
-                >
+                type="button"
+                variant="outline"
+                className="shrink-0 gap-2"
+                disabled={scrapingLinkedin || !linkedinUrl.trim()}
+                onClick={handleLinkedinScrape}>
+                
                   {scrapingLinkedin ? <Loader2 className="h-4 w-4 animate-spin" /> : <Linkedin className="h-4 w-4" />}
                   {scrapingLinkedin ? 'Importiere...' : 'Importieren'}
                 </Button>
@@ -281,73 +271,70 @@ export default function OnboardingPage() {
               <p className="text-xs text-muted-foreground">Felder werden automatisch ausgefüllt</p>
             </div>
 
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex justify-center">
               <input
-                ref={cvInputRef}
-                type="file"
-                accept=".pdf,.doc,.docx,.txt"
-                className="hidden"
-                onChange={handleCvUpload}
-              />
+              ref={cvInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.txt"
+              className="hidden"
+              onChange={handleCvUpload} />
+            
               <Button
-                type="button"
-                variant={cvUploaded ? "default" : "outline"}
-                className={cn("gap-2", cvUploaded && "bg-green-600 hover:bg-green-700 text-white")}
-                disabled={parsingCv}
-                onClick={() => cvInputRef.current?.click()}
-              >
-                {parsingCv ? <Loader2 className="h-4 w-4 animate-spin" /> : cvUploaded ? <Check className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
-                {parsingCv ? 'CV wird analysiert...' : cvUploaded ? 'CV erfolgreich hochgeladen ✓' : 'CV Upload zum automatischen Ausfüllen'}
+              type="button"
+              variant="outline"
+              className="gap-2"
+              disabled={parsingCv}
+              onClick={() => cvInputRef.current?.click()}>
+              
+                {parsingCv ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {parsingCv ? 'CV wird analysiert...' : 'CV hochladen & automatisch ausfüllen'}
               </Button>
-              {!cvUploaded && !parsingCv && (
-                <p className="text-xs text-destructive">Bitte laden Sie Ihren CV hoch, um fortzufahren.</p>
-              )}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Name</Label>
-                <Input value={name} onChange={e => setName(e.target.value)} placeholder="Max Mustermann" className="bg-card" />
+                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Max Mustermann" className="bg-card" />
               </div>
               <div className="space-y-2">
                 <Label>Unternehmen</Label>
-                <Input value={company} onChange={e => setCompany(e.target.value)} placeholder="Mustermann GmbH" className="bg-card" />
+                <Input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Mustermann GmbH" className="bg-card" />
               </div>
               <div className="space-y-2">
-                <Label>Position</Label>
-                <Input value={role} onChange={e => setRole(e.target.value)} placeholder="CEO / Geschäftsführer" className="bg-card" />
+                <Label className="text-muted-foreground">Position</Label>
+                <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="CEO / Geschäftsführer" className="bg-card" />
               </div>
               <div className="space-y-2">
                 <Label>Branche</Label>
-                <Input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="z.B. Technologie, Beratung" className="bg-card" />
+                <Input value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder="z.B. Technologie, Beratung" className="bg-card" />
               </div>
             </div>
           </div>
-        )}
+        }
 
-        {step === 3 && (
-          <div className="space-y-6">
+        {step === 3 &&
+        <div className="space-y-6">
             <div className="text-center">
               <h1 className="font-playfair text-2xl font-bold">Profilfotos</h1>
               <p className="mt-1 text-muted-foreground">Laden Sie bis zu 3 professionelle Fotos hoch</p>
             </div>
             <div className="flex flex-wrap justify-center gap-6">
-              {['Hauptprofilbild', 'Alternativbild 1', 'Alternativbild 2'].map((label, i) => (
-                <PhotoUpload
-                  key={i}
-                  label={label}
-                  currentUrl={avatarUrls[i]}
-                  userId={user?.id || ''}
-                  index={i + 1}
-                  onUploaded={(url) => setAvatarUrls(prev => { const u = [...prev]; u[i] = url; return u; })}
-                  onRemoved={() => setAvatarUrls(prev => { const u = [...prev]; u[i] = null; return u; })}
-                />
-              ))}
+              {['Hauptprofilbild', 'Alternativbild 1', 'Alternativbild 2'].map((label, i) =>
+            <PhotoUpload
+              key={i}
+              label={label}
+              currentUrl={avatarUrls[i]}
+              userId={user?.id || ''}
+              index={i + 1}
+              onUploaded={(url) => setAvatarUrls((prev) => {const u = [...prev];u[i] = url;return u;})}
+              onRemoved={() => setAvatarUrls((prev) => {const u = [...prev];u[i] = null;return u;})} />
+
+            )}
             </div>
           </div>
-        )}
+        }
 
-        {step === 4 && (
-          <div className="space-y-6">
+        {step === 4 &&
+        <div className="space-y-6">
             <div className="text-center">
               <h1 className="font-playfair text-2xl font-bold">Strategie</h1>
               <p className="mt-1 text-muted-foreground">Definieren Sie Ihre Kommunikationsstrategie</p>
@@ -355,7 +342,7 @@ export default function OnboardingPage() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Zielgruppe</Label>
-                <Textarea value={targetAudience} onChange={e => setTargetAudience(e.target.value)} placeholder="Beschreiben Sie Ihre ideale Zielgruppe auf LinkedIn..." className="min-h-[100px] bg-card" />
+                <Textarea value={targetAudience} onChange={(e) => setTargetAudience(e.target.value)} placeholder="Beschreiben Sie Ihre ideale Zielgruppe auf LinkedIn..." className="min-h-[100px] bg-card" />
               </div>
               <div className="space-y-2">
                 <Label>Kommunikations-Stil</Label>
@@ -364,16 +351,16 @@ export default function OnboardingPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {TONES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                    {TONES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
             </div>
           </div>
-        )}
+        }
 
-        {step === 5 && (
-          <div className="space-y-6">
+        {step === 5 &&
+        <div className="space-y-6">
             <div className="text-center">
               <h1 className="font-playfair text-2xl font-bold">Themen-DNA</h1>
               <p className="mt-1 text-muted-foreground">Welche Themen sollen behandelt oder vermieden werden?</p>
@@ -382,56 +369,56 @@ export default function OnboardingPage() {
               <div className="space-y-2">
                 <Label>Fokus-Themen</Label>
                 <div className="flex gap-2">
-                  <Input value={focusInput} onChange={e => setFocusInput(e.target.value)} onKeyDown={e => handleKeyDown(e, 'focus')} placeholder="Thema eingeben + Enter" className="bg-card" />
+                  <Input value={focusInput} onChange={(e) => setFocusInput(e.target.value)} onKeyDown={(e) => handleKeyDown(e, 'focus')} placeholder="Thema eingeben + Enter" className="bg-card" />
                   <Button type="button" size="icon" variant="outline" onClick={() => addTopic('focus')}><Plus className="h-4 w-4" /></Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {focusTopics.map((t, i) => (
-                    <Badge key={i} variant="secondary" className="gap-1">
-                      {t}<X className="h-3 w-3 cursor-pointer" onClick={() => setFocusTopics(prev => prev.filter((_, idx) => idx !== i))} />
+                  {focusTopics.map((t, i) =>
+                <Badge key={i} variant="secondary" className="gap-1">
+                      {t}<X className="h-3 w-3 cursor-pointer" onClick={() => setFocusTopics((prev) => prev.filter((_, idx) => idx !== i))} />
                     </Badge>
-                  ))}
+                )}
                 </div>
               </div>
               <div className="space-y-2">
                 <Label>No-Go Themen</Label>
                 <div className="flex gap-2">
-                  <Input value={noGoInput} onChange={e => setNoGoInput(e.target.value)} onKeyDown={e => handleKeyDown(e, 'nogo')} placeholder="Thema eingeben + Enter" className="bg-card" />
+                  <Input value={noGoInput} onChange={(e) => setNoGoInput(e.target.value)} onKeyDown={(e) => handleKeyDown(e, 'nogo')} placeholder="Thema eingeben + Enter" className="bg-card" />
                   <Button type="button" size="icon" variant="outline" onClick={() => addTopic('nogo')}><Plus className="h-4 w-4" /></Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {noGoTopics.map((t, i) => (
-                    <Badge key={i} variant="destructive" className="gap-1">
-                      {t}<X className="h-3 w-3 cursor-pointer" onClick={() => setNoGoTopics(prev => prev.filter((_, idx) => idx !== i))} />
+                  {noGoTopics.map((t, i) =>
+                <Badge key={i} variant="destructive" className="gap-1">
+                      {t}<X className="h-3 w-3 cursor-pointer" onClick={() => setNoGoTopics((prev) => prev.filter((_, idx) => idx !== i))} />
                     </Badge>
-                  ))}
+                )}
                 </div>
               </div>
             </div>
           </div>
-        )}
+        }
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-border bg-card/95 backdrop-blur-sm px-6 py-4">
         <div className="mx-auto flex max-w-2xl items-center justify-end gap-3">
-          <Button variant="outline" className="mr-auto" onClick={() => setStep(s => s - 1)} disabled={step === 1}>
+          <Button variant="outline" className="mr-auto" onClick={() => setStep((s) => s - 1)} disabled={step === 1}>
             Zurück
           </Button>
-          {step < totalSteps ? (
-            <InteractiveHoverButton onClick={() => setStep(s => s + 1)} disabled={!isStepValid}>Weiter</InteractiveHoverButton>
-          ) : (
-            <ShimmerButton
-              shimmerColor="hsl(var(--primary))"
-              background="hsl(var(--primary))"
-              className="text-primary-foreground text-sm font-medium"
-              onClick={handleComplete}
-              disabled={saving || !isStepValid}
-            >
+          {step < totalSteps ?
+          <InteractiveHoverButton onClick={() => setStep((s) => s + 1)} disabled={!isStepValid}>Weiter</InteractiveHoverButton> :
+
+          <ShimmerButton
+            shimmerColor="hsl(var(--primary))"
+            background="hsl(var(--primary))"
+            className="text-primary-foreground text-sm font-medium"
+            onClick={handleComplete}
+            disabled={saving || !isStepValid}>
+            
               {saving ? 'Wird gespeichert...' : 'Abschließen ✨'}
             </ShimmerButton>
-          )}
+          }
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
