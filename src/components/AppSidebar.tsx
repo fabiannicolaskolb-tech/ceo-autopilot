@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAuth } from '@/hooks/useAuth';
+import { useLang } from '@/hooks/useLang';
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu,
   SidebarMenuButton, SidebarMenuItem, SidebarFooter, useSidebar,
@@ -12,20 +13,21 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
-const navItems = [
-  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Profil', url: '/profile', icon: User },
-  { title: 'Ideation Lab', url: '/ideation', icon: Lightbulb },
-  { title: 'Post Library', url: '/post-library', icon: GalleryHorizontalEnd },
-  { title: 'Analytics', url: '/analytics', icon: BarChart3 },
-];
-
 export default function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
+  const { t } = useLang();
   const initials = profile?.name ? profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : '?';
+
+  const navItems = [
+    { title: t('nav.dashboard'), url: '/dashboard', icon: LayoutDashboard },
+    { title: t('nav.profile'), url: '/profile', icon: User },
+    { title: t('nav.ideation'), url: '/ideation', icon: Lightbulb },
+    { title: t('nav.postlibrary'), url: '/post-library', icon: GalleryHorizontalEnd },
+    { title: t('nav.analytics'), url: '/analytics', icon: BarChart3 },
+  ];
 
   return (
     <Sidebar collapsible="icon">
@@ -48,7 +50,7 @@ export default function AppSidebar() {
               {navItems.map((item) => {
                 const active = location.pathname === item.url;
                 return (
-                  <SidebarMenuItem key={item.title}>
+                  <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton asChild>
                       <NavLink
                         to={item.url}
@@ -84,7 +86,7 @@ export default function AppSidebar() {
         </div>
         <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" onClick={signOut}>
           <LogOut className="h-4 w-4" />
-          {!collapsed && <span className="text-xs">Abmelden</span>}
+          {!collapsed && <span className="text-xs">{t('nav.signout')}</span>}
         </Button>
       </SidebarFooter>
     </Sidebar>
