@@ -189,11 +189,10 @@ function LearningProgressCard({ posts }: { posts: any[] }) {
     [posts]
   );
 
-  if (analyzedPosts.length === 0) return null;
-
-  const engagementRates = analyzedPosts
-    .filter(p => (p.metrics as any)?.engagement_rate != null)
-    .map(p => Number((p.metrics as any).engagement_rate));
+  const engagementRates = useMemo(() =>
+    analyzedPosts.filter(p => (p.metrics as any)?.engagement_rate != null).map(p => Number((p.metrics as any).engagement_rate)),
+    [analyzedPosts]
+  );
 
   const engagementTrend = useMemo(() => {
     if (engagementRates.length < 2) return engagementRates;
@@ -238,6 +237,8 @@ function LearningProgressCard({ posts }: { posts: any[] }) {
     });
     return best || null;
   }, [analyzedPosts]);
+
+  if (analyzedPosts.length === 0) return null;
 
   return (
     <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
