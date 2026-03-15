@@ -112,9 +112,8 @@ export function FloatingHeader() {
             </DropdownMenu>
           </div>
 
-          {/* Mobile hamburger - hidden on dashboard */}
-          {!isDashboard && (
-            <div className="lg:hidden">
+          {/* Mobile hamburger */}
+          <div className="lg:hidden">
               <Sheet open={open} onOpenChange={setOpen}>
                 <Button variant="ghost" size="icon" onClick={() => setOpen(!open)} className="h-9 w-9">
                   <MenuIcon className="h-5 w-5" />
