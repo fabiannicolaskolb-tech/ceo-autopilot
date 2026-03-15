@@ -96,19 +96,19 @@ export function VoiceCopilotModal({ open, onClose, onInsightsSaved }: VoiceCopil
         .filter(t => t.role === 'user' && t.text.trim().length > 20)
         .map(t => t.text.trim());
 
-      if (keyPoints.length === 0) {
+      const conversationId = conversation.getId?.() || crypto.randomUUID();
+
+      if (transcripts.length === 0) {
         toast({ title: 'Keine Erkenntnisse', description: 'Das Gespräch war zu kurz für verwertbare Inhalte.' });
         onClose();
         return;
       }
 
-      const conversationId = conversation.getId?.() || crypto.randomUUID();
-
-      const { error } = await supabase.from('voice_insights' as any).insert({
+      const { error } = await supabase.from('voice_insights').insert({
         user_id: user!.id,
         conversation_id: conversationId,
         transcript: fullTranscript,
-        key_points: keyPoints,
+        key_points: keyPoints.length > 0 ? keyPoints : [fullTranscript.substring(0, 500)],
       });
 
       if (error) throw error;
