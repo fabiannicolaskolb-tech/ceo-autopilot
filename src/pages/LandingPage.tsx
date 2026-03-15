@@ -230,14 +230,19 @@ export default function LandingPage() {
                           exit={{ height: 0, opacity: 0, transition: { height: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }, opacity: { duration: 0.3 } } }}
                           className="w-full max-w-3xl mx-auto overflow-hidden"
                         >
-                          <div className="px-6 pb-6">
+                          <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1], delay: 0.12 }}
+                            className="px-6 pb-6"
+                          >
                             <img
                               src={previewImage}
                               alt={`${f.title} Vorschau`}
                               className="w-full rounded-xl border border-border shadow-lg brightness-[1.02] dark:brightness-[0.85] dark:contrast-[1.1] dark:border-border/50"
                               draggable={false}
                             />
-                          </div>
+                          </motion.div>
                         </motion.div>
                       )}
                     </AnimatePresence>
