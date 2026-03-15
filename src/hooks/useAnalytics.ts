@@ -88,6 +88,7 @@ export function useAnalytics() {
   const [posts, setPosts] = useState<AnalyticsPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
+  const [customRange, setCustomRange] = useState<{ from: Date; to: Date } | null>(null);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
