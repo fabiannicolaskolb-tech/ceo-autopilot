@@ -30,9 +30,11 @@ export function LinkedInPostPreview({
   hook,
   postedAt = 'Just now',
   metrics,
+  showActions = true,
+  defaultExpanded = false,
   className,
 }: LinkedInPostPreviewProps) {
-  const [showFull, setShowFull] = useState(false);
+  const [showFull, setShowFull] = useState(defaultExpanded);
 
   const initials = authorName
     .split(' ')
