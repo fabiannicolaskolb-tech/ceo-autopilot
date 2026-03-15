@@ -186,6 +186,8 @@ export default function IdeationPage() {
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
+  const [generatingTemplates, setGeneratingTemplates] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
 
