@@ -199,15 +199,13 @@ export default function LandingPage() {
               return (
                 <motion.div
                   key={f.title}
-                  layout
-                  transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
                   onClick={() => handleFeatureClick(f.title)}
                   className={`group relative cursor-pointer overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] ${hasColSpan ? 'sm:col-span-3' : ''}`}
                   animate={{
                     opacity: isHidden ? 0 : 1,
-                    scale: isHidden ? 0.95 : 1,
                     height: isHidden ? 0 : 'auto',
                   }}
+                  transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
                   style={isHidden ? { margin: 0, padding: 0, border: 'none', overflow: 'hidden', pointerEvents: 'none' } : undefined}
                 >
                   <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
@@ -230,7 +228,10 @@ export default function LandingPage() {
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                          transition={{
+                            height: { duration: 0.15, ease: 'easeOut' },
+                            opacity: { duration: 0.1 },
+                          }}
                           className="w-full max-w-3xl mx-auto overflow-hidden"
                         >
                           <div className="px-6 pb-6">
