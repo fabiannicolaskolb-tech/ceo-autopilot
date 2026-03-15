@@ -299,7 +299,9 @@ export default function IdeationPage() {
     try {
       const requestId = crypto.randomUUID();
       const payload = {
-        input: '__post_only__',
+        input: selectedInsights.length > 0
+          ? `Nutze folgende persönliche Erkenntnisse als Grundlage:\n\n${selectedInsights.map((s, i) => `${i + 1}. ${s}`).join('\n')}`
+          : '__post_only__',
         profile: {
           name: profile?.name,
           company: profile?.company,
