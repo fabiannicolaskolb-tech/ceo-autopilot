@@ -422,6 +422,26 @@ export default function IdeationPage() {
         </div>
       </div>
 
+      {/* Voice Copilot CTA */}
+      <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
+        <CardContent className="p-6 flex items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center h-12 w-12 rounded-2xl bg-primary/10 shrink-0">
+              <MessageSquare className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-playfair text-lg font-semibold text-foreground">Gespräch starten</h3>
+              <p className="text-sm text-muted-foreground">
+                Starten Sie ein Gespräch und erzählen Sie uns von Ihren Ideen — wir machen Content daraus.
+              </p>
+            </div>
+          </div>
+          <InteractiveHoverButton onClick={() => setVoiceModalOpen(true)} className="shrink-0">
+            Gespräch starten
+          </InteractiveHoverButton>
+        </CardContent>
+      </Card>
+
       {/* Voice Insights */}
       {voiceInsights.length === 0 && user && (
         <div className="flex justify-center">
