@@ -355,7 +355,7 @@ export default function PlannerPage() {
                   </div>
                   <p className="text-[10px] text-muted-foreground mt-2">
                     {post.scheduled_at
-                      ? format(new Date(post.scheduled_at), 'dd. MMM yyyy', { locale: de })
+                      ? format(new Date(post.scheduled_at), "dd. MMM yyyy 'um' HH:mm 'Uhr'", { locale: de })
                       : format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}
                   </p>
                 </div>
