@@ -288,105 +288,100 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
           />
         </div>
       )}
-      {/* Hashtags */}
-      {hashtags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {hashtags.map((tag, i) => (
-            <span key={i} className="text-[11px] text-primary/70 bg-primary/5 rounded-full px-2 py-0.5">{tag.startsWith('#') ? tag : `#${tag}`}</span>
-          ))}
-        </div>
-      )}
 
-      {/* Mini Metrics for Published */}
-      {tab === 'published' && hasMetrics && (
-        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground pt-1 border-t border-border/50">
-          {metrics.impressions != null && <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{Number(metrics.impressions).toLocaleString()}</span>}
-          {metrics.likes != null && <span className="flex items-center gap-1"><Heart className="h-3 w-3" />{metrics.likes}</span>}
-          {metrics.comments != null && <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" />{metrics.comments}</span>}
-          {metrics.shares != null && <span className="flex items-center gap-1"><Share2 className="h-3 w-3" />{metrics.shares}</span>}
-          {metrics.engagement_rate != null && <span className="flex items-center gap-1"><BarChart3 className="h-3 w-3" />{metrics.engagement_rate}%</span>}
-          {metrics.score != null && (
-            <Badge variant="secondary" className="text-[10px] rounded-full bg-warning/15 text-warning">Score: {metrics.score}/10</Badge>
-          )}
-        </div>
-      )}
-
-      {/* Expanded AI Insights for Published */}
-      {tab === 'published' && expanded && metrics && (
-        <div className="space-y-2 pt-2 border-t border-border/50">
-          {metrics.performance_summary && (
-            <div className="rounded-xl bg-muted/40 p-3">
-              <p className="text-xs font-medium text-foreground mb-1 flex items-center gap-1"><Sparkles className="h-3 w-3" /> Performance Summary</p>
-              <p className="text-xs text-muted-foreground">{metrics.performance_summary}</p>
-            </div>
-          )}
-          {metrics.what_worked && (
-            <div className="rounded-xl bg-success/5 p-3">
-              <p className="text-xs font-medium text-success mb-1">✓ Was funktioniert hat</p>
-              <p className="text-xs text-muted-foreground">{metrics.what_worked}</p>
-            </div>
-          )}
-          {metrics.what_to_improve && (
-            <div className="rounded-xl bg-warning/5 p-3">
-              <p className="text-xs font-medium text-warning mb-1">↗ Verbesserungspotenzial</p>
-              <p className="text-xs text-muted-foreground">{metrics.what_to_improve}</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="flex items-center gap-2 flex-wrap pt-1">
-        {tab === 'drafts' && (
-          <>
-            {post.status === 'draft' && (
-              <Button size="sm" variant="default" className="text-xs h-8" onClick={handleApprove}>
-                <Check className="h-3 w-3 mr-1" /> Freigeben
-              </Button>
+      {/* Metrics & Actions */}
+      <div className="p-5 pt-3 space-y-3">
+        {/* Mini Metrics for Published */}
+        {tab === 'published' && hasMetrics && (
+          <div className="flex flex-wrap gap-4 text-xs text-muted-foreground pt-1 border-t border-border/50">
+            {metrics.impressions != null && <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{Number(metrics.impressions).toLocaleString()}</span>}
+            {metrics.likes != null && <span className="flex items-center gap-1"><Heart className="h-3 w-3" />{metrics.likes}</span>}
+            {metrics.comments != null && <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" />{metrics.comments}</span>}
+            {metrics.shares != null && <span className="flex items-center gap-1"><Share2 className="h-3 w-3" />{metrics.shares}</span>}
+            {metrics.engagement_rate != null && <span className="flex items-center gap-1"><BarChart3 className="h-3 w-3" />{metrics.engagement_rate}%</span>}
+            {metrics.score != null && (
+              <Badge variant="secondary" className="text-[10px] rounded-full bg-warning/15 text-warning">Score: {metrics.score}/10</Badge>
             )}
-            {post.status === 'approved' && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button size="sm" variant="default" className="text-xs h-8">
-                    <CalendarDays className="h-3 w-3 mr-1" /> Planen
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-3 space-y-3" align="start">
-                  <Calendar mode="single" selected={scheduleDate} onSelect={setScheduleDate} className="p-3 pointer-events-auto" />
-                  <div className="flex items-center gap-2">
-                    <Input type="time" value={scheduleTime} onChange={e => setScheduleTime(e.target.value)} className="w-28 h-8 text-xs" />
-                    <Button size="sm" className="text-xs h-8" onClick={handleSchedule} disabled={!scheduleDate}>Bestätigen</Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
+          </div>
+        )}
+
+        {/* Expanded AI Insights for Published */}
+        {tab === 'published' && expanded && metrics && (
+          <div className="space-y-2 pt-2 border-t border-border/50">
+            {metrics.performance_summary && (
+              <div className="rounded-xl bg-muted/40 p-3">
+                <p className="text-xs font-medium text-foreground mb-1 flex items-center gap-1"><Sparkles className="h-3 w-3" /> Performance Summary</p>
+                <p className="text-xs text-muted-foreground">{metrics.performance_summary}</p>
+              </div>
             )}
-            <Button size="sm" variant="ghost" className="text-xs h-8" onClick={() => { setEditing(true); setEditContent(post.content || ''); }}>
-              <Pencil className="h-3 w-3 mr-1" /> Bearbeiten
-            </Button>
-          </>
+            {metrics.what_worked && (
+              <div className="rounded-xl bg-success/5 p-3">
+                <p className="text-xs font-medium text-success mb-1">✓ Was funktioniert hat</p>
+                <p className="text-xs text-muted-foreground">{metrics.what_worked}</p>
+              </div>
+            )}
+            {metrics.what_to_improve && (
+              <div className="rounded-xl bg-warning/5 p-3">
+                <p className="text-xs font-medium text-warning mb-1">↗ Verbesserungspotenzial</p>
+                <p className="text-xs text-muted-foreground">{metrics.what_to_improve}</p>
+              </div>
+            )}
+          </div>
         )}
-        <Button size="sm" variant="ghost" className="text-xs h-8" onClick={handleCopy}>
-          <Copy className="h-3 w-3 mr-1" /> Kopieren
-        </Button>
-        {tab === 'drafts' && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
-                <Trash2 className="h-3 w-3 mr-1" /> Löschen
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-border/30">
+          {tab === 'drafts' && (
+            <>
+              {post.status === 'draft' && (
+                <Button size="sm" variant="default" className="text-xs h-8" onClick={handleApprove}>
+                  <Check className="h-3 w-3 mr-1" /> Freigeben
+                </Button>
+              )}
+              {post.status === 'approved' && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button size="sm" variant="default" className="text-xs h-8">
+                      <CalendarDays className="h-3 w-3 mr-1" /> Planen
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-3 space-y-3" align="start">
+                    <Calendar mode="single" selected={scheduleDate} onSelect={setScheduleDate} className="p-3 pointer-events-auto" />
+                    <div className="flex items-center gap-2">
+                      <Input type="time" value={scheduleTime} onChange={e => setScheduleTime(e.target.value)} className="w-28 h-8 text-xs" />
+                      <Button size="sm" className="text-xs h-8" onClick={handleSchedule} disabled={!scheduleDate}>Bestätigen</Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
+              <Button size="sm" variant="ghost" className="text-xs h-8" onClick={() => { setEditing(true); setEditContent(post.content || ''); }}>
+                <Pencil className="h-3 w-3 mr-1" /> Bearbeiten
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Post löschen?</AlertDialogTitle>
-                <AlertDialogDescription>Diese Aktion kann nicht rückgängig gemacht werden.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>Löschen</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
+            </>
+          )}
+          <Button size="sm" variant="ghost" className="text-xs h-8" onClick={handleCopy}>
+            <Copy className="h-3 w-3 mr-1" /> Kopieren
+          </Button>
+          {tab === 'drafts' && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
+                  <Trash2 className="h-3 w-3 mr-1" /> Löschen
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Post löschen?</AlertDialogTitle>
+                  <AlertDialogDescription>Diese Aktion kann nicht rückgängig gemacht werden.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>Löschen</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
       </div>
     </div>
   );
