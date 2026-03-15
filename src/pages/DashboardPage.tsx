@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, TrendingUp, CalendarDays, Rocket, Loader2, Brain, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import DailyBriefing from '@/components/DailyBriefing';
 import { useAuth } from '@/hooks/useAuth';
 import { usePosts, usePipelineStatus } from '@/hooks/useRealtime';
 import { Badge } from '@/components/ui/badge';
@@ -68,6 +69,9 @@ export default function DashboardPage() {
   return (
     <div className="relative min-h-[calc(100vh-80px)] space-y-8">
       <MeshBackground />
+
+      {/* Daily Briefing */}
+      <DailyBriefing />
 
       {/* Welcome Hero */}
       <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
