@@ -253,6 +253,17 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
         </div>
       )}
 
+      {/* Post Image */}
+      {post.image_url && (
+        <div className="rounded-lg overflow-hidden border border-border/50">
+          <img
+            src={post.image_url}
+            alt="Post Bild"
+            className="w-full aspect-square object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
       {/* Hashtags */}
       {hashtags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
