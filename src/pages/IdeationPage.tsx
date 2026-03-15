@@ -430,7 +430,7 @@ export default function IdeationPage() {
           <ResizablePanel defaultSize={30} minSize={20}>
             <div className="p-6 h-full bg-muted/30 border-l-0">
               <h2 className="font-playfair text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">
-                Inspirations-Vorlagen
+                Gesprächs-Inspirationen
               </h2>
               <AnimatePresence mode="wait">
                 <motion.div
