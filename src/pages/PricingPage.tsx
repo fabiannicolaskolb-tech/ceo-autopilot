@@ -28,7 +28,7 @@ const plans = [
   },
   {
     name: 'Pro',
-    price: '$18',
+    price: '$9.99',
     popular: true,
     featureDetails: {
       'AI posts/month': '30',
