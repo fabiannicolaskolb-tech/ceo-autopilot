@@ -4,6 +4,7 @@ import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X } from 'lucide-react';
 import { Particles } from '@/components/ui/particles';
 import { useTheme } from '@/hooks/useTheme';
 import ShimmerText from '@/components/ui/shimmer-text';
+import { GlowingShadow } from '@/components/ui/glowing-shadow';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import PhotoUpload from '@/components/PhotoUpload';
@@ -140,13 +141,13 @@ export default function OnboardingPage() {
                 { icon: CalendarDays, title: 'Content Gallery', desc: 'Strategische Planung Ihres LinkedIn-Auftritts' },
                 { icon: BarChart3, title: 'AI Analytics', desc: 'Datengetriebene Optimierung Ihrer Reichweite' },
               ].map(f => (
-                <Card key={f.title} className="border-border shadow-sm hover:shadow-md transition-shadow">
-                  <CardContent className="flex flex-col items-center p-10 text-center">
+                <GlowingShadow key={f.title}>
+                  <div className="flex flex-col items-center p-10 text-center">
                     <f.icon className="mb-4 h-12 w-12 text-primary" />
                     <h3 className="font-playfair text-base font-semibold">{f.title}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{f.desc}</p>
-                  </CardContent>
-                </Card>
+                  </div>
+                </GlowingShadow>
               ))}
             </div>
           </div>
