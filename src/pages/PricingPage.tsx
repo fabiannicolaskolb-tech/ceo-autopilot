@@ -16,7 +16,7 @@ const allFeatures = [
 const plans = [
   {
     name: 'Starter',
-    price: '$99',
+    price: '$7',
     popular: false,
     featureDetails: {
       'AI posts/month': '10',
