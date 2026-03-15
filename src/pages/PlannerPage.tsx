@@ -251,10 +251,15 @@ export default function PlannerPage() {
 
   const saveEdit = () => {
     if (!editPost) return;
+    let scheduledDate = editDate;
+    if (scheduledDate) {
+      const [h, m] = editTime.split(':').map(Number);
+      scheduledDate = setMinutes(setHours(scheduledDate, h), m);
+    }
     updateMutation.mutate({
       id: editPost.id,
       content: editContent,
-      scheduled_at: editDate?.toISOString(),
+      scheduled_at: scheduledDate?.toISOString(),
     });
   };
 
