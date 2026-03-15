@@ -203,8 +203,21 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
   };
 
   const handleDelete = async () => {
-    const { error } = await supabase.from('posts').delete().eq('id', post.id);
-    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token;
+    if (!accessToken) { toast({ title: 'Fehler', description: 'Nicht eingeloggt', variant: 'destructive' }); return; }
+    const res = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/posts?id=eq.${post.id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+      }
+    );
+    if (!res.ok) { toast({ title: 'Fehler beim Löschen', variant: 'destructive' }); return; }
     toast({ title: 'Post gelöscht' });
     onMutate();
   };
