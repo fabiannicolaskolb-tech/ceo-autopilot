@@ -485,7 +485,7 @@ export default function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="type" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
                   <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }} />
+                  <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', color: 'hsl(var(--foreground))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }} />
                   <Bar dataKey="impressions" name="Impressions" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="engagement" name="Engagement" fill="hsl(var(--success))" radius={[4, 4, 0, 0]} />
                   <Legend />

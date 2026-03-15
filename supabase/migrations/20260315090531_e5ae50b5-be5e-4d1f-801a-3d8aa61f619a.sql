@@ -1,0 +1,4 @@
+
+INSERT INTO posts (user_id, hook, content, type, content_category, status, posted_at, created_at, updated_at, metrics) VALUES
+('e46243c2-c7b5-4bfb-94a6-3e1789ba6bcf', 'Die eine Metrik die wirklich zählt', 'Alle reden über Impressions. Aber die einzige Zahl die wirklich zählt ist eine andere...', 'text', 'Leadership', 'analyzed', '2026-03-15 08:00:00+00', '2026-03-15 08:00:00+00', '2026-03-15 09:00:00+00',
+'{"impressions": 2250, "likes": 108, "comments": 45, "shares": 28, "engagement_rate": 5.2, "score": 90, "sentiment": "positive", "follower_delta": 48, "ctr": 3.4, "performance_summary": "Kontraintuitiver Take auf Metriken erzeugt starke Diskussion.", "what_worked": ["Kontraintuitive These", "Relevanz für Zielgruppe", "Klare Argumentation"], "what_to_improve": ["Mehr Daten zur Untermauerung"], "recommended_follow_ups": ["Framework für Content-Metriken teilen"], "topic_tags": ["Analytics", "Content Strategy"], "content_pattern": "contrarian"}');
