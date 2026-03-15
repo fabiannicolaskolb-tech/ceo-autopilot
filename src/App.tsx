@@ -13,7 +13,6 @@ import OnboardingPage from "@/pages/OnboardingPage";
 import DashboardPage from "@/pages/DashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
 import IdeationPage from "@/pages/IdeationPage";
-import PlannerPage from "@/pages/PlannerPage";
 import PostLibraryPage from "@/pages/PostLibraryPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 
