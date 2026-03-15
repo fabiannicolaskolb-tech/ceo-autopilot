@@ -435,16 +435,18 @@ function GalleryGrid({ posts, onPostClick }: { posts: any[]; onPostClick?: (post
   );
 }
 
-// ──── Approval Card ────
+// ──── Approval Card (same style as PostCard) ────
 function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => void; profile: any }) {
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content || '');
+  const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const authorName = profile?.name || 'LinkedIn Creator';
-  const authorHeadline = [profile?.role, profile?.company].filter(Boolean).join(' at ') || 'Professional';
-  const authorAvatar = profile?.avatar_url_1 || undefined;
-  const postedAt = format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de });
+  const userName = profile?.name || 'Du';
+  const typeLabel = post.type || post.content_category || 'Post';
+  const contentPreview = post.content || '';
+  const isLong = contentPreview.length > 200;
+  const hashtags: string[] = Array.isArray(post.hashtags) ? post.hashtags : [];
 
   const handleApprove = async () => {
     const { error } = await supabase.from('posts').update({ status: 'approved' }).eq('id', post.id);
@@ -486,57 +488,96 @@ function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => 
   };
 
   return (
-    <div className="relative">
-      {editing ? (
-        <div className={cn(GLASS_CARD, 'p-4 space-y-3')}>
-          <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} className="text-xs" />
-          <div className="flex gap-2">
-            <Button size="sm" className="text-xs h-7" onClick={handleSaveEdit} disabled={saving}>
-              {saving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}Speichern
-            </Button>
-            <Button size="sm" variant="ghost" className="text-xs h-7" onClick={() => { setEditing(false); setEditContent(post.content || ''); }}>Abbrechen</Button>
+    <div className={cn(GLASS_CARD, 'overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]')}>
+      <div className="p-5 pb-0 space-y-3">
+        <div className="flex items-center gap-3">
+          {profile?.avatar_url_1 ? (
+            <img src={profile.avatar_url_1} alt={userName} className="h-10 w-10 rounded-full object-cover ring-2 ring-border" />
+          ) : (
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
+              {userName.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-foreground truncate">{userName}</span>
+              <span className="text-xs text-muted-foreground">·</span>
+              <span className="text-xs text-muted-foreground">
+                {format(new Date(post.created_at), 'dd. MMM', { locale: de })}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground truncate">
+              {typeLabel} · {post.angle || 'shared'}
+            </p>
           </div>
+          <StatusBadge status={post.status} />
         </div>
-      ) : (
-        <div>
-          <LinkedInPostPreview
-            authorName={authorName}
-            authorHeadline={authorHeadline}
-            authorAvatar={authorAvatar}
-            content={post.content || ''}
-            hook={post.hook || undefined}
-            imageUrl={post.image_url}
-            postedAt={postedAt}
-            showActions={false}
-          />
-          {/* Approval actions */}
-          <div className={cn(GLASS_CARD, '-mt-3 rounded-t-none pt-4 pb-3 px-4 flex items-center gap-2 border-t border-border/50')}>
-            <Button size="sm" className="text-xs h-8 flex-1" onClick={handleApprove}>
-              <Check className="h-3 w-3 mr-1" /> Freigeben
-            </Button>
-            <Button size="sm" variant="ghost" className="text-xs h-8" onClick={() => setEditing(true)}>
-              <Pencil className="h-3 w-3 mr-1" /> Bearbeiten
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Post ablehnen?</AlertDialogTitle>
-                  <AlertDialogDescription>Der Post wird unwiderruflich gelöscht.</AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleReject}>Ablehnen & Löschen</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+
+        {editing ? (
+          <div className="space-y-2">
+            <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} />
+            <div className="flex gap-2">
+              <Button size="sm" onClick={handleSaveEdit} disabled={saving}>
+                {saving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}Speichern
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => { setEditing(false); setEditContent(post.content || ''); }}>Abbrechen</Button>
+            </div>
           </div>
+        ) : (
+          <div>
+            <p className={cn('text-sm text-foreground leading-relaxed whitespace-pre-line', !expanded && isLong && 'line-clamp-4')}>
+              {contentPreview}
+            </p>
+            {isLong && (
+              <button onClick={() => setExpanded(!expanded)} className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                {expanded ? <><ChevronUp className="h-3 w-3" /> Weniger anzeigen</> : <><ChevronDown className="h-3 w-3" /> Mehr anzeigen</>}
+              </button>
+            )}
+          </div>
+        )}
+
+        {hashtags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {hashtags.map((tag, i) => (
+              <span key={i} className="text-[11px] text-primary/70">{tag.startsWith('#') ? tag : `#${tag}`}</span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {post.image_url && (
+        <div className="mt-3 border-t border-border/30">
+          <img src={post.image_url} alt="Post" className="w-full object-cover max-h-[400px]" loading="lazy" />
         </div>
       )}
+
+      <div className="p-5 pt-3 space-y-3">
+        <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-border/30">
+          <Button size="sm" variant="default" className="text-xs h-8" onClick={handleApprove}>
+            <Check className="h-3 w-3 mr-1" /> Freigeben
+          </Button>
+          <Button size="sm" variant="ghost" className="text-xs h-8" onClick={() => { setEditing(true); setEditContent(post.content || ''); }}>
+            <Pencil className="h-3 w-3 mr-1" /> Bearbeiten
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
+                <Trash2 className="h-3 w-3 mr-1" /> Ablehnen
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Post ablehnen?</AlertDialogTitle>
+                <AlertDialogDescription>Der Post wird unwiderruflich gelöscht.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                <AlertDialogAction onClick={handleReject}>Ablehnen & Löschen</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </div>
     </div>
   );
 }
@@ -668,7 +709,7 @@ export default function PostLibraryPage() {
             <h2 className="font-playfair text-lg font-semibold text-foreground">Zur Freigabe</h2>
             <Badge variant="secondary" className="text-[10px] rounded-full bg-warning/15 text-warning">{pendingApproval.length}</Badge>
           </div>
-          <div className="flex flex-col items-center gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             {pendingApproval.map(post => (
               <ApprovalCard key={post.id} post={post} onMutate={handleMutate} profile={profile} />
             ))}
