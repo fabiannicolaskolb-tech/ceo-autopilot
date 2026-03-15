@@ -433,12 +433,8 @@ export default function AnalyticsPage() {
               onClick={() => document.getElementById('import-section')?.scrollIntoView({ behavior: 'smooth' })}
               className="gap-2"
             >
-              {importLoading ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                <Linkedin className="h-4 w-4" />
-              )}
-              {importLoading ? 'Importiere…' : 'Posts importieren'}
+              <Linkedin className="h-4 w-4" />
+              Posts importieren
             </Button>
             <Tabs value={timeRange} onValueChange={v => {
               setTimeRange(v as TimeRange);
