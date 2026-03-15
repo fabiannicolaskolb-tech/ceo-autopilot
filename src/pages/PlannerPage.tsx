@@ -166,6 +166,7 @@ export default function PlannerPage() {
   const [editPost, setEditPost] = useState<any | null>(null);
   const [editContent, setEditContent] = useState('');
   const [editDate, setEditDate] = useState<Date | undefined>();
+  const [editTime, setEditTime] = useState('09:00');
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
