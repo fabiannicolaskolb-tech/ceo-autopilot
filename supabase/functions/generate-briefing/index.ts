@@ -39,9 +39,9 @@ Deno.serve(async (req) => {
 
     const userId = userData.user.id;
 
-    // Fetch analyzed posts from last 48h
+    // Try recent posts first (last 48h), then fallback to newest 5
     const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-    const { data: posts } = await supabase
+    let { data: posts } = await supabase
       .from("posts")
       .select("hook, content, metrics, content_category, type")
       .eq("user_id", userId)
@@ -50,8 +50,24 @@ Deno.serve(async (req) => {
       .order("updated_at", { ascending: false })
       .limit(5);
 
+    let isRecent = true;
+
     if (!posts || posts.length === 0) {
-      return new Response(JSON.stringify({ error: "Keine analysierten Posts in den letzten 48 Stunden." }), {
+      // Fallback: newest 5 analyzed posts without time filter
+      const { data: fallbackPosts } = await supabase
+        .from("posts")
+        .select("hook, content, metrics, content_category, type")
+        .eq("user_id", userId)
+        .eq("status", "analyzed")
+        .order("updated_at", { ascending: false })
+        .limit(5);
+
+      posts = fallbackPosts;
+      isRecent = false;
+    }
+
+    if (!posts || posts.length === 0) {
+      return new Response(JSON.stringify({ error: "Keine analysierten Posts vorhanden. Bitte zuerst Posts analysieren lassen." }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -63,6 +79,7 @@ Deno.serve(async (req) => {
     let bestScore = 0;
     const whatWorked: string[] = [];
     const followUps: string[] = [];
+    let engTotal = 0, engCount = 0;
 
     for (const p of posts) {
       const m = p.metrics as any;
@@ -70,6 +87,10 @@ Deno.serve(async (req) => {
       totalImpressions += Number(m.impressions || 0);
       totalLikes += Number(m.likes || 0);
       totalComments += Number(m.comments || 0);
+      if (m.engagement_rate != null) {
+        engTotal += Number(m.engagement_rate);
+        engCount++;
+      }
       const score = Number(m.score || 0);
       if (score > bestScore) {
         bestScore = score;
@@ -79,11 +100,17 @@ Deno.serve(async (req) => {
       if (m.recommended_follow_ups) followUps.push(...m.recommended_follow_ups);
     }
 
+    const avgEngagement = engCount > 0 ? Math.round((engTotal / engCount) * 10) / 10 : 0;
     const bestMetrics = bestPost?.metrics as any;
+
+    const timeframeText = isRecent
+      ? "In den letzten 24 Stunden"
+      : "Basierend auf Ihren letzten analysierten Posts";
+
     const briefingText = `
 Guten Morgen! Hier ist Ihr LinkedIn Performance Briefing.
 
-In den letzten 24 Stunden haben Ihre ${posts.length} analysierten Posts insgesamt ${totalImpressions} Impressions, ${totalLikes} Likes und ${totalComments} Kommentare generiert.
+${timeframeText} haben Ihre ${posts.length} analysierten Posts insgesamt ${totalImpressions} Impressions, ${totalLikes} Likes und ${totalComments} Kommentare generiert.
 
 ${bestPost ? `Ihr stärkster Post war "${bestPost.hook || bestPost.content?.substring(0, 60)}" mit einem Score von ${bestScore} von 100 und einer Engagement Rate von ${bestMetrics?.engagement_rate || 0} Prozent.` : ""}
 
@@ -163,6 +190,17 @@ Viel Erfolg mit Ihrem Content heute!
         success: true,
         audioUrl: urlData?.publicUrl,
         textSummary: briefingText,
+        metrics: {
+          impressions: totalImpressions,
+          likes: totalLikes,
+          comments: totalComments,
+          engagementRate: avgEngagement,
+          bestPostHook: bestPost?.hook || bestPost?.content?.substring(0, 60) || null,
+          bestPostScore: bestScore,
+          whatWorked: [...new Set(whatWorked)].slice(0, 3),
+          recommendedFollowUps: [...new Set(followUps)].slice(0, 2),
+          performanceSummary: bestMetrics?.performance_summary || null,
+        },
       }),
       {
         status: 200,
