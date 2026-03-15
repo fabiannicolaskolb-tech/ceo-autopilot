@@ -89,10 +89,36 @@ export default function ProfilePage() {
 
   const save = async () => {
     try {
-      await updateProfile({ name, company, role, industry, target_audience: targetAudience, tone });
+      await updateProfile({ name, company, role, industry, target_audience: targetAudience, tone, linkedin_url: linkedinUrl || null });
       toast({ title: 'Profil gespeichert' });
     } catch (err: any) {
       toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
+    }
+  };
+
+  const handleScrapeProfile = async () => {
+    if (!linkedinUrl.trim()) {
+      toast({ title: 'Bitte LinkedIn-URL eingeben', variant: 'destructive' });
+      return;
+    }
+    setScraping(true);
+    try {
+      // Save the URL first
+      await updateProfile({ linkedin_url: linkedinUrl.trim() });
+      
+      const { data, error } = await supabase.functions.invoke('scrape-linkedin', {
+        body: { linkedin_url: linkedinUrl.trim(), user_id: user?.id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      
+      await refreshProfile();
+      toast({ title: 'LinkedIn-Profil importiert', description: 'Name, Bio und Profilbild wurden aktualisiert.' });
+    } catch (err: any) {
+      console.error('Scrape error:', err);
+      toast({ title: 'Fehler beim Import', description: err?.message || 'LinkedIn-Profil konnte nicht importiert werden.', variant: 'destructive' });
+    } finally {
+      setScraping(false);
     }
   };
 
