@@ -412,20 +412,37 @@ export default function IdeationPage() {
                   transition={{ duration: 0.25 }}
                   className="space-y-3"
                 >
-                  {templates.map((tpl, i) => (
-                    <div
-                      key={i}
-                      className="w-full text-left p-3 rounded-sm border border-border bg-card group"
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className="text-lg leading-none">{tpl.emoji}</span>
-                        <div>
-                          <span className="text-sm font-medium text-foreground">{tpl.label}</span>
-                          <p className="text-xs text-muted-foreground mt-0.5">{tpl.prompt}</p>
-                        </div>
+                  {templates.map((tpl, i) => {
+                    const [open, setOpen] = React.useState(false);
+                    return (
+                      <div
+                        key={i}
+                        className="w-full text-left rounded-sm border border-border bg-card group"
+                      >
+                        <button
+                          onClick={() => setOpen(!open)}
+                          className="w-full flex items-center gap-2 p-3 text-left"
+                        >
+                          <span className="text-lg leading-none">{tpl.emoji}</span>
+                          <span className="text-sm font-medium text-foreground flex-1">{tpl.label}</span>
+                          <ChevronDown className={cn("h-3.5 w-3.5 text-muted-foreground transition-transform duration-200", open && "rotate-180")} />
+                        </button>
+                        <AnimatePresence initial={false}>
+                          {open && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="overflow-hidden"
+                            >
+                              <p className="text-xs text-muted-foreground px-3 pb-3 pl-[2.25rem]">{tpl.prompt}</p>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </motion.div>
               </AnimatePresence>
 
