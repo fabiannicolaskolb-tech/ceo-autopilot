@@ -205,6 +205,7 @@ export type Database = {
           id: string
           industry: string | null
           linkedin_connected: boolean
+          linkedin_url: string | null
           name: string | null
           onboarding_completed: boolean
           role: string | null
@@ -222,6 +223,7 @@ export type Database = {
           id: string
           industry?: string | null
           linkedin_connected?: boolean
+          linkedin_url?: string | null
           name?: string | null
           onboarding_completed?: boolean
           role?: string | null
@@ -239,6 +241,7 @@ export type Database = {
           id?: string
           industry?: string | null
           linkedin_connected?: boolean
+          linkedin_url?: string | null
           name?: string | null
           onboarding_completed?: boolean
           role?: string | null
@@ -308,35 +311,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "voice_insights_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      voice_samples: {
-        Row: {
-          content: string
-          created_at: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "voice_samples_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
