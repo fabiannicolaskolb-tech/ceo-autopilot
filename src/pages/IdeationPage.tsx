@@ -10,6 +10,13 @@ import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button
 import { useToast } from '@/hooks/use-toast';
 import { MeshBackground } from '@/components/MeshBackground';
 import { VoiceCopilotModal } from '@/components/VoiceCopilotModal';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+
+const TEMPLATES = [
+  { emoji: '🚀', label: 'Kundenerfolg teilen', prompt: 'Wir haben kürzlich einem Kunden geholfen, [Ergebnis] zu erreichen.' },
+  { emoji: '💡', label: 'Leadership-Lektion', prompt: 'Eine Erfahrung als Führungskraft hat mich diese Woche besonders geprägt.' },
+  { emoji: '📈', label: 'Branchen-Trend kommentieren', prompt: 'In unserer Branche sehe ich gerade einen spannenden Trend.' },
+];
 
 interface Concept {
   hook: string;
