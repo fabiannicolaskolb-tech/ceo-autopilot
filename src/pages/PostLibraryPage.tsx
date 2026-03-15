@@ -455,7 +455,7 @@ export default function PostLibraryPage() {
   const { user } = useAuth();
   const { posts, loading } = usePosts(user?.id);
   const [tab, setTab] = useState<'drafts' | 'published'>('drafts');
-  const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar' | 'feed'>('list');
   const [refreshKey, setRefreshKey] = useState(0);
 
   const pendingApproval = useMemo(() => posts.filter(p => p.status === 'draft'), [posts, refreshKey]);
