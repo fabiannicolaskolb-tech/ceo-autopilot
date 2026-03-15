@@ -112,20 +112,25 @@ export function useAnalytics() {
   }, [user]);
 
   const filteredPosts = useMemo(() => {
-    const start = getRangeStart(timeRange);
-    return posts.filter(p => p.posted_at && new Date(p.posted_at) >= start);
-  }, [posts, timeRange]);
+    const start = getRangeStart(timeRange, customRange?.from);
+    const end = getRangeEnd(timeRange, customRange?.to);
+    return posts.filter(p => {
+      if (!p.posted_at) return false;
+      const d = new Date(p.posted_at);
+      return d >= start && d <= end;
+    });
+  }, [posts, timeRange, customRange]);
 
   const previousPosts = useMemo(() => {
-    const days = getDaysForRange(timeRange);
-    const rangeStart = getRangeStart(timeRange);
+    const days = getDaysForRange(timeRange, customRange?.from);
+    const rangeStart = getRangeStart(timeRange, customRange?.from);
     const prevStart = new Date(rangeStart.getTime() - days * 24 * 60 * 60 * 1000);
     return posts.filter(p => {
       if (!p.posted_at) return false;
       const d = new Date(p.posted_at);
       return d >= prevStart && d < rangeStart;
     });
-  }, [posts, timeRange]);
+  }, [posts, timeRange, customRange]);
 
   const kpis = useMemo((): KPI[] => {
     const totalImpressions = filteredPosts.reduce((s, p) => s + (p.metrics.impressions || 0), 0);
