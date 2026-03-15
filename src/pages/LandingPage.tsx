@@ -191,15 +191,16 @@ export default function LandingPage() {
           <div className="grid gap-8 sm:grid-cols-3">
             {features.map((f) => {
               const isExpanded = expandedFeature === f.title;
-              const isHidden = expandedFeature != null && expandedFeature !== f.title;
+              const hasColSpan = colSpanFeature === f.title;
+              const isHidden = (expandedFeature != null && expandedFeature !== f.title) || (colSpanFeature != null && colSpanFeature !== f.title);
               const previewImage = f.title === 'Analytics' ? calendarPreview : f.title === 'Planning' ? plannerPreview : ideationPreview;
 
               return (
                 <div
                   key={f.title}
-                  onClick={() => setExpandedFeature(isExpanded ? null : f.title)}
-                  className={`group relative cursor-pointer overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] transition-all duration-500 ease-in-out ${isHidden ? 'max-h-0 opacity-0 scale-95 !m-0 !p-0 !gap-0 overflow-hidden' : 'max-h-[800px] opacity-100 scale-100'} ${isExpanded ? 'sm:col-span-3' : ''}`}
-                  style={isHidden ? { margin: 0, padding: 0, border: 'none', height: 0 } : undefined}
+                  onClick={() => handleFeatureClick(f.title)}
+                  className={`group relative cursor-pointer overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] transition-all duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${isHidden ? 'max-h-0 opacity-0 scale-95 overflow-hidden pointer-events-none' : 'max-h-[800px] opacity-100 scale-100'} ${hasColSpan ? 'sm:col-span-3' : ''}`}
+                  style={isHidden ? { margin: 0, padding: 0, border: 'none', height: 0, gap: 0 } : undefined}
                 >
                   <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
                   <div className="flex flex-col items-center text-center h-full">
