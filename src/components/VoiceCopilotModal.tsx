@@ -36,17 +36,20 @@ export function VoiceCopilotModal({ open, onClose, onInsightsSaved }: VoiceCopil
       console.log('Voice Copilot disconnected');
     },
     onMessage: (message: any) => {
-      if (message.type === 'user_transcript' && message.user_transcription_event?.user_transcript) {
-        transcriptsRef.current.push({
-          role: 'user',
-          text: message.user_transcription_event.user_transcript,
-        });
+      console.log('Voice Copilot message:', JSON.stringify(message));
+      // Try multiple known message formats
+      const userText = message.user_transcription_event?.user_transcript
+        || (message.type === 'user_transcript' && message.text)
+        || (message.role === 'user' && message.message);
+      const agentText = message.agent_response_event?.agent_response
+        || (message.type === 'agent_response' && message.text)
+        || (message.role === 'agent' && message.message);
+
+      if (userText) {
+        transcriptsRef.current.push({ role: 'user', text: String(userText) });
       }
-      if (message.type === 'agent_response' && message.agent_response_event?.agent_response) {
-        transcriptsRef.current.push({
-          role: 'agent',
-          text: message.agent_response_event.agent_response,
-        });
+      if (agentText) {
+        transcriptsRef.current.push({ role: 'agent', text: String(agentText) });
       }
     },
     onError: (error: any) => {
