@@ -438,10 +438,17 @@ const LangContext = createContext<LangContextType>({
 });
 
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLang] = useState<Lang>('de');
+  const [lang, setLang] = useState<Lang>(() => {
+    const saved = localStorage.getItem('briefly-lang');
+    return (saved === 'en' || saved === 'de') ? saved : 'de';
+  });
 
   const toggleLang = useCallback(() => {
-    setLang((prev) => (prev === 'de' ? 'en' : 'de'));
+    setLang((prev) => {
+      const next = prev === 'de' ? 'en' : 'de';
+      localStorage.setItem('briefly-lang', next);
+      return next;
+    });
   }, []);
 
   const t = useCallback(

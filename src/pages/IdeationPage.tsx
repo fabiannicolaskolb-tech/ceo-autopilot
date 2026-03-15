@@ -3,6 +3,7 @@ import { Loader2, X, ArrowRight, Sparkles, MessageSquare, FileText, Check, Penci
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useLang } from '@/hooks/useLang';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,13 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
-
-const INITIAL_TEMPLATES = [
-  { emoji: '🚀', label: 'Kundenerfolg teilen', prompt: 'Wir haben kürzlich einem Kunden geholfen, [Ergebnis] zu erreichen.' },
-  { emoji: '💡', label: 'Leadership-Lektion', prompt: 'Eine Erfahrung als Führungskraft hat mich diese Woche besonders geprägt.' },
-  { emoji: '📈', label: 'Branchen-Trend kommentieren', prompt: 'In unserer Branche sehe ich gerade einen spannenden Trend.' },
-];
+import { de, enUS } from 'date-fns/locale';
 
 interface Concept {
   hook: string;
@@ -32,12 +27,6 @@ interface Concept {
   score: number;
   category: string;
 }
-
-const LOADING_TEXTS = [
-  'Analysiere bestehende Posts...',
-  'Gleiche mit Ihrer Brand Voice ab...',
-  'Berechne Engagement-Potenzial...',
-];
 
 function TemplateTile({ tpl }: { tpl: { emoji: string; label: string; prompt: string } }) {
   const [open, setOpen] = useState(false);
@@ -68,19 +57,19 @@ function TemplateTile({ tpl }: { tpl: { emoji: string; label: string; prompt: st
   );
 }
 
-function ScoreBadge({ score }: { score: number }) {
+function ScoreBadge({ score, t }: { score: number; t: (k: string) => string }) {
   if (score >= 80) {
-    return <Badge variant="default" className="text-xs font-medium">Potenzial: Hoch · {score}/100</Badge>;
+    return <Badge variant="default" className="text-xs font-medium">{t('ideation.potential_high')} · {score}/100</Badge>;
   }
-  return <Badge variant="outline" className="text-xs font-medium">Potenzial: Mittel · {score}/100</Badge>;
+  return <Badge variant="outline" className="text-xs font-medium">{t('ideation.potential_medium')} · {score}/100</Badge>;
 }
 
-function CharCount({ text }: { text: string }) {
+function CharCount({ text, t }: { text: string; t: (k: string) => string }) {
   const len = text.length;
   const ideal = len >= 800 && len <= 1800;
   return (
     <span className={cn('text-xs tabular-nums', ideal ? 'text-emerald-500' : 'text-muted-foreground')}>
-      ca. {len.toLocaleString('de-DE')} Zeichen {ideal ? '(Ideal für LinkedIn)' : ''}
+      ca. {len.toLocaleString('de-DE')} {t('ideation.chars') || 'Zeichen'} {ideal ? t('ideation.ideal_linkedin') : ''}
     </span>
   );
 }
@@ -90,11 +79,15 @@ function ExpandedConceptCard({
   onSave,
   onDismiss,
   saving,
+  t,
+  lang,
 }: {
   concept: Concept;
   onSave: (c: Concept) => void;
   onDismiss: () => void;
   saving: boolean;
+  t: (k: string) => string;
+  lang: string;
 }) {
   const fullText = concept.hook ? `${concept.hook}\n\n${concept.preview}` : concept.preview;
   const [editedText, setEditedText] = useState(fullText);
@@ -117,6 +110,7 @@ function ExpandedConceptCard({
   };
 
   const paragraphs = editedText.split(/\n+/).filter(Boolean);
+  const dateFnsLocale = lang === 'en' ? enUS : de;
 
   return (
     <motion.div
@@ -126,11 +120,10 @@ function ExpandedConceptCard({
       transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
       className="space-y-4"
     >
-      {/* Post Preview */}
       <div className="rounded-xl border border-border bg-background/60 p-5">
         <div className="flex items-center justify-between mb-3">
           <Badge variant="secondary" className="text-xs rounded-sm">{concept.type}</Badge>
-          <CharCount text={editedText} />
+          <CharCount text={editedText} t={t} />
         </div>
 
         {editing ? (
@@ -145,7 +138,6 @@ function ExpandedConceptCard({
           <div
             onClick={() => setEditing(true)}
             className="cursor-text font-playfair text-sm leading-[1.85] text-foreground space-y-3 min-h-[120px] rounded-lg p-3 transition-colors hover:bg-muted/30"
-            title="Klicken zum Bearbeiten"
           >
             {paragraphs.map((p, i) => (
               <p key={i} className="whitespace-pre-line">{p}</p>
@@ -154,7 +146,6 @@ function ExpandedConceptCard({
         )}
       </div>
 
-      {/* Action Bar */}
       <div className="flex items-center gap-2 flex-wrap">
         <Button
           size="sm"
@@ -163,7 +154,7 @@ function ExpandedConceptCard({
           disabled={saving}
         >
           <Check className="h-3.5 w-3.5" />
-          In Queue posten
+          {t('ideation.post_to_queue')}
         </Button>
 
         <Button
@@ -173,14 +164,14 @@ function ExpandedConceptCard({
           onClick={() => setEditing(!editing)}
         >
           <Pencil className="h-3.5 w-3.5" />
-          {editing ? 'Vorschau' : 'Bearbeiten'}
+          {editing ? t('ideation.preview') : t('ideation.edit')}
         </Button>
 
         <Popover>
           <PopoverTrigger asChild>
             <Button size="sm" variant="outline" className="rounded-lg text-xs gap-1.5">
               <CalendarDays className="h-3.5 w-3.5" />
-              {scheduleDate ? format(scheduleDate, 'dd. MMM', { locale: de }) : 'Planen für...'}
+              {scheduleDate ? format(scheduleDate, 'dd. MMM', { locale: dateFnsLocale }) : t('ideation.schedule_for')}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -202,7 +193,7 @@ function ExpandedConceptCard({
           onClick={onDismiss}
         >
           <Trash2 className="h-3.5 w-3.5" />
-          Verwerfen
+          {t('ideation.discard')}
         </Button>
       </div>
     </motion.div>
@@ -215,10 +206,26 @@ export default function IdeationPage() {
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
+  const [templates, setTemplates] = useState<{ emoji: string; label: string; prompt: string }[]>([]);
   const [generatingTemplates, setGeneratingTemplates] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
+  const { t, lang } = useLang();
+
+  // Initialize templates with translations
+  useEffect(() => {
+    setTemplates([
+      { emoji: '🚀', label: t('ideation.template1_label'), prompt: t('ideation.template1_prompt') },
+      { emoji: '💡', label: t('ideation.template2_label'), prompt: t('ideation.template2_prompt') },
+      { emoji: '📈', label: t('ideation.template3_label'), prompt: t('ideation.template3_prompt') },
+    ]);
+  }, [lang, t]);
+
+  const LOADING_TEXTS = [
+    t('ideation.loading1'),
+    t('ideation.loading2'),
+    t('ideation.loading3'),
+  ];
 
   const { data: topics = [] } = useQuery({
     queryKey: ['topics', user?.id],
@@ -270,11 +277,11 @@ export default function IdeationPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast({ title: 'Entwurf erstellt', description: 'Post wurde zur Gallery hinzugefügt.' });
+      toast({ title: t('ideation.draft_created'), description: t('ideation.draft_added') });
       setExpandedIndex(null);
     },
     onError: (err: any) => {
-      toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
+      toast({ title: t('error'), description: err?.message, variant: 'destructive' });
     },
   });
 
@@ -285,10 +292,10 @@ export default function IdeationPage() {
       const isSelected = prev.includes(keyPoint);
       const updated = isSelected ? prev.filter(p => p !== keyPoint) : [...prev, keyPoint];
       toast({
-        title: isSelected ? 'Erkenntnis entfernt' : 'Erkenntnis vorgemerkt',
+        title: isSelected ? t('ideation.insight_removed') : t('ideation.insight_bookmarked'),
         description: isSelected
-          ? 'Wird nicht mehr für den nächsten Post genutzt.'
-          : 'Wird als Grundlage für den nächsten Post genutzt.',
+          ? t('ideation.insight_removed_desc')
+          : t('ideation.insight_bookmarked_desc'),
       });
       return updated;
     });
@@ -339,11 +346,11 @@ export default function IdeationPage() {
           has_history: false,
         });
       } else {
-        toast({ title: 'Keine Posts generiert', description: 'Der Workflow hat keine Konzepte zurückgegeben.', variant: 'destructive' });
+        toast({ title: t('error'), description: t('ideation.no_posts_generated') || 'No posts generated.', variant: 'destructive' });
       }
     } catch (err: any) {
       console.error('Generate post error:', err);
-      toast({ title: 'Fehler bei der Post-Generierung', description: err?.message || 'Unbekannter Fehler', variant: 'destructive' });
+      toast({ title: t('error'), description: err?.message || 'Unknown error', variant: 'destructive' });
     } finally {
       setGenerating(false);
     }
@@ -372,10 +379,10 @@ export default function IdeationPage() {
           <ResizablePanel defaultSize={70} minSize={55}>
             <div className="p-8 h-full flex flex-col">
               <h1 className="font-playfair text-3xl font-bold text-foreground tracking-tight">
-                Ideation Lab
+                {t('ideation.title')}
               </h1>
               <p className="text-sm text-muted-foreground mt-1 mb-8">
-                Generieren Sie Posts aus Ihren Daten oder teilen Sie persönliche Erlebnisse per Sprache.
+                {t('ideation.subtitle')}
               </p>
 
               <div className="grid gap-6 sm:grid-cols-2 flex-1">
@@ -385,9 +392,9 @@ export default function IdeationPage() {
                     <FileText className="h-7 w-7 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-playfair text-lg font-semibold text-foreground">Post generieren</h3>
+                    <h3 className="font-playfair text-lg font-semibold text-foreground">{t('ideation.generate')}</h3>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Basierend auf Profil, Themen & bisherigen Posts.
+                      {t('ideation.generate_desc')}
                     </p>
                   </div>
                   {generating ? (
@@ -400,11 +407,11 @@ export default function IdeationPage() {
                   ) : (
                     <>
                       <InteractiveHoverButton onClick={generatePost}>
-                        Post generieren
+                        {t('ideation.generate')}
                       </InteractiveHoverButton>
                       {selectedInsights.length > 0 && (
                         <p className="text-xs text-primary mt-2">
-                          {selectedInsights.length} Erkenntnis{selectedInsights.length > 1 ? 'se' : ''} als Grundlage ausgewählt
+                          {selectedInsights.length} {t('ideation.insights_selected')}
                         </p>
                       )}
                     </>
@@ -417,13 +424,13 @@ export default function IdeationPage() {
                     <MessageSquare className="h-7 w-7 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-playfair text-lg font-semibold text-foreground">Gespräch starten</h3>
+                    <h3 className="font-playfair text-lg font-semibold text-foreground">{t('ideation.conversation')}</h3>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Persönliche Erlebnisse per Sprache für Content nutzen.
+                      {t('ideation.conversation_desc')}
                     </p>
                   </div>
                   <InteractiveHoverButton onClick={() => setVoiceModalOpen(true)}>
-                    Gespräch starten
+                    {t('ideation.conversation')}
                   </InteractiveHoverButton>
                 </div>
               </div>
@@ -436,11 +443,11 @@ export default function IdeationPage() {
           <ResizablePanel defaultSize={30} minSize={20}>
             <div className="p-6 h-full bg-muted/30 border-l-0">
               <h2 className="font-playfair text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">
-                Gesprächs-Inspirationen
+                {t('ideation.inspirations')}
               </h2>
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={templates.map(t => t.label).join(',')}
+                  key={templates.map(tpl => tpl.label).join(',')}
                   initial={{ opacity: 0, y: -6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
@@ -466,10 +473,10 @@ export default function IdeationPage() {
                     if (data?.templates && Array.isArray(data.templates) && data.templates.length === 3) {
                       setTemplates(data.templates);
                     } else {
-                      throw new Error('Ungültige Antwort');
+                      throw new Error('Invalid response');
                     }
                   } catch (e: any) {
-                    toast({ title: 'Fehler', description: e?.message || 'Vorlagen konnten nicht generiert werden.', variant: 'destructive' });
+                    toast({ title: t('error'), description: e?.message, variant: 'destructive' });
                   } finally {
                     setGeneratingTemplates(false);
                   }
@@ -480,18 +487,18 @@ export default function IdeationPage() {
                 ) : (
                   <Sparkles className="h-3 w-3" />
                 )}
-                {generatingTemplates ? 'Generiere...' : 'Neue Inspirationen generieren'}
+                {generatingTemplates ? t('ideation.generating') : t('ideation.new_inspirations')}
               </Button>
 
               {topics.length > 0 && (
                 <div className="mt-6 pt-4 border-t border-border">
                   <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                    Ihre Fokus-Themen
+                    {t('ideation.focus_topics')}
                   </h3>
                   <div className="flex flex-wrap gap-1.5">
-                    {topics.slice(0, 8).map(t => (
-                      <Badge key={t.id} variant="outline" className="text-xs rounded-sm">
-                        {t.name}
+                    {topics.slice(0, 8).map(topic => (
+                      <Badge key={topic.id} variant="outline" className="text-xs rounded-sm">
+                        {topic.name}
                       </Badge>
                     ))}
                   </div>
@@ -505,29 +512,29 @@ export default function IdeationPage() {
       {/* Mobile layout */}
       <div className="md:hidden space-y-6">
         <div>
-          <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Ideation Lab</h1>
-          <p className="text-sm text-muted-foreground mt-1">Posts generieren oder per Sprache Ideen teilen.</p>
+          <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">{t('ideation.title')}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('ideation.mobile_subtitle')}</p>
         </div>
         <div className="grid gap-4">
           <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
             <CardContent className="p-6 flex flex-col items-center text-center gap-4">
               <FileText className="h-7 w-7 text-primary" />
-              <h3 className="font-playfair text-lg font-semibold text-foreground">Post generieren</h3>
+              <h3 className="font-playfair text-lg font-semibold text-foreground">{t('ideation.generate')}</h3>
               {generating ? (
                 <div className="flex items-center gap-3">
                   <Loader2 className="h-5 w-5 animate-spin text-primary" />
                   <span className="text-sm text-muted-foreground animate-pulse">{LOADING_TEXTS[loadingTextIndex]}</span>
                 </div>
               ) : (
-                <InteractiveHoverButton onClick={generatePost}>Post generieren</InteractiveHoverButton>
+                <InteractiveHoverButton onClick={generatePost}>{t('ideation.generate')}</InteractiveHoverButton>
               )}
             </CardContent>
           </Card>
           <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
             <CardContent className="p-6 flex flex-col items-center text-center gap-4">
               <MessageSquare className="h-7 w-7 text-primary" />
-              <h3 className="font-playfair text-lg font-semibold text-foreground">Gespräch starten</h3>
-              <InteractiveHoverButton onClick={() => setVoiceModalOpen(true)}>Gespräch starten</InteractiveHoverButton>
+              <h3 className="font-playfair text-lg font-semibold text-foreground">{t('ideation.conversation')}</h3>
+              <InteractiveHoverButton onClick={() => setVoiceModalOpen(true)}>{t('ideation.conversation')}</InteractiveHoverButton>
             </CardContent>
           </Card>
         </div>
@@ -538,7 +545,7 @@ export default function IdeationPage() {
         <div className="space-y-4">
           <h2 className="font-playfair text-xl font-semibold text-foreground flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-primary" />
-            Erkenntnisse aus Ihren Gesprächen
+            {t('ideation.insights_title')}
           </h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {voiceInsights.flatMap((insight: any) =>
@@ -548,7 +555,7 @@ export default function IdeationPage() {
                     <p className="text-sm text-foreground leading-relaxed">{point}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
-                        {new Date(insight.created_at).toLocaleDateString('de-DE')}
+                        {new Date(insight.created_at).toLocaleDateString(lang === 'en' ? 'en-US' : 'de-DE')}
                       </span>
                       <Button
                         size="sm"
@@ -559,11 +566,11 @@ export default function IdeationPage() {
                         {selectedInsights.includes(point) ? (
                           <>
                             <Check className="h-3 w-3 mr-1" />
-                            Vorgemerkt
+                            {t('ideation.bookmarked')}
                           </>
                         ) : (
                           <>
-                            Für nächsten Post nutzen
+                            {t('ideation.use_for_post')}
                             <ArrowRight className="h-3 w-3 ml-1" />
                           </>
                         )}
@@ -580,7 +587,7 @@ export default function IdeationPage() {
       {/* Generated Results */}
       {concepts.length > 0 && (
         <div className="space-y-4">
-          <h2 className="font-playfair text-xl font-semibold text-foreground">Generierte Posts</h2>
+          <h2 className="font-playfair text-xl font-semibold text-foreground">{t('ideation.generated_posts')}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {concepts.map((c, i) => {
               const isExpanded = expandedIndex === i;
@@ -602,7 +609,7 @@ export default function IdeationPage() {
                         <Badge variant="outline" className="text-xs rounded-sm">{c.category}</Badge>
                       </div>
                       <div className="flex items-center gap-2">
-                        <ScoreBadge score={c.score} />
+                        <ScoreBadge score={c.score} t={t} />
                         {isExpanded && (
                           <Button
                             size="sm"
@@ -629,6 +636,8 @@ export default function IdeationPage() {
                           onSave={(updated) => saveMutation.mutate(updated)}
                           onDismiss={() => dismissConcept(i)}
                           saving={saveMutation.isPending}
+                          t={t}
+                          lang={lang}
                         />
                       ) : (
                         <motion.div
@@ -640,7 +649,7 @@ export default function IdeationPage() {
                             className="rounded-sm text-xs"
                             onClick={(e) => { e.stopPropagation(); setExpandedIndex(i); }}
                           >
-                            Vorschau öffnen
+                            {t('ideation.open_preview')}
                             <ArrowRight className="h-3 w-3 ml-1" />
                           </Button>
                           <Button
@@ -661,7 +670,7 @@ export default function IdeationPage() {
           </div>
           <p className="text-xs text-muted-foreground pt-2">
             <Sparkles className="h-3 w-3 inline mr-1" />
-            Basierend auf Ihrem Profil und Thema <span className="font-medium text-foreground">{primaryTopic}</span>.
+            {t('ideation.based_on')} <span className="font-medium text-foreground">{primaryTopic}</span>.
           </p>
         </div>
       )}
