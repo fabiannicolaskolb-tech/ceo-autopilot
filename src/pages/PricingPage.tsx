@@ -214,7 +214,7 @@ export default function PricingPage() {
                       onClick={() => window.location.href = 'mailto:sales@briefly.app'}
                       className="w-full h-11 rounded-xl font-medium bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.1] border border-border/50 transition-all duration-300"
                     >
-                      Contact Sales
+                      {t('pricing.contact')}
                     </Button>
                   )}
                 </div>
