@@ -27,6 +27,7 @@ export function LinkedInPostPreview({
   authorAvatar,
   content,
   hook,
+  imageUrl,
   postedAt = 'Just now',
   metrics,
   showActions = true,
