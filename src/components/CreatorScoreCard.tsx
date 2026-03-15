@@ -255,5 +255,6 @@ export default function CreatorScoreCard() {
         </div>
       </TooltipProvider>
     </div>
+    </div>
   );
 }

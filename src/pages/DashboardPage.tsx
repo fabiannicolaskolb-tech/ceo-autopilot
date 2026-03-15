@@ -193,17 +193,17 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Preview info */}
-            <div className="mt-4 rounded-xl bg-muted/40 px-3.5 py-2.5 border border-border/30">
+            {/* Preview info - Liquid Glass */}
+            <div className="relative mt-4 rounded-xl bg-white/40 dark:bg-white/10 backdrop-blur-sm px-3.5 py-2.5 border border-white/20 dark:border-white/10">
               <p className="text-xs font-medium text-foreground/70">{item.preview}</p>
             </div>
 
             {/* CTA */}
-            <div className="mt-4 flex items-center justify-between">
+            <div className="relative mt-4 flex items-center justify-between">
               <span className="text-xs font-semibold transition-colors duration-300 group-hover:translate-x-1" style={{ color: item.color }}>
                 {item.cta}
               </span>
-              <div className="h-8 w-8 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110" style={{ backgroundColor: `color-mix(in srgb, ${item.color} 10%, transparent)` }}>
+              <div className="h-8 w-8 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-white/30 dark:bg-white/10 backdrop-blur-sm border border-white/20 dark:border-white/10">
                 <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" style={{ color: item.color }} />
               </div>
             </div>
