@@ -14,6 +14,106 @@ export type Database = {
   }
   public: {
     Tables: {
+      generated_ideas: {
+        Row: {
+          created_at: string | null
+          cycle_number: number | null
+          id: string
+          ideas: Json
+          raw_experience: string | null
+          request_id: string | null
+          selected_idea_index: number | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          cycle_number?: number | null
+          id?: string
+          ideas?: Json
+          raw_experience?: string | null
+          request_id?: string | null
+          selected_idea_index?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          cycle_number?: number | null
+          id?: string
+          ideas?: Json
+          raw_experience?: string | null
+          request_id?: string | null
+          selected_idea_index?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_ideas_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pipeline_state: {
+        Row: {
+          command: string
+          completed_at: string | null
+          created_at: string | null
+          cycle_number: number | null
+          error_message: string | null
+          id: string
+          request_id: string
+          result_summary: string | null
+          stage: string
+          started_at: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          command?: string
+          completed_at?: string | null
+          created_at?: string | null
+          cycle_number?: number | null
+          error_message?: string | null
+          id?: string
+          request_id: string
+          result_summary?: string | null
+          stage?: string
+          started_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          command?: string
+          completed_at?: string | null
+          created_at?: string | null
+          cycle_number?: number | null
+          error_message?: string | null
+          id?: string
+          request_id?: string
+          result_summary?: string | null
+          stage?: string
+          started_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pipeline_state_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           angle: string | null
