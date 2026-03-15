@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 
-const TEMPLATES = [
+const INITIAL_TEMPLATES = [
   { emoji: '🚀', label: 'Kundenerfolg teilen', prompt: 'Wir haben kürzlich einem Kunden geholfen, [Ergebnis] zu erreichen.' },
   { emoji: '💡', label: 'Leadership-Lektion', prompt: 'Eine Erfahrung als Führungskraft hat mich diese Woche besonders geprägt.' },
   { emoji: '📈', label: 'Branchen-Trend kommentieren', prompt: 'In unserer Branche sehe ich gerade einen spannenden Trend.' },
@@ -186,6 +186,8 @@ export default function IdeationPage() {
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
+  const [generatingTemplates, setGeneratingTemplates] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
 
@@ -401,22 +403,61 @@ export default function IdeationPage() {
               <h2 className="font-playfair text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">
                 Inspirations-Vorlagen
               </h2>
-              <div className="space-y-3">
-                {TEMPLATES.map((tpl, i) => (
-                  <div
-                    key={i}
-                    className="w-full text-left p-3 rounded-sm border border-border bg-card group"
-                  >
-                    <div className="flex items-start gap-2">
-                      <span className="text-lg leading-none">{tpl.emoji}</span>
-                      <div>
-                        <span className="text-sm font-medium text-foreground">{tpl.label}</span>
-                        <p className="text-xs text-muted-foreground mt-0.5">{tpl.prompt}</p>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={templates.map(t => t.label).join(',')}
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-3"
+                >
+                  {templates.map((tpl, i) => (
+                    <div
+                      key={i}
+                      className="w-full text-left p-3 rounded-sm border border-border bg-card group"
+                    >
+                      <div className="flex items-start gap-2">
+                        <span className="text-lg leading-none">{tpl.emoji}</span>
+                        <div>
+                          <span className="text-sm font-medium text-foreground">{tpl.label}</span>
+                          <p className="text-xs text-muted-foreground mt-0.5">{tpl.prompt}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full mt-2 text-xs text-muted-foreground hover:text-foreground gap-1.5"
+                disabled={generatingTemplates}
+                onClick={async () => {
+                  setGeneratingTemplates(true);
+                  try {
+                    const { data, error } = await supabase.functions.invoke('generate-templates');
+                    if (error) throw error;
+                    if (data?.templates && Array.isArray(data.templates) && data.templates.length === 3) {
+                      setTemplates(data.templates);
+                    } else {
+                      throw new Error('Ungültige Antwort');
+                    }
+                  } catch (e: any) {
+                    toast({ title: 'Fehler', description: e?.message || 'Vorlagen konnten nicht generiert werden.', variant: 'destructive' });
+                  } finally {
+                    setGeneratingTemplates(false);
+                  }
+                }}
+              >
+                {generatingTemplates ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Sparkles className="h-3 w-3" />
+                )}
+                {generatingTemplates ? 'Generiere...' : 'Neue Vorlagen generieren'}
+              </Button>
 
               {topics.length > 0 && (
                 <div className="mt-6 pt-4 border-t border-border">
