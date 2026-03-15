@@ -174,6 +174,9 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
   const handleApprove = async () => {
     const { error } = await supabase.from('posts').update({ status: 'approved' }).eq('id', post.id);
     if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
+    // Trigger n8n workflow
+    const { error: fnError } = await supabase.functions.invoke('trigger-n8n', { body: { postId: post.id } });
+    if (fnError) console.error('n8n trigger error:', fnError);
     toast({ title: 'Post freigegeben' });
     onMutate();
   };
