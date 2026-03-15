@@ -441,6 +441,7 @@ export default function AnalyticsPage() {
               )}
               {importLoading ? 'Importiere…' : 'Posts importieren'}
             </Button>
+            <Tabs value={timeRange} onValueChange={v => {
               setTimeRange(v as TimeRange);
               if (v !== 'custom') setCustomRange(null);
             }}>
