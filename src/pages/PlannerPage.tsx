@@ -374,17 +374,30 @@ export default function PlannerPage() {
             <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} className="min-h-[150px] bg-card" />
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Veröffentlichungsdatum</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !editDate && "text-muted-foreground")}>
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {editDate ? format(editDate, 'PPP', { locale: de }) : 'Datum wählen'}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={editDate} onSelect={setEditDate} locale={de} className="pointer-events-auto p-3" />
-                </PopoverContent>
-              </Popover>
+              <div className="flex gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("flex-1 justify-start text-left font-normal", !editDate && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {editDate ? format(editDate, 'PPP', { locale: de }) : 'Datum wählen'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={editDate} onSelect={setEditDate} locale={de} className="pointer-events-auto p-3" />
+                  </PopoverContent>
+                </Popover>
+                <input
+                  type="time"
+                  value={editTime}
+                  onChange={e => setEditTime(e.target.value)}
+                  className="h-10 rounded-md border border-input bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
+              {editDate && (
+                <p className="text-xs text-muted-foreground">
+                  Geplant für: {format(setMinutes(setHours(editDate, parseInt(editTime.split(':')[0])), parseInt(editTime.split(':')[1])), "dd. MMM yyyy 'um' HH:mm 'Uhr'", { locale: de })}
+                </p>
+              )}
             </div>
           </div>
           <DialogFooter className="flex-col sm:flex-row gap-2">
