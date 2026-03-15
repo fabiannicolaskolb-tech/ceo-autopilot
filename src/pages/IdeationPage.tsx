@@ -335,7 +335,7 @@ export default function IdeationPage() {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {voiceInsights.flatMap((insight: any) =>
               (insight.key_points as string[])?.map((point: string, pi: number) => (
-                <Card key={`${insight.id}-${pi}`} className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)]">
+                <Card key={`${insight.id}-${pi}`} className="rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06)]">
                   <CardContent className="p-5 space-y-3">
                     <p className="text-sm text-foreground leading-relaxed">{point}</p>
                     <div className="flex items-center justify-between">
