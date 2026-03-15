@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Loader2, X, ArrowRight, Sparkles, MessageSquare, FileText, Check, Pencil, CalendarDays, Trash2 } from 'lucide-react';
+import { Loader2, X, ArrowRight, Sparkles, MessageSquare, FileText, Check, Pencil, CalendarDays, Trash2, ChevronDown } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -38,6 +38,35 @@ const LOADING_TEXTS = [
   'Gleiche mit Ihrer Brand Voice ab...',
   'Berechne Engagement-Potenzial...',
 ];
+
+function TemplateTile({ tpl }: { tpl: { emoji: string; label: string; prompt: string } }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="w-full text-left rounded-sm border border-border bg-card group">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-2 p-3 text-left"
+      >
+        <span className="text-lg leading-none">{tpl.emoji}</span>
+        <span className="text-sm font-medium text-foreground flex-1">{tpl.label}</span>
+        <ChevronDown className={cn("h-3.5 w-3.5 text-muted-foreground transition-transform duration-200", open && "rotate-180")} />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <p className="text-xs text-muted-foreground px-3 pb-3 pl-[2.25rem]">{tpl.prompt}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 function ScoreBadge({ score }: { score: number }) {
   if (score >= 80) {
@@ -413,18 +442,7 @@ export default function IdeationPage() {
                   className="space-y-3"
                 >
                   {templates.map((tpl, i) => (
-                    <div
-                      key={i}
-                      className="w-full text-left p-3 rounded-sm border border-border bg-card group"
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className="text-lg leading-none">{tpl.emoji}</span>
-                        <div>
-                          <span className="text-sm font-medium text-foreground">{tpl.label}</span>
-                          <p className="text-xs text-muted-foreground mt-0.5">{tpl.prompt}</p>
-                        </div>
-                      </div>
-                    </div>
+                    <TemplateTile key={`${tpl.label}-${i}`} tpl={tpl} />
                   ))}
                 </motion.div>
               </AnimatePresence>
