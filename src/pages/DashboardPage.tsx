@@ -215,7 +215,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Published */}
-        <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
+        <div className="rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] p-6 shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)]">
           <div className="rounded-[12px] bg-success/10 p-2.5 w-fit">
             <TrendingUp className="h-5 w-5 text-success" />
           </div>
