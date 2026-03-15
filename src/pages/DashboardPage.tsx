@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, TrendingUp, CalendarDays, Rocket } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { FileText, TrendingUp, CalendarDays, Rocket, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { usePosts, usePipelineStatus } from '@/hooks/useRealtime';
 import { Badge } from '@/components/ui/badge';
 import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -30,63 +29,41 @@ function buildTrend(posts: any[], status: string, days = 30): number[] {
   return buckets;
 }
 
+const STAGE_LABELS: Record<string, string> = {
+  started: 'Gestartet',
+  ideating: 'Ideen werden generiert',
+  creating: 'Post wird erstellt',
+  posting: 'Wird veröffentlicht',
+  analyzing: 'Analyse läuft',
+  completed: 'Abgeschlossen',
+  error: 'Fehler',
+};
+
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const firstName = profile?.name?.split(' ')[0] ?? 'dort';
   const initials = profile?.name ? profile.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '?';
 
-  const { data: drafts = [] } = useQuery({
-    queryKey: ['posts', 'drafts', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase.
-      from('posts').
-      select('*').
-      eq('user_id', user!.id).
-      eq('status', 'draft');
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user
-  });
+  const { posts, loading: postsLoading } = usePosts(user?.id);
+  const { pipeline } = usePipelineStatus(user?.id);
 
-  const { data: nextScheduled } = useQuery({
-    queryKey: ['posts', 'next-scheduled', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase.
-      from('posts').
-      select('*').
-      eq('user_id', user!.id).
-      eq('status', 'scheduled').
-      gte('scheduled_at', new Date().toISOString()).
-      order('scheduled_at', { ascending: true }).
-      limit(1).
-      maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user
-  });
-
-  const { data: postedPosts = [] } = useQuery({
-    queryKey: ['posts', 'posted', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase.
-      from('posts').
-      select('*').
-      eq('user_id', user!.id).
-      eq('status', 'posted');
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user
-  });
+  const drafts = useMemo(() => posts.filter(p => p.status === 'draft'), [posts]);
+  const postedPosts = useMemo(() => posts.filter(p => p.status === 'posted'), [posts]);
+  const nextScheduled = useMemo(() => {
+    const now = new Date().toISOString();
+    return posts
+      .filter(p => p.status === 'scheduled' && p.scheduled_at && p.scheduled_at >= now)
+      .sort((a, b) => (a.scheduled_at || '').localeCompare(b.scheduled_at || ''))[0] || null;
+  }, [posts]);
 
   const draftTrend = useMemo(() => buildTrend(drafts, 'draft'), [drafts]);
   const postedTrend = useMemo(() => buildTrend(postedPosts, 'posted'), [postedPosts]);
 
   const draftCount = drafts.length;
   const postCount = postedPosts.length;
+
+  const pipelineRunning = pipeline && pipeline.stage !== 'completed' && pipeline.stage !== 'error' && pipeline.stage !== 'idle';
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] space-y-8">
@@ -111,9 +88,17 @@ export default function DashboardPage() {
               </p>
             </div>
           </div>
-          <InteractiveHoverButton onClick={() => navigate('/profile')}>
-            Profil bearbeiten
-          </InteractiveHoverButton>
+          <div className="flex items-center gap-3">
+            {pipelineRunning && (
+              <Badge variant="secondary" className="flex items-center gap-1.5 text-xs rounded-full animate-pulse">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                {STAGE_LABELS[pipeline.stage] || pipeline.stage}
+              </Badge>
+            )}
+            <InteractiveHoverButton onClick={() => navigate('/profile')}>
+              Profil bearbeiten
+            </InteractiveHoverButton>
+          </div>
         </div>
       </div>
 
@@ -193,5 +178,4 @@ export default function DashboardPage() {
       {/* Creator Score */}
       <CreatorScoreCard />
     </div>);
-
 }
