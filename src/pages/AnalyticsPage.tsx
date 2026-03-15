@@ -754,8 +754,6 @@ function AILearningInsights() {
     [allPosts]
   );
 
-  if (analyzed.length === 0) return null;
-
   const bestPattern = useMemo(() => {
     const map: Record<string, { total: number; count: number }> = {};
     analyzed.forEach(p => {
@@ -812,6 +810,8 @@ function AILearningInsights() {
     });
     return recs.slice(0, 5);
   }, [analyzed]);
+
+  if (analyzed.length === 0) return null;
 
   return (
     <div className={cn(GLASS_CARD, 'p-6')}>
