@@ -70,9 +70,6 @@ export default function DashboardPage() {
     <div className="relative min-h-[calc(100vh-80px)] space-y-8">
       <MeshBackground />
 
-      {/* Daily Briefing */}
-      <DailyBriefing />
-
       {/* Welcome Hero */}
       <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
