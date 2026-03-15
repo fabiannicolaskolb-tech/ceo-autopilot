@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
-export type TimeRange = '7d' | '30d' | '90d' | 'ytd';
+export type TimeRange = '7d' | '30d' | '90d' | 'custom';
 
 interface PostMetrics {
   impressions?: number;
@@ -51,21 +51,26 @@ interface BestTimeCell {
   intensity: number;
 }
 
-function getDaysForRange(range: TimeRange): number {
+function getDaysForRange(range: TimeRange, customStart?: Date): number {
   if (range === '7d') return 7;
   if (range === '30d') return 30;
   if (range === '90d') return 90;
-  // YTD
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 1);
-  return Math.ceil((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  if (range === 'custom' && customStart) {
+    return Math.ceil((new Date().getTime() - customStart.getTime()) / (1000 * 60 * 60 * 24));
+  }
+  return 30;
 }
 
-function getRangeStart(range: TimeRange): Date {
+function getRangeStart(range: TimeRange, customStart?: Date): Date {
+  if (range === 'custom' && customStart) return customStart;
   const now = new Date();
-  if (range === 'ytd') return new Date(now.getFullYear(), 0, 1);
   const days = getDaysForRange(range);
   return new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+}
+
+function getRangeEnd(range: TimeRange, customEnd?: Date): Date {
+  if (range === 'custom' && customEnd) return customEnd;
+  return new Date();
 }
 
 function getMetrics(raw: unknown): PostMetrics {
@@ -83,6 +88,7 @@ export function useAnalytics() {
   const [posts, setPosts] = useState<AnalyticsPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
+  const [customRange, setCustomRange] = useState<{ from: Date; to: Date } | null>(null);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
@@ -106,20 +112,25 @@ export function useAnalytics() {
   }, [user]);
 
   const filteredPosts = useMemo(() => {
-    const start = getRangeStart(timeRange);
-    return posts.filter(p => p.posted_at && new Date(p.posted_at) >= start);
-  }, [posts, timeRange]);
+    const start = getRangeStart(timeRange, customRange?.from);
+    const end = getRangeEnd(timeRange, customRange?.to);
+    return posts.filter(p => {
+      if (!p.posted_at) return false;
+      const d = new Date(p.posted_at);
+      return d >= start && d <= end;
+    });
+  }, [posts, timeRange, customRange]);
 
   const previousPosts = useMemo(() => {
-    const days = getDaysForRange(timeRange);
-    const rangeStart = getRangeStart(timeRange);
+    const days = getDaysForRange(timeRange, customRange?.from);
+    const rangeStart = getRangeStart(timeRange, customRange?.from);
     const prevStart = new Date(rangeStart.getTime() - days * 24 * 60 * 60 * 1000);
     return posts.filter(p => {
       if (!p.posted_at) return false;
       const d = new Date(p.posted_at);
       return d >= prevStart && d < rangeStart;
     });
-  }, [posts, timeRange]);
+  }, [posts, timeRange, customRange]);
 
   const kpis = useMemo((): KPI[] => {
     const totalImpressions = filteredPosts.reduce((s, p) => s + (p.metrics.impressions || 0), 0);
@@ -235,5 +246,7 @@ export function useAnalytics() {
     hasData,
     timeRange,
     setTimeRange,
+    customRange,
+    setCustomRange,
   };
 }
