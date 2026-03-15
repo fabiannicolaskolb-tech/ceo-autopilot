@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { TypingAnimation } from '@/components/ui/typing-animation';
 import analyticsPreview from '@/assets/analytics-preview.png';
 import calendarPreview from '@/assets/ki-optimierung-preview.png';
+import plannerPreview from '@/assets/planner-preview.png';
 
 const features = [
 {
@@ -176,9 +177,11 @@ export default function LandingPage() {
 
           <div className="grid gap-8 sm:grid-cols-3">
             {features.map((f) => {
-              const isAnalytics = f.title === 'Analytics';
+              const isExpandable = f.title === 'Analytics' || f.title === 'Planning';
               const isExpanded = expandedFeature === f.title;
-              const isHidden = expandedFeature === 'Analytics' && !isAnalytics;
+              const isHidden = expandedFeature != null && expandedFeature !== f.title;
+
+              const previewImage = f.title === 'Analytics' ? calendarPreview : f.title === 'Planning' ? plannerPreview : null;
 
               return (
                 <motion.div
@@ -189,8 +192,8 @@ export default function LandingPage() {
                     : { opacity: 1, scale: 1, height: 'auto', marginBottom: undefined }
                   }
                   transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-                  onClick={() => isAnalytics && setExpandedFeature(isExpanded ? null : f.title)}
-                  className={`group relative overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-shadow duration-300 hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] ${isAnalytics ? 'cursor-pointer' : ''} ${isExpanded ? 'sm:col-span-3' : ''}`}
+                  onClick={() => isExpandable && setExpandedFeature(isExpanded ? null : f.title)}
+                  className={`group relative overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-shadow duration-300 hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] ${isExpandable ? 'cursor-pointer' : ''} ${isExpanded ? 'sm:col-span-3' : ''}`}
                 >
                   <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
                   <div className="flex flex-col items-center text-center">
@@ -201,11 +204,11 @@ export default function LandingPage() {
                       <h3 className="font-playfair text-lg font-bold text-foreground">{f.headline}</h3>
                       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
                       <span className="mt-5 inline-block text-xs font-medium tracking-wide text-[hsl(var(--feature-accent))] transition-all group-hover:underline">
-                        {isAnalytics ? (isExpanded ? 'Schließen ↑' : 'Vorschau ansehen →') : 'Mehr erfahren →'}
+                        {isExpandable ? (isExpanded ? 'Schließen ↑' : 'Vorschau ansehen →') : 'Mehr erfahren →'}
                       </span>
                     </div>
                     <AnimatePresence>
-                      {isAnalytics && isExpanded && (
+                      {isExpandable && isExpanded && previewImage && (
                         <motion.div
                           initial={{ opacity: 0, y: 20, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -214,8 +217,8 @@ export default function LandingPage() {
                           className="w-full max-w-3xl mx-auto px-6 pb-6"
                         >
                           <img
-                            src={calendarPreview}
-                            alt="Analytics Kalender Vorschau"
+                            src={previewImage}
+                            alt={`${f.title} Vorschau`}
                             className="w-full rounded-xl border border-border shadow-lg brightness-[1.02] dark:brightness-[0.85] dark:contrast-[1.1] dark:border-border/50"
                             draggable={false}
                           />
