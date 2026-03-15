@@ -197,15 +197,17 @@ export default function LandingPage() {
                   className={`group relative overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-shadow duration-300 hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] ${isExpandable ? 'cursor-pointer' : ''} ${isExpanded ? 'sm:col-span-3' : ''}`}
                 >
                   <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
-                  <div className="flex flex-col items-center text-center">
-                    <div className="flex flex-col items-center p-8 pt-7 text-center">
-                      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--feature-icon-bg))]">
-                        <f.icon className="h-7 w-7 text-[hsl(var(--feature-icon))]" />
+                  <div className="flex flex-col items-center text-center h-full">
+                    <div className="flex flex-1 flex-col items-center justify-between p-8 pt-7 text-center">
+                      <div>
+                        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--feature-icon-bg))] mx-auto">
+                          <f.icon className="h-7 w-7 text-[hsl(var(--feature-icon))]" />
+                        </div>
+                        <h3 className="font-playfair text-lg font-bold text-foreground">{f.headline}</h3>
+                        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
                       </div>
-                      <h3 className="font-playfair text-lg font-bold text-foreground">{f.headline}</h3>
-                      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
                       <span className="mt-5 inline-block text-xs font-medium tracking-wide text-[hsl(var(--feature-accent))] transition-all group-hover:underline">
-                        {isExpandable ? (isExpanded ? 'Schließen ↑' : 'Vorschau ansehen →') : 'Mehr erfahren →'}
+                        {isExpanded ? 'Schließen ↑' : 'Vorschau ansehen →'}
                       </span>
                     </div>
                     <AnimatePresence>
