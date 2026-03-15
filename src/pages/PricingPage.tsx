@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Zap, Check, X, Sun, Moon, ArrowLeft, Sparkles } from 'lucide-react';
+import { Zap, Check, X, Sun, Moon, ArrowLeft, Sparkles, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/hooks/useTheme';
+import { useLang } from '@/hooks/useLang';
 
 const allFeatures = [
   'AI posts/month',
