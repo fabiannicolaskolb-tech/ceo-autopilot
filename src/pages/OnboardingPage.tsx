@@ -206,7 +206,7 @@ export default function OnboardingPage() {
                 onClick={() => cvInputRef.current?.click()}
               >
                 {parsingCv ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                {parsingCv ? 'CV wird analysiert...' : 'CV hochladen & Felder ausfüllen'}
+                {parsingCv ? 'CV wird analysiert...' : 'CV hochladen & automatisch ausfüllen'}
               </Button>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
