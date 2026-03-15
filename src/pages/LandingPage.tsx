@@ -58,6 +58,19 @@ export default function LandingPage() {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [expandedFeature, setExpandedFeature] = useState<string | null>(null);
+  const [colSpanFeature, setColSpanFeature] = useState<string | null>(null);
+
+  const handleFeatureClick = (title: string) => {
+    if (expandedFeature === title) {
+      // Closing: first collapse image, then after delay remove col-span & show others
+      setExpandedFeature(null);
+      setTimeout(() => setColSpanFeature(null), 400);
+    } else {
+      // Opening: set col-span immediately, then expand
+      setColSpanFeature(title);
+      setExpandedFeature(title);
+    }
+  };
 
   useEffect(() => {
     if (!loading && user && profile) {
