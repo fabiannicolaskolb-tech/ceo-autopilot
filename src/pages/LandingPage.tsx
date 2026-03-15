@@ -231,6 +231,7 @@ export default function LandingPage() {
                           transition={{
                             height: { duration: 0.15, ease: 'easeOut' },
                             opacity: { duration: 0.1 },
+                            exit: { height: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }, opacity: { duration: 0.3 } },
                           }}
                           className="w-full max-w-3xl mx-auto overflow-hidden"
                         >
