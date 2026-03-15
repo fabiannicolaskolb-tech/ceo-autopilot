@@ -263,7 +263,7 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
             loading="lazy"
           />
         </div>
-
+      )}
       {/* Hashtags */}
       {hashtags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
