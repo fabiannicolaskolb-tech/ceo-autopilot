@@ -315,9 +315,8 @@ function TopPostsTable({ posts }: { posts: AnalyticsPost[] }) {
       </TableHeader>
       <TableBody>
         {sorted.map(p => {
-          const i = p.metrics.interactions || {};
           const eng = p.metrics.impressions
-            ? (((i.comments || 0) * 3 + (i.shares || 0) * 2 + (i.likes || 0)) / p.metrics.impressions * 100).toFixed(1)
+            ? (((p.metrics.comments || 0) * 3 + (p.metrics.shares || 0) * 2 + (p.metrics.likes || 0)) / p.metrics.impressions * 100).toFixed(1)
             : '0.0';
           return (
             <TableRow key={p.id}>

@@ -70,7 +70,7 @@ export function useCreatorScore() {
         .from('posts')
         .select('id, posted_at, metrics, status')
         .eq('user_id', user!.id)
-        .eq('status', 'posted');
+        .in('status', ['posted', 'analyzed']);
       if (error) throw error;
       return data;
     },
