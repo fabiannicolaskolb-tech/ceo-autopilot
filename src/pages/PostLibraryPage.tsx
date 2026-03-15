@@ -431,63 +431,80 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
   };
 
   return (
-    <div className={cn(GLASS_CARD, 'p-4 border-l-4 border-l-primary space-y-3')}>
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          {post.hook && (
-            <p className="font-playfair text-sm font-semibold text-foreground line-clamp-1">{post.hook}</p>
-          )}
-          {editing ? (
-            <div className="space-y-2 mt-1">
-              <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} className="text-xs" />
-              <div className="flex gap-2">
-                <Button size="sm" className="text-xs h-7" onClick={handleSaveEdit} disabled={saving}>
-                  {saving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}Speichern
-                </Button>
-                <Button size="sm" variant="ghost" className="text-xs h-7" onClick={() => { setEditing(false); setEditContent(post.content || ''); }}>Abbrechen</Button>
-              </div>
+    <div className={cn(GLASS_CARD, 'overflow-hidden border-l-4 border-l-primary')}>
+      {/* Image preview if available */}
+      {post.image_url && (
+        <div className="w-full h-32 overflow-hidden">
+          <img src={post.image_url} alt="Post Bild" className="w-full h-full object-cover" loading="lazy" />
+        </div>
+      )}
+
+      <div className="p-4 space-y-3">
+        {/* Header row */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            {post.hook && (
+              <p className="font-playfair text-sm font-semibold text-foreground line-clamp-1">{post.hook}</p>
+            )}
+            <div className="flex items-center gap-2 mt-1">
+              {post.type && <Badge variant="outline" className="text-[10px] rounded-full">{post.type}</Badge>}
+              {post.angle && <Badge variant="outline" className="text-[10px] rounded-full">{post.angle}</Badge>}
             </div>
-          ) : (
-            <p className="text-xs text-muted-foreground line-clamp-3 mt-1 whitespace-pre-line">{post.content || '—'}</p>
-          )}
+          </div>
+          <div className="text-right shrink-0">
+            <span className="text-[10px] text-muted-foreground block">
+              {format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}
+            </span>
+            <span className="text-[10px] text-muted-foreground">
+              {format(new Date(post.created_at), 'HH:mm', { locale: de })} Uhr
+            </span>
+          </div>
         </div>
-        <Badge variant="outline" className="text-[10px] rounded-full shrink-0">
-          {format(new Date(post.created_at), 'dd.MM.', { locale: de })}
-        </Badge>
-      </div>
-      {!editing && post.type && (
-        <div className="flex gap-1.5">
-          <Badge variant="outline" className="text-[10px] rounded-full">{post.type}</Badge>
-          {post.angle && <Badge variant="outline" className="text-[10px] rounded-full">{post.angle}</Badge>}
-        </div>
-      )}
-      {!editing && (
-        <div className="flex items-center gap-2 pt-1">
-          <Button size="sm" className="text-xs h-8 flex-1" onClick={handleApprove}>
-            <Check className="h-3 w-3 mr-1" /> Freigeben
-          </Button>
-          <Button size="sm" variant="ghost" className="text-xs h-8" onClick={() => setEditing(true)}>
-            <Pencil className="h-3 w-3 mr-1" /> Bearbeiten
-          </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
-                <Trash2 className="h-3 w-3 mr-1" /> Ablehnen
+
+        {/* Content */}
+        {editing ? (
+          <div className="space-y-2">
+            <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} className="text-xs" />
+            <div className="flex gap-2">
+              <Button size="sm" className="text-xs h-7" onClick={handleSaveEdit} disabled={saving}>
+                {saving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}Speichern
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Post ablehnen?</AlertDialogTitle>
-                <AlertDialogDescription>Der Post wird unwiderruflich gelöscht.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                <AlertDialogAction onClick={handleReject}>Ablehnen & Löschen</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      )}
+              <Button size="sm" variant="ghost" className="text-xs h-7" onClick={() => { setEditing(false); setEditContent(post.content || ''); }}>Abbrechen</Button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground line-clamp-3 whitespace-pre-line leading-relaxed">{post.content || '—'}</p>
+        )}
+
+        {/* Actions */}
+        {!editing && (
+          <div className="flex items-center gap-2 pt-1 border-t border-border/50">
+            <Button size="sm" className="text-xs h-8 flex-1" onClick={handleApprove}>
+              <Check className="h-3 w-3 mr-1" /> Freigeben
+            </Button>
+            <Button size="sm" variant="ghost" className="text-xs h-8" onClick={() => setEditing(true)}>
+              <Pencil className="h-3 w-3 mr-1" /> Bearbeiten
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Post ablehnen?</AlertDialogTitle>
+                  <AlertDialogDescription>Der Post wird unwiderruflich gelöscht.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleReject}>Ablehnen & Löschen</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -542,7 +559,9 @@ export default function PostLibraryPage() {
   const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar' | 'feed'>('list');
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const pendingApproval = useMemo(() => posts.filter(p => p.status === 'draft'), [posts, refreshKey]);
+  const pendingApproval = useMemo(() =>
+    posts.filter(p => p.status === 'draft').sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+    [posts, refreshKey]);
   const drafts = useMemo(() => posts.filter(p => ['draft', 'approved', 'scheduled'].includes(p.status)), [posts, refreshKey]);
   const published = useMemo(() => posts.filter(p => ['posted', 'analyzed'].includes(p.status)), [posts, refreshKey]);
 
