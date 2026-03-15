@@ -402,7 +402,7 @@ export default function OnboardingPage() {
 
       <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-border bg-card/95 backdrop-blur-sm px-6 py-4">
         <div className="mx-auto flex max-w-2xl items-center justify-end gap-3">
-          <Button variant="outline" onClick={() => setStep(s => s - 1)} disabled={step === 1}>
+          <Button variant="outline" className="mr-auto" onClick={() => setStep(s => s - 1)} disabled={step === 1}>
             Zurück
           </Button>
           {step < totalSteps ? (
