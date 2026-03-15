@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X, GripVertical, Wifi, WifiOff } from 'lucide-react';
+import { Plus, X, GripVertical, Wifi, WifiOff, Loader2, Link as LinkIcon, Download } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PhotoUpload from '@/components/PhotoUpload';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,7 +37,8 @@ export default function ProfilePage() {
   const [tone, setTone] = useState('visionary');
   const [focusInput, setFocusInput] = useState('');
   const [noGoInput, setNoGoInput] = useState('');
-
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [scraping, setScraping] = useState(false);
   useEffect(() => {
     if (profile) {
       setName(profile.name || '');
@@ -46,6 +47,7 @@ export default function ProfilePage() {
       setIndustry(profile.industry || '');
       setTargetAudience(profile.target_audience || '');
       setTone(profile.tone || 'visionary');
+      setLinkedinUrl(profile.linkedin_url || '');
     }
   }, [profile]);
 
@@ -87,10 +89,36 @@ export default function ProfilePage() {
 
   const save = async () => {
     try {
-      await updateProfile({ name, company, role, industry, target_audience: targetAudience, tone });
+      await updateProfile({ name, company, role, industry, target_audience: targetAudience, tone, linkedin_url: linkedinUrl || null });
       toast({ title: 'Profil gespeichert' });
     } catch (err: any) {
       toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
+    }
+  };
+
+  const handleScrapeProfile = async () => {
+    if (!linkedinUrl.trim()) {
+      toast({ title: 'Bitte LinkedIn-URL eingeben', variant: 'destructive' });
+      return;
+    }
+    setScraping(true);
+    try {
+      // Save the URL first
+      await updateProfile({ linkedin_url: linkedinUrl.trim() });
+      
+      const { data, error } = await supabase.functions.invoke('scrape-linkedin', {
+        body: { linkedin_url: linkedinUrl.trim(), user_id: user?.id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      
+      await refreshProfile();
+      toast({ title: 'LinkedIn-Profil importiert', description: 'Name, Bio und Profilbild wurden aktualisiert.' });
+    } catch (err: any) {
+      console.error('Scrape error:', err);
+      toast({ title: 'Fehler beim Import', description: err?.message || 'LinkedIn-Profil konnte nicht importiert werden.', variant: 'destructive' });
+    } finally {
+      setScraping(false);
     }
   };
 
@@ -170,19 +198,47 @@ export default function ProfilePage() {
 
       <div className={cn(GLASS_CARD, 'p-6')}>
         <h2 className="font-playfair text-base font-semibold text-foreground mb-4">LinkedIn Verbindung</h2>
-        <div className="flex items-center gap-3">
-          {profile?.linkedin_connected ? (
-            <>
-              <Wifi className="h-5 w-5 text-success" />
-              <span className="text-sm text-foreground">Verbunden</span>
-            </>
-          ) : (
-            <>
-              <WifiOff className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Nicht verbunden</span>
-              <Button size="sm" variant="outline" disabled>Verbinden (in Kürze verfügbar)</Button>
-            </>
-          )}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>LinkedIn-Profil URL</Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={linkedinUrl}
+                  onChange={e => setLinkedinUrl(e.target.value)}
+                  placeholder="https://linkedin.com/in/dein-name"
+                  className="bg-card/60 pl-9"
+                />
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleScrapeProfile}
+                disabled={scraping || !linkedinUrl.trim()}
+                className="shrink-0"
+              >
+                {scraping ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <Download className="h-4 w-4 mr-1.5" />}
+                {scraping ? 'Importiere...' : 'Profil importieren'}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Importiert Name, Bio und Profilbild von LinkedIn. Die URL wird auch für den Post-Import auf der Analytics-Seite verwendet.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {linkedinUrl ? (
+              <>
+                <Wifi className="h-4 w-4 text-success" />
+                <span className="text-sm text-success">LinkedIn-URL hinterlegt</span>
+              </>
+            ) : (
+              <>
+                <WifiOff className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Keine LinkedIn-URL hinterlegt</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
