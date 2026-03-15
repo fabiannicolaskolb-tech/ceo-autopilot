@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { FileText, TrendingUp, CalendarDays, Rocket, Loader2, Brain, ArrowUpRight, ArrowDownRight, Lightbulb, GalleryHorizontalEnd, BarChart3 } from 'lucide-react';
+import { FileText, TrendingUp, CalendarDays, Rocket, Loader2, Brain, ArrowUpRight, ArrowDownRight, Lightbulb, GalleryHorizontalEnd, BarChart3, ChevronDown } from 'lucide-react';
 import DailyBriefing from '@/components/DailyBriefing';
 import { useAuth } from '@/hooks/useAuth';
 import { usePosts, usePipelineStatus } from '@/hooks/useRealtime';
@@ -10,6 +10,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Sparkline } from '@/components/Sparkline';
 import { MeshBackground } from '@/components/MeshBackground';
 import CreatorScoreCard from '@/components/CreatorScoreCard';
+import { useCreatorScore } from '@/hooks/useCreatorScore';
 import { format, subDays, startOfDay } from 'date-fns';
 import { de } from 'date-fns/locale';
 
