@@ -278,31 +278,30 @@ export default function IdeationPage() {
     },
   });
 
-  const saveInsightAsPost = useMutation({
-    mutationFn: async (keyPoint: string) => {
-      const { error } = await supabase.from('posts').insert({
-        user_id: user!.id,
-        content: keyPoint,
-        status: 'draft',
-        type: 'Voice Insight',
-        content_category: 'Voice Copilot',
+  const [selectedInsights, setSelectedInsights] = useState<string[]>([]);
+
+  const toggleInsightForNextPost = (keyPoint: string) => {
+    setSelectedInsights(prev => {
+      const isSelected = prev.includes(keyPoint);
+      const updated = isSelected ? prev.filter(p => p !== keyPoint) : [...prev, keyPoint];
+      toast({
+        title: isSelected ? 'Erkenntnis entfernt' : 'Erkenntnis vorgemerkt',
+        description: isSelected
+          ? 'Wird nicht mehr für den nächsten Post genutzt.'
+          : 'Wird als Grundlage für den nächsten Post genutzt.',
       });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({ title: 'Post-Entwurf erstellt', description: 'Erkenntnis wurde als Draft gespeichert.' });
-    },
-    onError: (err: any) => {
-      toast({ title: 'Fehler', description: err?.message, variant: 'destructive' });
-    },
-  });
+      return updated;
+    });
+  };
 
   const generatePost = async () => {
     setGenerating(true);
     try {
       const requestId = crypto.randomUUID();
       const payload = {
-        input: '__post_only__',
+        input: selectedInsights.length > 0
+          ? `Nutze folgende persönliche Erkenntnisse als Grundlage:\n\n${selectedInsights.map((s, i) => `${i + 1}. ${s}`).join('\n')}`
+          : '__post_only__',
         profile: {
           name: profile?.name,
           company: profile?.company,
@@ -399,9 +398,16 @@ export default function IdeationPage() {
                       </span>
                     </div>
                   ) : (
-                    <InteractiveHoverButton onClick={generatePost}>
-                      Post generieren
-                    </InteractiveHoverButton>
+                    <>
+                      <InteractiveHoverButton onClick={generatePost}>
+                        Post generieren
+                      </InteractiveHoverButton>
+                      {selectedInsights.length > 0 && (
+                        <p className="text-xs text-primary mt-2">
+                          {selectedInsights.length} Erkenntnis{selectedInsights.length > 1 ? 'se' : ''} als Grundlage ausgewählt
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -546,13 +552,21 @@ export default function IdeationPage() {
                       </span>
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant={selectedInsights.includes(point) ? "default" : "outline"}
                         className="rounded-sm text-xs"
-                        onClick={() => saveInsightAsPost.mutate(point)}
-                        disabled={saveInsightAsPost.isPending}
+                        onClick={() => toggleInsightForNextPost(point)}
                       >
-                        Als Post übernehmen
-                        <ArrowRight className="h-3 w-3 ml-1" />
+                        {selectedInsights.includes(point) ? (
+                          <>
+                            <Check className="h-3 w-3 mr-1" />
+                            Vorgemerkt
+                          </>
+                        ) : (
+                          <>
+                            Für nächsten Post nutzen
+                            <ArrowRight className="h-3 w-3 ml-1" />
+                          </>
+                        )}
                       </Button>
                     </div>
                   </CardContent>
