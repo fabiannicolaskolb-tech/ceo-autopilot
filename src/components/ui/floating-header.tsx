@@ -175,7 +175,6 @@ export function FloatingHeader() {
                 </SheetContent>
               </Sheet>
             </div>
-          )}
         </div>
       </div>
     </header>
