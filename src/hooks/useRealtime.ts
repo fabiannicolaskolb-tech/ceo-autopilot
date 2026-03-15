@@ -165,21 +165,19 @@ export function usePosts(userId: string | undefined) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchPosts = async () => {
-    if (!userId) return;
-    const { data } = await supabase
-      .from("posts")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
-
-    if (data) setPosts(data as Post[]);
-    setLoading(false);
-  };
-
   useEffect(() => {
     if (!userId) return;
 
+    const fetchPosts = async () => {
+      const { data } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+      if (data) setPosts(data as Post[]);
+      setLoading(false);
+    };
     fetchPosts();
 
     const channel = supabase
@@ -201,8 +199,6 @@ export function usePosts(userId: string | undefined) {
                 p.id === (payload.new as Post).id ? (payload.new as Post) : p
               )
             );
-          } else if (payload.eventType === "DELETE" && payload.old && "id" in payload.old) {
-            setPosts((prev) => prev.filter((p) => p.id !== (payload.old as Post).id));
           }
         }
       )
@@ -213,7 +209,7 @@ export function usePosts(userId: string | undefined) {
     };
   }, [userId]);
 
-  return { posts, loading, refetch: fetchPosts };
+  return { posts, loading };
 }
 
 // ============================================

@@ -393,22 +393,14 @@ function GalleryGrid({ posts, onPostClick }: { posts: any[]; onPostClick?: (post
 function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
   const handleApprove = async () => {
     const { error } = await supabase.from('posts').update({ status: 'approved' }).eq('id', post.id);
-    if (error) { 
-      console.error('Approve error:', error);
-      toast({ title: 'Fehler beim Freigeben', description: error.message, variant: 'destructive' }); 
-      return; 
-    }
+    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
     toast({ title: 'Post freigegeben ✓' });
     onMutate();
   };
 
   const handleReject = async () => {
     const { error } = await supabase.from('posts').delete().eq('id', post.id);
-    if (error) { 
-      console.error('Reject error:', error);
-      toast({ title: 'Fehler beim Ablehnen', description: error.message, variant: 'destructive' }); 
-      return; 
-    }
+    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
     toast({ title: 'Post abgelehnt und gelöscht' });
     onMutate();
   };
@@ -502,17 +494,18 @@ function FeedView({ posts, profile }: { posts: any[]; profile: any }) {
 // ──── Main Page ────
 export default function PostLibraryPage() {
   const { user, profile } = useAuth();
-  const { posts, loading, refetch } = usePosts(user?.id);
+  const { posts, loading } = usePosts(user?.id);
   const [tab, setTab] = useState<'drafts' | 'published'>('drafts');
   const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar' | 'feed'>('list');
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const pendingApproval = useMemo(() => posts.filter(p => p.status === 'draft'), [posts]);
-  const drafts = useMemo(() => posts.filter(p => ['draft', 'approved', 'scheduled'].includes(p.status)), [posts]);
-  const published = useMemo(() => posts.filter(p => ['posted', 'analyzed'].includes(p.status)), [posts]);
+  const pendingApproval = useMemo(() => posts.filter(p => p.status === 'draft'), [posts, refreshKey]);
+  const drafts = useMemo(() => posts.filter(p => ['draft', 'approved', 'scheduled'].includes(p.status)), [posts, refreshKey]);
+  const published = useMemo(() => posts.filter(p => ['posted', 'analyzed'].includes(p.status)), [posts, refreshKey]);
 
   const currentPosts = tab === 'drafts' ? drafts : published;
 
-  const handleMutate = () => refetch();
+  const handleMutate = () => setRefreshKey(k => k + 1);
 
 
   // Dummy handler for gallery/calendar clicks (scrolls to card view)
