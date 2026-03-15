@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FileText, TrendingUp, CalendarDays, Rocket, Loader2, Brain, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { FileText, TrendingUp, CalendarDays, Rocket, Loader2, Brain, ArrowUpRight, ArrowDownRight, Lightbulb, GalleryHorizontalEnd, BarChart3 } from 'lucide-react';
 import DailyBriefing from '@/components/DailyBriefing';
 import { useAuth } from '@/hooks/useAuth';
 import { usePosts, usePipelineStatus } from '@/hooks/useRealtime';
