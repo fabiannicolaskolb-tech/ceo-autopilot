@@ -277,14 +277,13 @@ function TopPostsTable({ posts }: { posts: AnalyticsPost[] }) {
   const sorted = useMemo(() => {
     return [...posts].sort((a, b) => {
       const ma = a.metrics, mb = b.metrics;
-      const ia = ma.interactions || {}, ib = mb.interactions || {};
       switch (sortKey) {
         case 'impressions': return (mb.impressions || 0) - (ma.impressions || 0);
         case 'ctr': return (mb.ctr || 0) - (ma.ctr || 0);
-        case 'comments': return (ib.comments || 0) - (ia.comments || 0);
+        case 'comments': return (mb.comments || 0) - (ma.comments || 0);
         case 'engagement': {
-          const eA = ma.impressions ? ((ia.comments || 0) * 3 + (ia.shares || 0) * 2 + (ia.likes || 0)) / ma.impressions * 100 : 0;
-          const eB = mb.impressions ? ((ib.comments || 0) * 3 + (ib.shares || 0) * 2 + (ib.likes || 0)) / mb.impressions * 100 : 0;
+          const eA = ma.impressions ? ((ma.comments || 0) * 3 + (ma.shares || 0) * 2 + (ma.likes || 0)) / ma.impressions * 100 : 0;
+          const eB = mb.impressions ? ((mb.comments || 0) * 3 + (mb.shares || 0) * 2 + (mb.likes || 0)) / mb.impressions * 100 : 0;
           return eB - eA;
         }
         default: return 0;
