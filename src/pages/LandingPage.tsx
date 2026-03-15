@@ -11,7 +11,7 @@ import { InteractiveHoverButton } from '@/components/ui/interactive-hover-button
 import { Button } from '@/components/ui/button';
 import { TypingAnimation } from '@/components/ui/typing-animation';
 import analyticsPreview from '@/assets/analytics-preview.png';
-import calendarPreview from '@/assets/calendar-preview.png';
+import calendarPreview from '@/assets/ki-optimierung-preview.png';
 
 const features = [
 {
