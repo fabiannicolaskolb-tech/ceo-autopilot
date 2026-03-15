@@ -113,7 +113,8 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
+      <Particles className="absolute inset-0 z-0" quantity={150} color={theme === 'dark' ? '#8899bb' : '#1a2740'} size={0.5} burst={burstKey} />
       <div className="sticky top-0 z-10 bg-card border-b border-border">
         <Progress value={progress} className="h-1 rounded-none" />
         <div className="flex items-center justify-between px-6 py-3">
