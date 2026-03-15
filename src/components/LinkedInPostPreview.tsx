@@ -130,26 +130,28 @@ export function LinkedInPostPreview({
         </div>
       )}
 
-      {/* Divider */}
-      <div className="mx-4 border-t border-[#e0e0e0] dark:border-[#333]" />
-
-      {/* Action bar */}
-      <div className="flex items-center justify-around px-2 py-1">
-        {[
-          { icon: ThumbsUp, label: 'Gefällt mir' },
-          { icon: MessageCircle, label: 'Kommentieren' },
-          { icon: Repeat2, label: 'Reposten' },
-          { icon: Send, label: 'Senden' },
-        ].map(({ icon: Icon, label }) => (
-          <button
-            key={label}
-            className="flex items-center gap-1.5 px-3 py-2.5 rounded-md text-xs font-medium text-[#666] dark:text-[#999] hover:text-[#191919] dark:hover:text-white hover:bg-[#f5f5f5] dark:hover:bg-[#333] transition-colors"
-          >
-            <Icon className="h-4 w-4" />
-            <span className="hidden sm:inline">{label}</span>
-          </button>
-        ))}
-      </div>
+      {/* Divider + Action bar */}
+      {showActions && (
+        <>
+          <div className="mx-4 border-t border-[#e0e0e0] dark:border-[#333]" />
+          <div className="flex items-center justify-around px-2 py-1">
+            {[
+              { icon: ThumbsUp, label: 'Gefällt mir' },
+              { icon: MessageCircle, label: 'Kommentieren' },
+              { icon: Repeat2, label: 'Reposten' },
+              { icon: Send, label: 'Senden' },
+            ].map(({ icon: Icon, label }) => (
+              <button
+                key={label}
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-md text-xs font-medium text-[#666] dark:text-[#999] hover:text-[#191919] dark:hover:text-white hover:bg-[#f5f5f5] dark:hover:bg-[#333] transition-colors"
+              >
+                <Icon className="h-4 w-4" />
+                <span className="hidden sm:inline">{label}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
