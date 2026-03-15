@@ -207,7 +207,7 @@ export default function PricingPage() {
                           : 'bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.1] border border-border/50'
                       }`}
                     >
-                      Get Started
+                      {t('pricing.cta')}
                     </Button>
                   ) : (
                     <Button
