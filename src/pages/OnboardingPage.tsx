@@ -134,17 +134,17 @@ export default function OnboardingPage() {
               <ShimmerText className="font-playfair text-3xl font-bold text-foreground">Willkommen bei CEO Autopilot</ShimmerText>
               <p className="mt-2 text-muted-foreground">Ihr LinkedIn-Autopilot für strategische Sichtbarkeit</p>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-3">
               {[
                 { icon: Lightbulb, title: 'Ideation Lab', desc: 'KI-gestützte Content-Ideen aus Ihrem Alltag' },
                 { icon: CalendarDays, title: 'Content Gallery', desc: 'Strategische Planung Ihres LinkedIn-Auftritts' },
                 { icon: BarChart3, title: 'AI Analytics', desc: 'Datengetriebene Optimierung Ihrer Reichweite' },
               ].map(f => (
                 <Card key={f.title} className="border-border shadow-sm hover:shadow-md transition-shadow">
-                  <CardContent className="flex flex-col items-center p-6 text-center">
-                    <f.icon className="mb-3 h-8 w-8 text-primary" />
-                    <h3 className="font-playfair text-sm font-semibold">{f.title}</h3>
-                    <p className="mt-1 text-xs text-muted-foreground">{f.desc}</p>
+                  <CardContent className="flex flex-col items-center p-10 text-center">
+                    <f.icon className="mb-4 h-12 w-12 text-primary" />
+                    <h3 className="font-playfair text-base font-semibold">{f.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{f.desc}</p>
                   </CardContent>
                 </Card>
               ))}
