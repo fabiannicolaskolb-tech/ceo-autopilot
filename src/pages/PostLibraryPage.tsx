@@ -452,7 +452,7 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
 
 // ──── Main Page ────
 export default function PostLibraryPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { posts, loading } = usePosts(user?.id);
   const [tab, setTab] = useState<'drafts' | 'published'>('drafts');
   const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar' | 'feed'>('list');
