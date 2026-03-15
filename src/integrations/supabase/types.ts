@@ -18,36 +18,42 @@ export type Database = {
         Row: {
           created_at: string | null
           cycle_number: number | null
+          has_history: boolean | null
           id: string
           ideas: Json
           raw_experience: string | null
           request_id: string | null
           selected_idea_index: number | null
           status: string | null
+          strategy_note: string | null
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
           created_at?: string | null
           cycle_number?: number | null
+          has_history?: boolean | null
           id?: string
           ideas?: Json
           raw_experience?: string | null
           request_id?: string | null
           selected_idea_index?: number | null
           status?: string | null
+          strategy_note?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
           created_at?: string | null
           cycle_number?: number | null
+          has_history?: boolean | null
           id?: string
           ideas?: Json
           raw_experience?: string | null
           request_id?: string | null
           selected_idea_index?: number | null
           status?: string | null
+          strategy_note?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -117,14 +123,18 @@ export type Database = {
       posts: {
         Row: {
           angle: string | null
+          confidence_score: number | null
           content: string | null
           content_category: string | null
           created_at: string
+          hashtags: Json | null
           hook: string | null
           id: string
+          image_url: string | null
           linkedin_post_id: string | null
           metrics: Json | null
           posted_at: string | null
+          reasoning: string | null
           scheduled_at: string | null
           status: string
           type: string | null
@@ -133,14 +143,18 @@ export type Database = {
         }
         Insert: {
           angle?: string | null
+          confidence_score?: number | null
           content?: string | null
           content_category?: string | null
           created_at?: string
+          hashtags?: Json | null
           hook?: string | null
           id?: string
+          image_url?: string | null
           linkedin_post_id?: string | null
           metrics?: Json | null
           posted_at?: string | null
+          reasoning?: string | null
           scheduled_at?: string | null
           status?: string
           type?: string | null
@@ -149,14 +163,18 @@ export type Database = {
         }
         Update: {
           angle?: string | null
+          confidence_score?: number | null
           content?: string | null
           content_category?: string | null
           created_at?: string
+          hashtags?: Json | null
           hook?: string | null
           id?: string
+          image_url?: string | null
           linkedin_post_id?: string | null
           metrics?: Json | null
           posted_at?: string | null
+          reasoning?: string | null
           scheduled_at?: string | null
           status?: string
           type?: string | null
