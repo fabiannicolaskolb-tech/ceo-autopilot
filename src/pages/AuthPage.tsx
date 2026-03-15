@@ -111,7 +111,7 @@ export default function AuthPage() {
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
             <Zap className="h-6 w-6 text-primary-foreground" />
           </div>
-          <CardTitle className="font-playfair text-2xl">CEO Autopilot</CardTitle>
+          <CardTitle className="font-playfair text-2xl">Briefly</CardTitle>
           <CardDescription className="font-inter text-xs uppercase tracking-widest text-muted-foreground">LinkedIn</CardDescription>
         </CardHeader>
         <CardContent>

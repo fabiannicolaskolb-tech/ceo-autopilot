@@ -50,7 +50,7 @@ export default function PricingPage() {
               <Zap className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="font-playfair text-[15px] font-semibold tracking-tight text-foreground">
-              CEO Autopilot
+              Briefly
             </span>
           </Link>
           <div className="flex items-center gap-2">

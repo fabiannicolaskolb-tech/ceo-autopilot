@@ -218,7 +218,7 @@ export default function OnboardingPage() {
         {step === 1 &&
         <div className="space-y-8">
             <div className="text-center">
-              <ShimmerText className="font-playfair text-3xl font-bold text-foreground">Willkommen bei CEO Autopilot</ShimmerText>
+              <ShimmerText className="font-playfair text-3xl font-bold text-foreground">Willkommen bei Briefly</ShimmerText>
               <p className="mt-2 text-muted-foreground">Ihr LinkedIn-Autopilot für strategische Sichtbarkeit</p>
             </div>
             <div className="grid gap-6 sm:grid-cols-3">
