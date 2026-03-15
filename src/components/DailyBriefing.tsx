@@ -28,6 +28,12 @@ interface BriefingMetrics {
   engagementRate: number;
 }
 
+interface GeneratedBriefingData {
+  whatWorked: string[];
+  recommendedFollowUps: string[];
+  performanceSummary: string | null;
+}
+
 export default function DailyBriefing() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -41,15 +47,15 @@ export default function DailyBriefing() {
   const [duration, setDuration] = useState(0);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [generatedData, setGeneratedData] = useState<GeneratedBriefingData | null>(null);
+  const [generatedMetrics, setGeneratedMetrics] = useState<BriefingMetrics | null>(null);
 
-  // Fetch posts & audio
+  // Fetch posts & audio — no strict time filter, load newest analyzed posts
   useEffect(() => {
     if (!user?.id) return;
 
     const fetchData = async () => {
       setLoading(true);
-
-      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
       const [postsResult, filesResult] = await Promise.all([
         supabase
@@ -57,8 +63,8 @@ export default function DailyBriefing() {
           .select('*')
           .eq('status', 'analyzed')
           .eq('user_id', user.id)
-          .gte('updated_at', twentyFourHoursAgo)
-          .order('updated_at', { ascending: false }),
+          .order('updated_at', { ascending: false })
+          .limit(10),
         supabase.storage
           .from('briefings')
           .list(user.id, { limit: 1, sortBy: { column: 'created_at', order: 'desc' } }),
@@ -78,7 +84,6 @@ export default function DailyBriefing() {
 
     fetchData();
 
-    // Refresh on tab focus
     const onFocus = () => fetchData();
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
@@ -124,8 +129,40 @@ export default function DailyBriefing() {
     audio.currentTime = ratio * duration;
   }, [duration]);
 
-  // Aggregate metrics
+  const handleGenerate = useCallback(async () => {
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-briefing');
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (data?.audioUrl) {
+        setAudioUrl(data.audioUrl);
+      }
+      if (data?.metrics) {
+        setGeneratedMetrics({
+          impressions: data.metrics.impressions || 0,
+          likes: data.metrics.likes || 0,
+          comments: data.metrics.comments || 0,
+          engagementRate: data.metrics.engagementRate || 0,
+        });
+        setGeneratedData({
+          whatWorked: data.metrics.whatWorked || [],
+          recommendedFollowUps: data.metrics.recommendedFollowUps || [],
+          performanceSummary: data.metrics.performanceSummary || null,
+        });
+      }
+      toast({ title: 'Briefing erstellt', description: 'Ihr Audio-Briefing ist bereit.' });
+    } catch (err: any) {
+      console.error('Briefing generation error:', err);
+      toast({ title: 'Fehler', description: err?.message || 'Briefing konnte nicht generiert werden.', variant: 'destructive' });
+    } finally {
+      setGenerating(false);
+    }
+  }, [toast]);
+
+  // Aggregate metrics from posts or use generated metrics
   const metrics = useMemo<BriefingMetrics>(() => {
+    if (generatedMetrics) return generatedMetrics;
     let impressions = 0, likes = 0, comments = 0, engTotal = 0, engCount = 0;
     posts.forEach(p => {
       const m = p.metrics as any;
@@ -144,7 +181,7 @@ export default function DailyBriefing() {
       comments,
       engagementRate: engCount > 0 ? Math.round((engTotal / engCount) * 10) / 10 : 0,
     };
-  }, [posts]);
+  }, [posts, generatedMetrics]);
 
   // Best post by score
   const bestPost = useMemo(() => {
@@ -158,10 +195,27 @@ export default function DailyBriefing() {
 
   const bestMetrics = bestPost?.metrics as any;
 
+  // Use generated data if available, otherwise fall back to bestPost metrics
+  const displayWhatWorked = generatedData?.whatWorked?.length ? generatedData.whatWorked : bestMetrics?.what_worked || [];
+  const displayFollowUps = generatedData?.recommendedFollowUps?.length ? generatedData.recommendedFollowUps : bestMetrics?.recommended_follow_ups || [];
+  const displaySummary = generatedData?.performanceSummary || bestMetrics?.performance_summary || null;
+
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  // Empty state
-  if (!loading && posts.length === 0) {
+  const GenerateButton = () => (
+    <Button
+      size="sm"
+      onClick={handleGenerate}
+      disabled={generating}
+      className="shrink-0 bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30 border-0"
+    >
+      {generating ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <RefreshCw className="h-4 w-4 mr-1.5" />}
+      {generating ? 'Generiere...' : 'Generieren'}
+    </Button>
+  );
+
+  // Empty state — still show generate option
+  if (!loading && posts.length === 0 && !audioUrl && !generatedMetrics) {
     return (
       <div className={cn(GLASS_CARD, 'p-6 sm:p-8')}>
         <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -172,6 +226,17 @@ export default function DailyBriefing() {
           <p className="text-sm text-muted-foreground mt-2 max-w-md">
             Sobald dein erster Post analysiert wurde, erscheint hier dein tägliches Morgen-Briefing mit Performance-Daten und KI-Empfehlungen.
           </p>
+          {user && (
+            <Button
+              onClick={handleGenerate}
+              disabled={generating}
+              className="mt-4"
+              variant="outline"
+            >
+              {generating ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <RefreshCw className="h-4 w-4 mr-1.5" />}
+              {generating ? 'Generiere Briefing...' : 'Briefing jetzt generieren'}
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -247,31 +312,7 @@ export default function DailyBriefing() {
                 <p className="text-xs text-primary-foreground/60 mt-0.5">Generieren Sie jetzt Ihr Morgen-Briefing.</p>
               </div>
             </div>
-            <Button
-              size="sm"
-              onClick={async () => {
-                setGenerating(true);
-                try {
-                  const { data, error } = await supabase.functions.invoke('generate-briefing');
-                  if (error) throw error;
-                  if (data?.error) throw new Error(data.error);
-                  if (data?.audioUrl) {
-                    setAudioUrl(data.audioUrl);
-                    toast({ title: 'Briefing erstellt', description: 'Ihr Audio-Briefing ist bereit.' });
-                  }
-                } catch (err: any) {
-                  console.error('Briefing generation error:', err);
-                  toast({ title: 'Fehler', description: err?.message || 'Briefing konnte nicht generiert werden.', variant: 'destructive' });
-                } finally {
-                  setGenerating(false);
-                }
-              }}
-              disabled={generating}
-              className="shrink-0 bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30 border-0"
-            >
-              {generating ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <RefreshCw className="h-4 w-4 mr-1.5" />}
-              {generating ? 'Generiere...' : 'Generieren'}
-            </Button>
+            <GenerateButton />
           </div>
         )}
       </div>
@@ -292,21 +333,21 @@ export default function DailyBriefing() {
       </div>
 
       {/* Performance Summary */}
-      {bestMetrics?.performance_summary && (
+      {displaySummary && (
         <p className="text-sm text-foreground/80 leading-relaxed italic border-l-2 border-primary/30 pl-4">
-          "{bestMetrics.performance_summary}"
+          "{displaySummary}"
         </p>
       )}
 
       {/* What Worked */}
-      {bestMetrics?.what_worked && bestMetrics.what_worked.length > 0 && (
+      {displayWhatWorked.length > 0 && (
         <div className="space-y-2">
           <h3 className="flex items-center gap-2 text-sm font-medium text-foreground">
             <CheckCircle2 className="h-4 w-4 text-success" />
             Was funktioniert hat
           </h3>
           <ul className="space-y-1.5 pl-6">
-            {bestMetrics.what_worked.map((item: string, i: number) => (
+            {displayWhatWorked.map((item: string, i: number) => (
               <li key={i} className="text-sm text-muted-foreground list-disc">{item}</li>
             ))}
           </ul>
@@ -314,14 +355,14 @@ export default function DailyBriefing() {
       )}
 
       {/* Recommended Follow-ups */}
-      {bestMetrics?.recommended_follow_ups && bestMetrics.recommended_follow_ups.length > 0 && (
+      {displayFollowUps.length > 0 && (
         <div className="space-y-2">
           <h3 className="flex items-center gap-2 text-sm font-medium text-foreground">
             <Lightbulb className="h-4 w-4 text-warning" />
             Nächste Post-Ideen
           </h3>
           <ul className="space-y-1.5 pl-6">
-            {bestMetrics.recommended_follow_ups.map((item: string, i: number) => (
+            {displayFollowUps.map((item: string, i: number) => (
               <li key={i} className="text-sm text-muted-foreground list-disc">{item}</li>
             ))}
           </ul>
