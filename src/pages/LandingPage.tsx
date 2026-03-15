@@ -56,6 +56,7 @@ export default function LandingPage() {
   const { user, profile, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const [expandedFeature, setExpandedFeature] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && user && profile) {
