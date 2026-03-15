@@ -234,8 +234,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Creator Score */}
-      <CreatorScoreCard />
+      {/* Creator Score moved to welcome hero expand */}
 
       {/* AI Learning Progress */}
       <LearningProgressCard posts={posts} />
