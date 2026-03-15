@@ -388,6 +388,67 @@ function GalleryGrid({ posts, onPostClick }: { posts: any[]; onPostClick?: (post
   );
 }
 
+// ──── Approval Card ────
+function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
+  const handleApprove = async () => {
+    const { error } = await supabase.from('posts').update({ status: 'approved' }).eq('id', post.id);
+    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
+    toast({ title: 'Post freigegeben ✓' });
+    onMutate();
+  };
+
+  const handleReject = async () => {
+    const { error } = await supabase.from('posts').delete().eq('id', post.id);
+    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
+    toast({ title: 'Post abgelehnt und gelöscht' });
+    onMutate();
+  };
+
+  return (
+    <div className={cn(GLASS_CARD, 'p-4 border-l-4 border-l-warning space-y-3')}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          {post.hook && (
+            <p className="font-playfair text-sm font-semibold text-foreground line-clamp-1">{post.hook}</p>
+          )}
+          <p className="text-xs text-muted-foreground line-clamp-3 mt-1 whitespace-pre-line">{post.content || '—'}</p>
+        </div>
+        <Badge variant="outline" className="text-[10px] rounded-full shrink-0">
+          {format(new Date(post.created_at), 'dd.MM.', { locale: de })}
+        </Badge>
+      </div>
+      {post.type && (
+        <div className="flex gap-1.5">
+          <Badge variant="outline" className="text-[10px] rounded-full">{post.type}</Badge>
+          {post.angle && <Badge variant="outline" className="text-[10px] rounded-full">{post.angle}</Badge>}
+        </div>
+      )}
+      <div className="flex items-center gap-2 pt-1">
+        <Button size="sm" className="text-xs h-8 flex-1" onClick={handleApprove}>
+          <Check className="h-3 w-3 mr-1" /> Freigeben
+        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
+              <Trash2 className="h-3 w-3 mr-1" /> Ablehnen
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Post ablehnen?</AlertDialogTitle>
+              <AlertDialogDescription>Der Post wird unwiderruflich gelöscht.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+              <AlertDialogAction onClick={handleReject}>Ablehnen & Löschen</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </div>
+  );
+}
+
 // ──── Main Page ────
 export default function PostLibraryPage() {
   const { user } = useAuth();
@@ -396,6 +457,7 @@ export default function PostLibraryPage() {
   const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar'>('list');
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const pendingApproval = useMemo(() => posts.filter(p => p.status === 'draft'), [posts, refreshKey]);
   const drafts = useMemo(() => posts.filter(p => ['draft', 'approved', 'scheduled'].includes(p.status)), [posts, refreshKey]);
   const published = useMemo(() => posts.filter(p => ['posted', 'analyzed'].includes(p.status)), [posts, refreshKey]);
 
@@ -456,6 +518,24 @@ export default function PostLibraryPage() {
           </div>
         )}
       </div>
+
+      {/* Approval Queue */}
+      {!loading && pendingApproval.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-warning/15">
+              <Zap className="h-3.5 w-3.5 text-warning" />
+            </div>
+            <h2 className="font-playfair text-lg font-semibold text-foreground">Zur Freigabe</h2>
+            <Badge variant="secondary" className="text-[10px] rounded-full bg-warning/15 text-warning">{pendingApproval.length}</Badge>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {pendingApproval.map(post => (
+              <ApprovalCard key={post.id} post={post} onMutate={handleMutate} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       {loading ? (
