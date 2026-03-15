@@ -447,6 +447,8 @@ export default function AnalyticsPage() {
               </Popover>
             )}
           </div>
+        </div>
+      </div>
 
       {!hasData ? (
         <EmptyState />
