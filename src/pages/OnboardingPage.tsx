@@ -356,7 +356,7 @@ export default function OnboardingPage() {
         {step === 6 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h1 className="font-playfair text-2xl font-bold">What's your tone?</h1>
+              <h1 className="font-playfair text-2xl font-bold">Your Voice DNA</h1>
               <p className="mt-1 text-muted-foreground">Fügen Sie 3-5 Ihrer besten LinkedIn-Posts ein (500–3.000 Zeichen pro Post)</p>
             </div>
             <div className="space-y-4">
