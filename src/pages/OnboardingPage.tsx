@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X, Upload, Loader2, Linkedin } from 'lucide-react';
+import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X, Upload, Loader2, Linkedin, Check } from 'lucide-react';
 import { Particles } from '@/components/ui/particles';
 import { useTheme } from '@/hooks/useTheme';
 import ShimmerText from '@/components/ui/shimmer-text';
@@ -48,6 +48,7 @@ export default function OnboardingPage() {
   const [avatarUrls, setAvatarUrls] = useState<(string | null)[]>([null, null, null]);
   const [saving, setSaving] = useState(false);
   const [parsingCv, setParsingCv] = useState(false);
+  const [cvUploaded, setCvUploaded] = useState(false);
   const cvInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,6 +80,7 @@ export default function OnboardingPage() {
       }
 
       toast({ title: 'CV erfolgreich ausgelesen!' });
+      setCvUploaded(true);
     } catch (err: any) {
       toast({ title: 'CV konnte nicht ausgelesen werden', description: err?.message, variant: 'destructive' });
     }
@@ -127,7 +129,7 @@ export default function OnboardingPage() {
   const isStepValid = (() => {
     switch (step) {
       case 1: return true;
-      case 2: return name.trim() !== '' && company.trim() !== '' && role.trim() !== '' && industry.trim() !== '';
+      case 2: return name.trim() !== '' && company.trim() !== '' && role.trim() !== '' && industry.trim() !== '' && cvUploaded;
       case 3: return avatarUrls.filter(url => url !== null).length >= 2;
       case 4: return targetAudience.trim() !== '' && tone.trim() !== '';
       case 5: return focusTopics.length > 0;
@@ -279,7 +281,7 @@ export default function OnboardingPage() {
               <p className="text-xs text-muted-foreground">Felder werden automatisch ausgefüllt</p>
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center gap-2">
               <input
                 ref={cvInputRef}
                 type="file"
@@ -289,14 +291,17 @@ export default function OnboardingPage() {
               />
               <Button
                 type="button"
-                variant="outline"
-                className="gap-2"
+                variant={cvUploaded ? "default" : "outline"}
+                className={cn("gap-2", cvUploaded && "bg-green-600 hover:bg-green-700 text-white")}
                 disabled={parsingCv}
                 onClick={() => cvInputRef.current?.click()}
               >
-                {parsingCv ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                {parsingCv ? 'CV wird analysiert...' : 'CV hochladen & automatisch ausfüllen'}
+                {parsingCv ? <Loader2 className="h-4 w-4 animate-spin" /> : cvUploaded ? <Check className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
+                {parsingCv ? 'CV wird analysiert...' : cvUploaded ? 'CV erfolgreich hochgeladen ✓' : 'CV hochladen (Pflicht)'}
               </Button>
+              {!cvUploaded && !parsingCv && (
+                <p className="text-xs text-destructive">Bitte laden Sie Ihren CV hoch, um fortzufahren.</p>
+              )}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
