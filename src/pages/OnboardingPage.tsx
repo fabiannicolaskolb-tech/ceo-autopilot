@@ -84,6 +84,18 @@ export default function OnboardingPage() {
     setBurstKey(k => k + 1);
   }, [step]);
 
+  const isStepValid = (() => {
+    switch (step) {
+      case 1: return true;
+      case 2: return name.trim() !== '' && company.trim() !== '' && role.trim() !== '' && industry.trim() !== '';
+      case 3: return avatarUrls.every(url => url !== null);
+      case 4: return targetAudience.trim() !== '' && tone.trim() !== '';
+      case 5: return focusTopics.length > 0;
+      case 6: return voiceSamples.filter(s => s.trim()).length >= 3;
+      default: return true;
+    }
+  })();
+
   const totalSteps = 6;
   const progress = (step / totalSteps) * 100;
 
@@ -355,9 +367,9 @@ export default function OnboardingPage() {
             Zurück
           </Button>
           {step < totalSteps ? (
-            <InteractiveHoverButton onClick={() => setStep(s => s + 1)}>Weiter</InteractiveHoverButton>
+            <InteractiveHoverButton onClick={() => setStep(s => s + 1)} disabled={!isStepValid}>Weiter</InteractiveHoverButton>
           ) : (
-            <InteractiveHoverButton onClick={handleComplete} disabled={saving}>
+            <InteractiveHoverButton onClick={handleComplete} disabled={saving || !isStepValid}>
               {saving ? 'Wird gespeichert...' : 'Abschließen'}
             </InteractiveHoverButton>
           )}
