@@ -161,42 +161,24 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Bento Grid Stats */}
-      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Drafts Widget */}
-        <div className="flex flex-col overflow-hidden rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]">
-          <div className="p-6 pb-2">
-            <div className="flex items-start justify-between">
-              <div className="rounded-[12px] p-2.5 bg-[#c8ccd5]">
-                <FileText className="h-5 w-5 text-primary" />
-              </div>
-            </div>
-            <div className="mt-4">
-              <p className="text-3xl font-bold text-foreground tracking-tight">{draftCount}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Entwürfe</p>
-            </div>
+      {/* Stats */}
+      <div className="grid gap-5 grid-cols-2 lg:grid-cols-4">
+        {/* Drafts */}
+        <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
+          <div className="rounded-[12px] p-2.5 bg-muted/50 w-fit">
+            <FileText className="h-5 w-5 text-primary" />
           </div>
-          <div className="flex-1 min-h-[60px]">
-            <Sparkline data={draftTrend} color="hsl(220, 55%, 20%)" height={80} width={300} />
-          </div>
+          <p className="text-3xl font-bold text-foreground tracking-tight mt-4">{draftCount}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Entwürfe</p>
         </div>
 
-        {/* Published Widget */}
-        <div className="flex flex-col overflow-hidden rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]">
-          <div className="p-6 pb-2">
-            <div className="flex items-start justify-between">
-              <div className="rounded-[12px] bg-[hsl(160_60%_38%/0.1)] p-2.5">
-                <TrendingUp className="h-5 w-5 text-success" />
-              </div>
-            </div>
-            <div className="mt-4">
-              <p className="text-3xl font-bold text-foreground tracking-tight">{postCount}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Veröffentlicht</p>
-            </div>
+        {/* Published */}
+        <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
+          <div className="rounded-[12px] bg-success/10 p-2.5 w-fit">
+            <TrendingUp className="h-5 w-5 text-success" />
           </div>
-          <div className="flex-1 min-h-[60px]">
-            <Sparkline data={postedTrend} color="hsl(160, 60%, 38%)" height={80} width={300} />
-          </div>
+          <p className="text-3xl font-bold text-foreground tracking-tight mt-4">{postCount}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Veröffentlicht</p>
         </div>
 
         {/* Next Scheduled - spans 2 cols on lg */}
