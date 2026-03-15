@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Sun, Play, Pause, Volume2, CheckCircle2, Lightbulb, AudioLines } from 'lucide-react';
+import { Sun, Play, Pause, Volume2, CheckCircle2, Lightbulb, AudioLines, Loader2, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
 
@@ -28,6 +30,7 @@ interface BriefingMetrics {
 
 export default function DailyBriefing() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
 
@@ -37,6 +40,7 @@ export default function DailyBriefing() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
 
   // Fetch posts & audio
   useEffect(() => {
@@ -235,14 +239,39 @@ export default function DailyBriefing() {
             </div>
           </>
         ) : (
-          <div className="flex items-center gap-3 text-primary-foreground/70">
-            <AudioLines className="h-5 w-5 animate-pulse" />
-            <div>
-              <p className="text-sm font-medium text-primary-foreground">Audio-Briefing wird generiert…</p>
-              {bestMetrics?.voice_briefing_text && (
-                <p className="text-xs text-primary-foreground/60 mt-1 line-clamp-2">{bestMetrics.voice_briefing_text}</p>
-              )}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 text-primary-foreground/70">
+              <AudioLines className="h-5 w-5" />
+              <div>
+                <p className="text-sm font-medium text-primary-foreground">Kein Audio-Briefing vorhanden</p>
+                <p className="text-xs text-primary-foreground/60 mt-0.5">Generieren Sie jetzt Ihr Morgen-Briefing.</p>
+              </div>
             </div>
+            <Button
+              size="sm"
+              onClick={async () => {
+                setGenerating(true);
+                try {
+                  const { data, error } = await supabase.functions.invoke('generate-briefing');
+                  if (error) throw error;
+                  if (data?.error) throw new Error(data.error);
+                  if (data?.audioUrl) {
+                    setAudioUrl(data.audioUrl);
+                    toast({ title: 'Briefing erstellt', description: 'Ihr Audio-Briefing ist bereit.' });
+                  }
+                } catch (err: any) {
+                  console.error('Briefing generation error:', err);
+                  toast({ title: 'Fehler', description: err?.message || 'Briefing konnte nicht generiert werden.', variant: 'destructive' });
+                } finally {
+                  setGenerating(false);
+                }
+              }}
+              disabled={generating}
+              className="shrink-0 bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30 border-0"
+            >
+              {generating ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <RefreshCw className="h-4 w-4 mr-1.5" />}
+              {generating ? 'Generiere...' : 'Generieren'}
+            </Button>
           </div>
         )}
       </div>
