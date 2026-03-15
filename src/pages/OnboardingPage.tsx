@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X } from 'lucide-react';
 import { Particles } from '@/components/ui/particles';
 import { useTheme } from '@/hooks/useTheme';
+import ShimmerText from '@/components/ui/shimmer-text';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import PhotoUpload from '@/components/PhotoUpload';
