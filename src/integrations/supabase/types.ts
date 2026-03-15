@@ -127,6 +127,7 @@ export type Database = {
           content: string | null
           content_category: string | null
           created_at: string
+          cycle_number: number | null
           hashtags: Json | null
           hook: string | null
           id: string
@@ -147,6 +148,7 @@ export type Database = {
           content?: string | null
           content_category?: string | null
           created_at?: string
+          cycle_number?: number | null
           hashtags?: Json | null
           hook?: string | null
           id?: string
@@ -167,6 +169,7 @@ export type Database = {
           content?: string | null
           content_category?: string | null
           created_at?: string
+          cycle_number?: number | null
           hashtags?: Json | null
           hook?: string | null
           id?: string
