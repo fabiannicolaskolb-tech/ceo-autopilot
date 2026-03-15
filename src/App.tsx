@@ -15,6 +15,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import IdeationPage from "@/pages/IdeationPage";
 import PostLibraryPage from "@/pages/PostLibraryPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
+import PricingPage from "@/pages/PricingPage";
 
 import NotFound from "@/pages/NotFound";
 import { Particles } from "@/components/ui/particles";
@@ -33,6 +34,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/onboarding" element={<OnboardingPage />} />
               <Route element={<ProtectedLayout />}>
