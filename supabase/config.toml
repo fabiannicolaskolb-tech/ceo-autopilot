@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.generate-templates]
 verify_jwt = false
+
+[functions.scrape-linkedin-posts]
+verify_jwt = false
