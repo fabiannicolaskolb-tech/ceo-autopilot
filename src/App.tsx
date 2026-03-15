@@ -13,7 +13,6 @@ import OnboardingPage from "@/pages/OnboardingPage";
 import DashboardPage from "@/pages/DashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
 import IdeationPage from "@/pages/IdeationPage";
-import PlannerPage from "@/pages/PlannerPage";
 import PostLibraryPage from "@/pages/PostLibraryPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 
@@ -40,12 +39,12 @@ const App = () => (
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/ideation" element={<IdeationPage />} />
-                <Route path="/planner" element={<PlannerPage />} />
                 <Route path="/post-library" element={<PostLibraryPage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 
               </Route>
               <Route path="/post-queue" element={<Navigate to="/post-library" replace />} />
+              <Route path="/planner" element={<Navigate to="/post-library" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

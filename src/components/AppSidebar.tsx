@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 const navItems = [
-  { title: 'Dashboard', url: '/', icon: LayoutDashboard },
+  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Profil', url: '/profile', icon: User },
   { title: 'Ideation Lab', url: '/ideation', icon: Lightbulb },
   { title: 'Post Library', url: '/post-library', icon: GalleryHorizontalEnd },
