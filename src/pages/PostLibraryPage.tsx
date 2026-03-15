@@ -440,7 +440,9 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content || '');
   const [saving, setSaving] = useState(false);
-  const contentText = post.hook || post.content?.split('\n')[0] || '—';
+  const [expanded, setExpanded] = useState(false);
+  const contentText = post.content || '—';
+  const isLong = contentText.length > 200;
 
   const handleApprove = async () => {
     const { error } = await supabase.from('posts').update({ status: 'approved' }).eq('id', post.id);
@@ -518,7 +520,12 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
           </div>
         ) : (
           <div>
-            <p className="text-sm text-foreground whitespace-pre-line leading-relaxed">{contentText}</p>
+            <p className={cn('text-sm text-foreground whitespace-pre-line leading-relaxed', !expanded && isLong && 'line-clamp-4')}>{contentText}</p>
+            {isLong && (
+              <button onClick={() => setExpanded(!expanded)} className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                {expanded ? <><ChevronUp className="h-3 w-3" /> Weniger anzeigen</> : <><ChevronDown className="h-3 w-3" /> Mehr anzeigen</>}
+              </button>
+            )}
           </div>
         )}
 
