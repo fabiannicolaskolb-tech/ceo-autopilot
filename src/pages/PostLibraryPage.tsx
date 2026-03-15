@@ -720,7 +720,7 @@ export default function PostLibraryPage() {
         ) : (
           <GalleryGrid posts={posts} onPostClick={handlePostClick} />
         )
-      ) : currentPosts.length === 0 ? (
+      ) : currentPosts.length === 0 && (tab !== 'drafts' || pendingApproval.length === 0) ? (
         <EmptyState tab={tab} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
