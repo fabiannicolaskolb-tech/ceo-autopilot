@@ -44,6 +44,8 @@ const STAGE_LABELS: Record<string, string> = {
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
+  const score = useCreatorScore();
+  const [showScore, setShowScore] = useState(false);
   const firstName = profile?.name?.split(' ')[0] ?? 'dort';
   const initials = profile?.name ? profile.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '?';
 
