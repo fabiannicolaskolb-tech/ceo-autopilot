@@ -205,7 +205,7 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
   };
 
   const handleCopy = () => {
-    const text = `${post.content || ''}\n\n${hashtags.map(h => `#${h}`).join(' ')}`.trim();
+    const text = `${post.content || ''}\n\n${hashtags.map(h => h.startsWith('#') ? h : `#${h}`).join(' ')}`.trim();
     navigator.clipboard.writeText(text);
     toast({ title: 'In Zwischenablage kopiert' });
   };
