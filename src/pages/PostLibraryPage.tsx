@@ -391,6 +391,10 @@ function GalleryGrid({ posts, onPostClick }: { posts: any[]; onPostClick?: (post
 
 // ──── Approval Card ────
 function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
+  const [editing, setEditing] = useState(false);
+  const [editContent, setEditContent] = useState(post.content || '');
+  const [saving, setSaving] = useState(false);
+
   const handleApprove = async () => {
     const { error } = await supabase.from('posts').update({ status: 'approved' }).eq('id', post.id);
     if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
@@ -405,6 +409,16 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
     onMutate();
   };
 
+  const handleSaveEdit = async () => {
+    setSaving(true);
+    const { error } = await supabase.from('posts').update({ content: editContent }).eq('id', post.id);
+    setSaving(false);
+    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
+    toast({ title: 'Änderungen gespeichert ✓' });
+    setEditing(false);
+    onMutate();
+  };
+
   return (
     <div className={cn(GLASS_CARD, 'p-4 border-l-4 border-l-warning space-y-3')}>
       <div className="flex items-start justify-between gap-2">
@@ -412,40 +426,57 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
           {post.hook && (
             <p className="font-playfair text-sm font-semibold text-foreground line-clamp-1">{post.hook}</p>
           )}
-          <p className="text-xs text-muted-foreground line-clamp-3 mt-1 whitespace-pre-line">{post.content || '—'}</p>
+          {editing ? (
+            <div className="space-y-2 mt-1">
+              <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} className="text-xs" />
+              <div className="flex gap-2">
+                <Button size="sm" className="text-xs h-7" onClick={handleSaveEdit} disabled={saving}>
+                  {saving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}Speichern
+                </Button>
+                <Button size="sm" variant="ghost" className="text-xs h-7" onClick={() => { setEditing(false); setEditContent(post.content || ''); }}>Abbrechen</Button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground line-clamp-3 mt-1 whitespace-pre-line">{post.content || '—'}</p>
+          )}
         </div>
         <Badge variant="outline" className="text-[10px] rounded-full shrink-0">
           {format(new Date(post.created_at), 'dd.MM.', { locale: de })}
         </Badge>
       </div>
-      {post.type && (
+      {!editing && post.type && (
         <div className="flex gap-1.5">
           <Badge variant="outline" className="text-[10px] rounded-full">{post.type}</Badge>
           {post.angle && <Badge variant="outline" className="text-[10px] rounded-full">{post.angle}</Badge>}
         </div>
       )}
-      <div className="flex items-center gap-2 pt-1">
-        <Button size="sm" className="text-xs h-8 flex-1" onClick={handleApprove}>
-          <Check className="h-3 w-3 mr-1" /> Freigeben
-        </Button>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
-              <Trash2 className="h-3 w-3 mr-1" /> Ablehnen
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Post ablehnen?</AlertDialogTitle>
-              <AlertDialogDescription>Der Post wird unwiderruflich gelöscht.</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-              <AlertDialogAction onClick={handleReject}>Ablehnen & Löschen</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+      {!editing && (
+        <div className="flex items-center gap-2 pt-1">
+          <Button size="sm" className="text-xs h-8 flex-1" onClick={handleApprove}>
+            <Check className="h-3 w-3 mr-1" /> Freigeben
+          </Button>
+          <Button size="sm" variant="ghost" className="text-xs h-8" onClick={() => setEditing(true)}>
+            <Pencil className="h-3 w-3 mr-1" /> Bearbeiten
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
+                <Trash2 className="h-3 w-3 mr-1" /> Ablehnen
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Post ablehnen?</AlertDialogTitle>
+                <AlertDialogDescription>Der Post wird unwiderruflich gelöscht.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                <AlertDialogAction onClick={handleReject}>Ablehnen & Löschen</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      )}
     </div>
   );
 }
