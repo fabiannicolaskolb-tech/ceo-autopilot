@@ -5,7 +5,7 @@ import {
   FileText, Send, Check, Clock, BarChart3, Copy, Pencil, Trash2,
   CalendarDays, ChevronDown, ChevronUp, Inbox, Sparkles,
   Eye, Heart, MessageCircle, Share2, List, ChevronLeft, ChevronRight,
-  Loader2, Zap, Rocket,
+  Loader2, Zap, Rocket, Newspaper,
 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
