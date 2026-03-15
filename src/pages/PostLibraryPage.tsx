@@ -205,7 +205,7 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
   };
 
   const handleCopy = () => {
-    const text = `${post.content || ''}\n\n${hashtags.map(h => `#${h}`).join(' ')}`.trim();
+    const text = `${post.content || ''}\n\n${hashtags.map(h => h.startsWith('#') ? h : `#${h}`).join(' ')}`.trim();
     navigator.clipboard.writeText(text);
     toast({ title: 'In Zwischenablage kopiert' });
   };
@@ -256,7 +256,7 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
       {hashtags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {hashtags.map((tag, i) => (
-            <span key={i} className="text-[11px] text-primary/70 bg-primary/5 rounded-full px-2 py-0.5">#{tag}</span>
+            <span key={i} className="text-[11px] text-primary/70 bg-primary/5 rounded-full px-2 py-0.5">{tag.startsWith('#') ? tag : `#${tag}`}</span>
           ))}
         </div>
       )}
