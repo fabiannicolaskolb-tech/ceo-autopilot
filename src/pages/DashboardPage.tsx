@@ -137,24 +137,66 @@ export default function DashboardPage() {
       <DailyBriefing />
 
       {/* Quick Navigation */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { title: 'Ideation Lab', desc: 'Neue Ideen generieren', icon: Lightbulb, url: '/ideation', color: 'hsl(var(--warning))' },
-          { title: 'Post Library', desc: 'Alle Beiträge verwalten', icon: GalleryHorizontalEnd, url: '/post-library', color: 'hsl(var(--success))' },
-          { title: 'Analytics', desc: 'Performance analysieren', icon: BarChart3, url: '/analytics', color: 'hsl(var(--primary))' },
+          {
+            title: 'Ideation Lab',
+            desc: 'KI-gestützte Ideen generieren und verfeinern',
+            icon: Lightbulb,
+            url: '/ideation',
+            color: 'hsl(var(--warning))',
+            preview: `${draftCount > 0 ? `${draftCount} Entwürfe bereit` : 'Starte deine erste Idee'}`,
+            cta: 'Ideen entdecken',
+          },
+          {
+            title: 'Post Library',
+            desc: 'Alle Beiträge verwalten, planen und veröffentlichen',
+            icon: GalleryHorizontalEnd,
+            url: '/post-library',
+            color: 'hsl(var(--success))',
+            preview: `${postCount} veröffentlicht · ${draftCount} Entwürfe`,
+            cta: 'Library öffnen',
+          },
+          {
+            title: 'Analytics',
+            desc: 'Performance analysieren und Wachstum tracken',
+            icon: BarChart3,
+            url: '/analytics',
+            color: 'hsl(var(--primary))',
+            preview: postCount > 0 ? `${postCount} Posts ausgewertet` : 'Noch keine Daten',
+            cta: 'Insights ansehen',
+          },
         ].map(item => (
           <Link
             key={item.url}
             to={item.url}
-            className="group rounded-2xl bg-card/80 backdrop-blur-xl p-4 sm:p-5 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border border-transparent hover:border-primary/20 transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.12)] hover:-translate-y-0.5"
+            className="group relative rounded-[20px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-[0_12px_40px_-8px_hsl(220_55%_20%/0.15)] hover:-translate-y-1 overflow-hidden"
           >
-            <div className="flex items-center gap-3">
-              <div className="rounded-xl p-2.5 transition-colors" style={{ backgroundColor: `color-mix(in srgb, ${item.color} 12%, transparent)` }}>
-                <item.icon className="h-5 w-5 transition-transform group-hover:scale-110" style={{ color: item.color }} />
+            {/* Gradient accent line */}
+            <div className="absolute top-0 left-0 right-0 h-1 rounded-t-[20px] opacity-60 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `linear-gradient(90deg, ${item.color}, color-mix(in srgb, ${item.color} 40%, transparent))` }} />
+
+            <div className="flex items-start gap-4">
+              <div className="rounded-2xl p-3 transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg" style={{ backgroundColor: `color-mix(in srgb, ${item.color} 12%, transparent)` }}>
+                <item.icon className="h-6 w-6" style={{ color: item.color }} />
               </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">{item.title}</p>
-                <p className="text-xs text-muted-foreground truncate hidden sm:block">{item.desc}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-base font-bold text-foreground">{item.title}</p>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{item.desc}</p>
+              </div>
+            </div>
+
+            {/* Preview info */}
+            <div className="mt-4 rounded-xl bg-muted/40 px-3.5 py-2.5 border border-border/30">
+              <p className="text-xs font-medium text-foreground/70">{item.preview}</p>
+            </div>
+
+            {/* CTA */}
+            <div className="mt-4 flex items-center justify-between">
+              <span className="text-xs font-semibold transition-colors duration-300 group-hover:translate-x-1" style={{ color: item.color }}>
+                {item.cta}
+              </span>
+              <div className="h-8 w-8 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110" style={{ backgroundColor: `color-mix(in srgb, ${item.color} 10%, transparent)` }}>
+                <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" style={{ color: item.color }} />
               </div>
             </div>
           </Link>
