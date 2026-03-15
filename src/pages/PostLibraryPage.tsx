@@ -450,6 +450,46 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
   );
 }
 
+// ──── Feed View (LinkedIn Preview) ────
+function FeedView({ posts, profile }: { posts: any[]; profile: any }) {
+  const authorName = profile?.name || 'LinkedIn Creator';
+  const authorHeadline = [profile?.role, profile?.company].filter(Boolean).join(' at ') || 'Professional';
+  const authorAvatar = profile?.avatar_url_1 || undefined;
+
+  if (posts.length === 0) return <EmptyState tab="drafts" />;
+
+  return (
+    <div className="flex flex-col items-center gap-4 py-2">
+      {posts.map(post => {
+        const metrics = post.metrics && typeof post.metrics === 'object' ? post.metrics as any : undefined;
+        const postedAt = post.posted_at
+          ? format(new Date(post.posted_at), 'dd. MMM yyyy', { locale: de })
+          : post.scheduled_at
+            ? format(new Date(post.scheduled_at), 'dd. MMM yyyy', { locale: de })
+            : 'Just now';
+
+        return (
+          <LinkedInPostPreview
+            key={post.id}
+            authorName={authorName}
+            authorHeadline={authorHeadline}
+            authorAvatar={authorAvatar}
+            content={post.content || ''}
+            hook={post.hook || undefined}
+            postedAt={postedAt}
+            metrics={metrics ? {
+              likes: metrics.likes,
+              comments: metrics.comments,
+              shares: metrics.shares,
+              impressions: metrics.impressions,
+            } : undefined}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 // ──── Main Page ────
 export default function PostLibraryPage() {
   const { user, profile } = useAuth();
