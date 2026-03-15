@@ -190,6 +190,25 @@ export default function OnboardingPage() {
               <h1 className="font-playfair text-2xl font-bold">Basis-Informationen</h1>
               <p className="mt-1 text-muted-foreground">Erzählen Sie uns von sich</p>
             </div>
+            <div className="flex justify-center">
+              <input
+                ref={cvInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.txt"
+                className="hidden"
+                onChange={handleCvUpload}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="gap-2"
+                disabled={parsingCv}
+                onClick={() => cvInputRef.current?.click()}
+              >
+                {parsingCv ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {parsingCv ? 'CV wird analysiert...' : 'CV hochladen & Felder ausfüllen'}
+              </Button>
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Name</Label>
