@@ -74,34 +74,61 @@ export default function DashboardPage() {
       <MeshBackground />
 
       {/* Welcome Hero */}
-      <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 sm:p-8 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12 ring-2 ring-primary/10 ring-offset-2 ring-offset-background">
-              {profile?.avatar_url_1 && <AvatarImage src={profile.avatar_url_1} alt="Avatar" />}
-              <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">{initials}</AvatarFallback>
-            </Avatar>
-            <div>
-              <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">
-                Hi {firstName}, bereit für den nächsten Post?
-              </h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {draftCount > 0 ?
-                `${draftCount} Entwürfe warten auf Ihre Freigabe` :
-                'Starten Sie mit einer neuen Idee'}
-              </p>
+      <div className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] overflow-hidden">
+        <div className="p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-12 w-12 ring-2 ring-primary/10 ring-offset-2 ring-offset-background">
+                {profile?.avatar_url_1 && <AvatarImage src={profile.avatar_url_1} alt="Avatar" />}
+                <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">{initials}</AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">
+                  Hi {firstName}, bereit für den nächsten Post?
+                </h1>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  {draftCount > 0 ?
+                  `${draftCount} Entwürfe warten auf Ihre Freigabe` :
+                  'Starten Sie mit einer neuen Idee'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {pipelineRunning && (
+                <Badge variant="secondary" className="flex items-center gap-1.5 text-xs rounded-full animate-pulse">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  {STAGE_LABELS[pipeline.stage] || pipeline.stage}
+                </Badge>
+              )}
+
+              {/* Level Badge */}
+              <button
+                onClick={() => setShowScore(!showScore)}
+                className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer border border-transparent hover:border-primary/20"
+                style={{
+                  backgroundColor: `color-mix(in srgb, ${score.currentLevel.color} 12%, transparent)`,
+                  color: score.currentLevel.color,
+                }}
+              >
+                <span className="text-base">{score.currentLevel.emoji}</span>
+                <span className="hidden sm:inline">{score.currentLevel.name}</span>
+                <span className="font-bold">{score.totalXP} XP</span>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${showScore ? 'rotate-180' : ''}`} />
+              </button>
+
+              <InteractiveHoverButton onClick={() => navigate('/profile')}>
+                Profil bearbeiten
+              </InteractiveHoverButton>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            {pipelineRunning && (
-              <Badge variant="secondary" className="flex items-center gap-1.5 text-xs rounded-full animate-pulse">
-                <Loader2 className="h-3 w-3 animate-spin" />
-                {STAGE_LABELS[pipeline.stage] || pipeline.stage}
-              </Badge>
-            )}
-            <InteractiveHoverButton onClick={() => navigate('/profile')}>
-              Profil bearbeiten
-            </InteractiveHoverButton>
+        </div>
+
+        {/* Expandable Creator Score */}
+        <div
+          className={`transition-all duration-500 ease-in-out overflow-hidden ${showScore ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}
+        >
+          <div className="border-t border-border/50 p-6 sm:p-8 pt-6">
+            <CreatorScoreCard />
           </div>
         </div>
       </div>
