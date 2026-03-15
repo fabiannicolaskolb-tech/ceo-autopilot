@@ -46,6 +46,7 @@ export default function OnboardingPage() {
   const [voiceSamples, setVoiceSamples] = useState<string[]>(['', '', '']);
   const [avatarUrls, setAvatarUrls] = useState<(string | null)[]>([null, null, null]);
   const [saving, setSaving] = useState(false);
+  const [showVoiceWarning, setShowVoiceWarning] = useState(false);
   const [parsingCv, setParsingCv] = useState(false);
   const cvInputRef = React.useRef<HTMLInputElement>(null);
 
