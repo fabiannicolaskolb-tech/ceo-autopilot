@@ -20,8 +20,7 @@ export const CREATOR_LEVELS = [
 export type CreatorLevel = (typeof CREATOR_LEVELS)[number];
 
 function weightedEngagement(metrics: any): number {
-  const i = metrics?.interactions || {};
-  return (i.comments || 0) * 3 + (i.shares || 0) * 2 + (i.likes || 0);
+  return (metrics?.comments || 0) * 3 + (metrics?.shares || 0) * 2 + (metrics?.likes || 0);
 }
 
 function calculateWeekStreak(postedDates: Date[]): number {
@@ -71,7 +70,7 @@ export function useCreatorScore() {
         .from('posts')
         .select('id, posted_at, metrics, status')
         .eq('user_id', user!.id)
-        .eq('status', 'posted');
+        .in('status', ['posted', 'analyzed']);
       if (error) throw error;
       return data;
     },

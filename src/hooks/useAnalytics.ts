@@ -6,10 +6,21 @@ export type TimeRange = '7d' | '30d' | '90d' | 'custom';
 
 interface PostMetrics {
   impressions?: number;
-  interactions?: { likes?: number; comments?: number; shares?: number };
-  ctr?: number;
-  sentiment?: { positive?: number; neutral?: number; negative?: number };
+  likes?: number;
+  comments?: number;
+  shares?: number;
+  engagement_rate?: number;
+  score?: number;
+  sentiment?: string; // "positive" | "neutral" | "negative"
   follower_delta?: number;
+  ctr?: number;
+  performance_summary?: string;
+  voice_briefing_text?: string;
+  what_worked?: string[];
+  what_to_improve?: string[];
+  recommended_follow_ups?: string[];
+  topic_tags?: string[];
+  content_pattern?: string;
 }
 
 export interface AnalyticsPost {
@@ -24,7 +35,7 @@ export interface AnalyticsPost {
 interface KPI {
   label: string;
   value: string;
-  trend: number | null; // percentage change vs previous period
+  trend: number | null;
 }
 
 interface TimelinePoint {
@@ -79,8 +90,7 @@ function getMetrics(raw: unknown): PostMetrics {
 }
 
 function weightedEngagement(m: PostMetrics): number {
-  const i = m.interactions || {};
-  return (i.comments || 0) * 3 + (i.shares || 0) * 2 + (i.likes || 0);
+  return (m.comments || 0) * 3 + (m.shares || 0) * 2 + (m.likes || 0);
 }
 
 export function useAnalytics() {
@@ -99,7 +109,7 @@ export function useAnalytics() {
         .from('posts')
         .select('id, hook, type, content_category, posted_at, metrics')
         .eq('user_id', user!.id)
-        .eq('status', 'posted')
+        .in('status', ['posted', 'analyzed'])
         .not('metrics', 'is', null)
         .order('posted_at', { ascending: true });
 
@@ -201,9 +211,9 @@ export function useAnalytics() {
     filteredPosts.forEach(p => {
       const s = p.metrics.sentiment;
       if (!s) return;
-      positive += s.positive || 0;
-      neutral += s.neutral || 0;
-      negative += s.negative || 0;
+      if (s === 'positive') positive++;
+      else if (s === 'neutral') neutral++;
+      else if (s === 'negative') negative++;
     });
     const total = positive + neutral + negative;
     if (total === 0) return [];

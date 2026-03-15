@@ -132,9 +132,9 @@ interface CompareMetric {
 
 const COMPARE_METRICS: CompareMetric[] = [
   { label: 'Impressions', icon: Eye, getValue: (p) => p.metrics.impressions || 0 },
-  { label: 'Likes', icon: Heart, getValue: (p) => p.metrics.interactions?.likes || 0 },
-  { label: 'Kommentare', icon: MessageCircle, getValue: (p) => p.metrics.interactions?.comments || 0 },
-  { label: 'Shares', icon: Share2, getValue: (p) => p.metrics.interactions?.shares || 0 },
+  { label: 'Likes', icon: Heart, getValue: (p) => p.metrics.likes || 0 },
+  { label: 'Kommentare', icon: MessageCircle, getValue: (p) => p.metrics.comments || 0 },
+  { label: 'Shares', icon: Share2, getValue: (p) => p.metrics.shares || 0 },
   { label: 'CTR', icon: TrendingUp, getValue: (p) => p.metrics.ctr || 0 },
 ];
 
@@ -277,14 +277,13 @@ function TopPostsTable({ posts }: { posts: AnalyticsPost[] }) {
   const sorted = useMemo(() => {
     return [...posts].sort((a, b) => {
       const ma = a.metrics, mb = b.metrics;
-      const ia = ma.interactions || {}, ib = mb.interactions || {};
       switch (sortKey) {
         case 'impressions': return (mb.impressions || 0) - (ma.impressions || 0);
         case 'ctr': return (mb.ctr || 0) - (ma.ctr || 0);
-        case 'comments': return (ib.comments || 0) - (ia.comments || 0);
+        case 'comments': return (mb.comments || 0) - (ma.comments || 0);
         case 'engagement': {
-          const eA = ma.impressions ? ((ia.comments || 0) * 3 + (ia.shares || 0) * 2 + (ia.likes || 0)) / ma.impressions * 100 : 0;
-          const eB = mb.impressions ? ((ib.comments || 0) * 3 + (ib.shares || 0) * 2 + (ib.likes || 0)) / mb.impressions * 100 : 0;
+          const eA = ma.impressions ? ((ma.comments || 0) * 3 + (ma.shares || 0) * 2 + (ma.likes || 0)) / ma.impressions * 100 : 0;
+          const eB = mb.impressions ? ((mb.comments || 0) * 3 + (mb.shares || 0) * 2 + (mb.likes || 0)) / mb.impressions * 100 : 0;
           return eB - eA;
         }
         default: return 0;
@@ -316,9 +315,8 @@ function TopPostsTable({ posts }: { posts: AnalyticsPost[] }) {
       </TableHeader>
       <TableBody>
         {sorted.map(p => {
-          const i = p.metrics.interactions || {};
           const eng = p.metrics.impressions
-            ? (((i.comments || 0) * 3 + (i.shares || 0) * 2 + (i.likes || 0)) / p.metrics.impressions * 100).toFixed(1)
+            ? (((p.metrics.comments || 0) * 3 + (p.metrics.shares || 0) * 2 + (p.metrics.likes || 0)) / p.metrics.impressions * 100).toFixed(1)
             : '0.0';
           return (
             <TableRow key={p.id}>
@@ -330,7 +328,7 @@ function TopPostsTable({ posts }: { posts: AnalyticsPost[] }) {
               </TableCell>
               <TableCell>{(p.metrics.impressions || 0).toLocaleString()}</TableCell>
               <TableCell>{p.metrics.ctr != null ? `${p.metrics.ctr}%` : '—'}</TableCell>
-              <TableCell>{i.comments || 0}</TableCell>
+              <TableCell>{p.metrics.comments || 0}</TableCell>
               <TableCell>
                 <Badge variant="secondary" className="bg-success/10 text-success text-xs">{eng}%</Badge>
               </TableCell>
