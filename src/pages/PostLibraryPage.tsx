@@ -477,6 +477,8 @@ function FeedView({ posts, profile }: { posts: any[]; profile: any }) {
             content={post.content || ''}
             hook={post.hook || undefined}
             postedAt={postedAt}
+            showActions={false}
+            defaultExpanded={true}
             metrics={metrics ? {
               likes: metrics.likes,
               comments: metrics.comments,
@@ -563,8 +565,8 @@ export default function PostLibraryPage() {
         )}
       </div>
 
-      {/* Approval Queue */}
-      {!loading && pendingApproval.length > 0 && (
+      {/* Approval Queue (hidden in feed mode) */}
+      {viewMode !== 'feed' && !loading && pendingApproval.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center h-6 w-6 rounded-full bg-warning/15">
