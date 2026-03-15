@@ -118,7 +118,7 @@ export default function LandingPage() {
             <img
               src={analyticsPreview}
               alt="CEO Autopilot Analytics Tool Vorschau"
-              className="mx-auto rounded-2xl object-cover h-full w-full object-left-top"
+              className="mx-auto rounded-2xl object-cover h-full w-full object-[15%_0%]"
               draggable={false} />
             
           </ContainerScroll>
