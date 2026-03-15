@@ -244,7 +244,9 @@ export default function PlannerPage() {
   const openEdit = (post: any) => {
     setEditPost(post);
     setEditContent(post.content || '');
-    setEditDate(post.scheduled_at ? new Date(post.scheduled_at) : undefined);
+    const scheduled = post.scheduled_at ? new Date(post.scheduled_at) : undefined;
+    setEditDate(scheduled);
+    setEditTime(scheduled ? format(scheduled, 'HH:mm') : '09:00');
   };
 
   const saveEdit = () => {
