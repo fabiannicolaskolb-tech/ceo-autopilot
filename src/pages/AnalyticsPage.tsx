@@ -6,9 +6,10 @@ import {
   RefreshCw, Linkedin,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
+import { de, enUS } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useLang } from '@/hooks/useLang';
 import { usePosts } from '@/hooks/useRealtime';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -34,10 +35,9 @@ import { cn } from '@/lib/utils';
 const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
 const GLASS_CARD_HOVER = `${GLASS_CARD} transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]`;
 
-const DAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-
 // ──── Empty State ────
 function EmptyState() {
+  const { t } = useLang();
   return (
     <div className={cn(GLASS_CARD, 'p-8')}>
       <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -45,11 +45,10 @@ function EmptyState() {
           <Rocket className="h-8 w-8 text-muted-foreground/50" />
         </div>
         <h2 className="font-playfair text-xl font-semibold text-foreground mb-2">
-          Sammle erste Daten…
+          {t('analytics.empty_title')}
         </h2>
         <p className="max-w-md text-sm text-muted-foreground">
-          Ihr erstes Performance-Update erscheint nach dem ersten Post.
-          Veröffentlichen Sie Ihren ersten Beitrag, um detaillierte Analysen freizuschalten.
+          {t('analytics.empty_desc')}
         </p>
       </div>
     </div>
@@ -86,22 +85,25 @@ function KPICard({ label, value, trend, icon: Icon }: {
 
 // ──── Heatmap ────
 function BestTimeHeatmap({ data }: { data: { day: number; hour: number; intensity: number }[] }) {
+  const { t } = useLang();
+  const DAYS_MAP: Record<number, string> = {
+    0: t('weekday.so'), 1: t('weekday.mo'), 2: t('weekday.di'), 3: t('weekday.mi'),
+    4: t('weekday.do'), 5: t('weekday.fr'), 6: t('weekday.sa'),
+  };
   const hours = Array.from({ length: 24 }, (_, i) => i);
   return (
     <div className="overflow-x-auto">
       <div className="grid gap-px" style={{ gridTemplateColumns: `48px repeat(24, minmax(28px, 1fr))` }}>
-        {/* Header row */}
         <div />
         {hours.map(h => (
           <div key={h} className="text-center text-[10px] text-muted-foreground pb-1">
             {h}
           </div>
         ))}
-        {/* Data rows */}
         {[1, 2, 3, 4, 5, 6, 0].map(day => (
           <React.Fragment key={day}>
             <div className="text-xs text-muted-foreground flex items-center pr-2 font-medium">
-              {DAYS[day]}
+              {DAYS_MAP[day]}
             </div>
             {hours.map(hour => {
               const cell = data.find(c => c.day === day && c.hour === hour);
@@ -113,7 +115,7 @@ function BestTimeHeatmap({ data }: { data: { day: number; hour: number; intensit
                   style={{
                     backgroundColor: `hsl(var(--primary) / ${Math.max(0.05, intensity)})`,
                   }}
-                  title={`${DAYS[day]} ${hour}:00 — Intensität: ${Math.round(intensity * 100)}%`}
+                  title={`${DAYS_MAP[day]} ${hour}:00 — ${Math.round(intensity * 100)}%`}
                 />
               );
             })}
@@ -131,28 +133,28 @@ interface CompareMetric {
   getValue: (p: AnalyticsPost) => number;
 }
 
-const COMPARE_METRICS: CompareMetric[] = [
-  { label: 'Impressions', icon: Eye, getValue: (p) => p.metrics.impressions || 0 },
-  { label: 'Likes', icon: Heart, getValue: (p) => p.metrics.likes || 0 },
-  { label: 'Kommentare', icon: MessageCircle, getValue: (p) => p.metrics.comments || 0 },
-  { label: 'Shares', icon: Share2, getValue: (p) => p.metrics.shares || 0 },
-  { label: 'CTR', icon: TrendingUp, getValue: (p) => p.metrics.ctr || 0 },
-];
-
 function PostCompare({ posts }: { posts: AnalyticsPost[] }) {
+  const { t } = useLang();
   const [idA, setIdA] = useState('');
   const [idB, setIdB] = useState('');
   const postA = posts.find(p => p.id === idA);
   const postB = posts.find(p => p.id === idB);
-
   const bothSelected = postA && postB;
+
+  const COMPARE_METRICS: CompareMetric[] = [
+    { label: 'Impressions', icon: Eye, getValue: (p) => p.metrics.impressions || 0 },
+    { label: 'Likes', icon: Heart, getValue: (p) => p.metrics.likes || 0 },
+    { label: t('analytics.comments'), icon: MessageCircle, getValue: (p) => p.metrics.comments || 0 },
+    { label: 'Shares', icon: Share2, getValue: (p) => p.metrics.shares || 0 },
+    { label: 'CTR', icon: TrendingUp, getValue: (p) => p.metrics.ctr || 0 },
+  ];
 
   return (
     <div className="space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-3">
           <Select value={idA} onValueChange={setIdA}>
-            <SelectTrigger><SelectValue placeholder="Post A auswählen" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t('analytics.post_a')} /></SelectTrigger>
             <SelectContent>
               {posts.map(p => (
                 <SelectItem key={p.id} value={p.id}>{(p.hook || p.id).slice(0, 50)}</SelectItem>
@@ -163,13 +165,13 @@ function PostCompare({ posts }: { posts: AnalyticsPost[] }) {
             {postA ? (
               <p className="font-playfair font-semibold text-foreground text-sm line-clamp-2">{postA.hook || '—'}</p>
             ) : (
-              <p className="text-sm text-muted-foreground">Post auswählen</p>
+              <p className="text-sm text-muted-foreground">{t('analytics.select_post_label')}</p>
             )}
           </div>
         </div>
         <div className="space-y-3">
           <Select value={idB} onValueChange={setIdB}>
-            <SelectTrigger><SelectValue placeholder="Post B auswählen" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t('analytics.post_b')} /></SelectTrigger>
             <SelectContent>
               {posts.map(p => (
                 <SelectItem key={p.id} value={p.id}>{(p.hook || p.id).slice(0, 50)}</SelectItem>
@@ -180,13 +182,12 @@ function PostCompare({ posts }: { posts: AnalyticsPost[] }) {
             {postB ? (
               <p className="font-playfair font-semibold text-foreground text-sm line-clamp-2">{postB.hook || '—'}</p>
             ) : (
-              <p className="text-sm text-muted-foreground">Post auswählen</p>
+              <p className="text-sm text-muted-foreground">{t('analytics.select_post_label')}</p>
             )}
           </div>
         </div>
       </div>
 
-      {/* Comparison breakdown */}
       {bothSelected && (
         <div className="space-y-2">
           {COMPARE_METRICS.map((metric) => {
@@ -194,7 +195,7 @@ function PostCompare({ posts }: { posts: AnalyticsPost[] }) {
             const valB = metric.getValue(postB);
             const maxVal = Math.max(valA, valB, 1);
             const diff = maxVal > 0 ? Math.abs(valA - valB) / maxVal : 0;
-            const isSignificant = diff >= 0.3; // ≥30% difference
+            const isSignificant = diff >= 0.3;
             const winner = valA > valB ? 'A' : valB > valA ? 'B' : null;
             const Icon = metric.icon;
             const isCtr = metric.label === 'CTR';
@@ -205,58 +206,26 @@ function PostCompare({ posts }: { posts: AnalyticsPost[] }) {
                 key={metric.label}
                 className={cn(
                   'flex items-center gap-3 rounded-xl px-4 py-3 transition-all',
-                  isSignificant
-                    ? 'bg-primary/[0.06] ring-1 ring-primary/20'
-                    : 'bg-card/40'
+                  isSignificant ? 'bg-primary/[0.06] ring-1 ring-primary/20' : 'bg-card/40'
                 )}
               >
                 <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                 <span className="text-xs text-muted-foreground w-24 shrink-0">{metric.label}</span>
-
-                {/* Value A */}
-                <span className={cn(
-                  'text-sm font-semibold w-16 text-right shrink-0',
-                  isSignificant && winner === 'A' ? 'text-success' : 'text-foreground'
-                )}>
+                <span className={cn('text-sm font-semibold w-16 text-right shrink-0', isSignificant && winner === 'A' ? 'text-success' : 'text-foreground')}>
                   {formatVal(valA)}
                 </span>
-
-                {/* Bar comparison */}
                 <div className="flex-1 flex items-center gap-1 min-w-0">
                   <div className="flex-1 h-2 rounded-full bg-muted/40 overflow-hidden flex justify-end">
-                    <div
-                      className={cn(
-                        'h-full rounded-full transition-all duration-500',
-                        isSignificant && winner === 'A'
-                          ? 'bg-success'
-                          : 'bg-primary/40'
-                      )}
-                      style={{ width: `${maxVal > 0 ? (valA / maxVal) * 100 : 0}%` }}
-                    />
+                    <div className={cn('h-full rounded-full transition-all duration-500', isSignificant && winner === 'A' ? 'bg-success' : 'bg-primary/40')} style={{ width: `${maxVal > 0 ? (valA / maxVal) * 100 : 0}%` }} />
                   </div>
                   <div className="w-px h-4 bg-border shrink-0" />
                   <div className="flex-1 h-2 rounded-full bg-muted/40 overflow-hidden">
-                    <div
-                      className={cn(
-                        'h-full rounded-full transition-all duration-500',
-                        isSignificant && winner === 'B'
-                          ? 'bg-success'
-                          : 'bg-primary/40'
-                      )}
-                      style={{ width: `${maxVal > 0 ? (valB / maxVal) * 100 : 0}%` }}
-                    />
+                    <div className={cn('h-full rounded-full transition-all duration-500', isSignificant && winner === 'B' ? 'bg-success' : 'bg-primary/40')} style={{ width: `${maxVal > 0 ? (valB / maxVal) * 100 : 0}%` }} />
                   </div>
                 </div>
-
-                {/* Value B */}
-                <span className={cn(
-                  'text-sm font-semibold w-16 shrink-0',
-                  isSignificant && winner === 'B' ? 'text-success' : 'text-foreground'
-                )}>
+                <span className={cn('text-sm font-semibold w-16 shrink-0', isSignificant && winner === 'B' ? 'text-success' : 'text-foreground')}>
                   {formatVal(valB)}
                 </span>
-
-                {/* Difference badge */}
                 {isSignificant && (
                   <Badge variant="default" className="text-[10px] px-1.5 py-0 shrink-0 rounded-full bg-success/15 text-success border-0 font-bold">
                     {winner === 'A' ? '←' : '→'} +{Math.round(diff * 100)}%
@@ -273,6 +242,7 @@ function PostCompare({ posts }: { posts: AnalyticsPost[] }) {
 
 // ──── Top Posts Table ────
 function TopPostsTable({ posts }: { posts: AnalyticsPost[] }) {
+  const { t, lang } = useLang();
   const [sortKey, setSortKey] = useState<'impressions' | 'ctr' | 'comments' | 'engagement'>('impressions');
 
   const sorted = useMemo(() => {
@@ -293,13 +263,14 @@ function TopPostsTable({ posts }: { posts: AnalyticsPost[] }) {
   }, [posts, sortKey]);
 
   const headerClass = "cursor-pointer hover:text-foreground transition-colors";
+  const dateLocale = lang === 'de' ? 'de-DE' : 'en-US';
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Hook</TableHead>
-          <TableHead>Datum</TableHead>
+          <TableHead>{t('analytics.hook')}</TableHead>
+          <TableHead>{t('analytics.date')}</TableHead>
           <TableHead className={headerClass} onClick={() => setSortKey('impressions')}>
             Impressions {sortKey === 'impressions' && '↓'}
           </TableHead>
@@ -307,10 +278,10 @@ function TopPostsTable({ posts }: { posts: AnalyticsPost[] }) {
             CTR {sortKey === 'ctr' && '↓'}
           </TableHead>
           <TableHead className={headerClass} onClick={() => setSortKey('comments')}>
-            Kommentare {sortKey === 'comments' && '↓'}
+            {t('analytics.comments')} {sortKey === 'comments' && '↓'}
           </TableHead>
           <TableHead className={headerClass} onClick={() => setSortKey('engagement')}>
-            Engagement {sortKey === 'engagement' && '↓'}
+            {t('analytics.engagement')} {sortKey === 'engagement' && '↓'}
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -325,7 +296,7 @@ function TopPostsTable({ posts }: { posts: AnalyticsPost[] }) {
                 {p.hook || '—'}
               </TableCell>
               <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                {p.posted_at ? new Date(p.posted_at).toLocaleDateString('de-DE') : '—'}
+                {p.posted_at ? new Date(p.posted_at).toLocaleDateString(dateLocale) : '—'}
               </TableCell>
               <TableCell>{(p.metrics.impressions || 0).toLocaleString()}</TableCell>
               <TableCell>{p.metrics.ctr != null ? `${p.metrics.ctr}%` : '—'}</TableCell>
@@ -351,6 +322,8 @@ const SENTIMENT_COLORS = [
 // ──── Main Page ────
 export default function AnalyticsPage() {
   const { user } = useAuth();
+  const { t, lang } = useLang();
+  const dateFnsLocale = lang === 'de' ? de : enUS;
   const {
     posts, kpis, timelineData, contentTypeData, sentimentData,
     bestTimeData, loading, hasData, timeRange, setTimeRange,
@@ -364,7 +337,6 @@ export default function AnalyticsPage() {
     if (!user) return;
     setImportLoading(true);
     try {
-      // Get linkedin_url from profile
       const { data: profile } = await supabase
         .from('profiles')
         .select('linkedin_url')
@@ -373,8 +345,8 @@ export default function AnalyticsPage() {
 
       if (!profile?.linkedin_url) {
         toast({
-          title: 'LinkedIn-URL fehlt',
-          description: 'Bitte hinterlegen Sie Ihre LinkedIn-URL in Ihrem Profil.',
+          title: t('analytics.linkedin_missing'),
+          description: t('analytics.linkedin_missing_desc'),
           variant: 'destructive',
         });
         return;
@@ -387,17 +359,16 @@ export default function AnalyticsPage() {
       if (error) throw error;
 
       toast({
-        title: 'LinkedIn-Import abgeschlossen',
-        description: `${data.imported} Posts importiert, ${data.skipped || 0} übersprungen.`,
+        title: t('analytics.import_done'),
+        description: `${data.imported} ${t('analytics.posts')} imported, ${data.skipped || 0} skipped.`,
       });
 
-      // Reload page to refresh analytics
       window.location.reload();
     } catch (err: any) {
       console.error('LinkedIn import error:', err);
       toast({
-        title: 'Import fehlgeschlagen',
-        description: err.message || 'Bitte versuchen Sie es erneut.',
+        title: t('analytics.import_failed'),
+        description: err.message,
         variant: 'destructive',
       });
     } finally {
@@ -423,8 +394,8 @@ export default function AnalyticsPage() {
       <div className={cn(GLASS_CARD, 'p-6 sm:p-8')}>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Analytics</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">Performance-Übersicht Ihres LinkedIn-Auftritts</p>
+            <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">{t('analytics.title')}</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">{t('analytics.subtitle')}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Button
@@ -434,21 +405,21 @@ export default function AnalyticsPage() {
               className="gap-2"
             >
               <Linkedin className="h-4 w-4" />
-              Posts importieren
+              {t('analytics.import_posts')}
             </Button>
             <Tabs value={timeRange} onValueChange={v => {
               setTimeRange(v as TimeRange);
               if (v !== 'custom') setCustomRange(null);
             }}>
               <TabsList>
-                <TabsTrigger value="7d">7T</TabsTrigger>
-                <TabsTrigger value="30d">30T</TabsTrigger>
-                <TabsTrigger value="90d">90T</TabsTrigger>
+                <TabsTrigger value="7d">{lang === 'de' ? '7T' : '7D'}</TabsTrigger>
+                <TabsTrigger value="30d">{lang === 'de' ? '30T' : '30D'}</TabsTrigger>
+                <TabsTrigger value="90d">{lang === 'de' ? '90T' : '90D'}</TabsTrigger>
                 <TabsTrigger value="custom" className="gap-1">
                   <CalendarIcon className="h-3 w-3" />
                   {timeRange === 'custom' && customRange
-                    ? `${format(customRange.from, 'dd.MM', { locale: de })} – ${format(customRange.to, 'dd.MM', { locale: de })}`
-                    : 'Zeitraum'}
+                    ? `${format(customRange.from, 'dd.MM', { locale: dateFnsLocale })} – ${format(customRange.to, 'dd.MM', { locale: dateFnsLocale })}`
+                    : t('analytics.period')}
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -459,14 +430,14 @@ export default function AnalyticsPage() {
                   <Button variant="outline" size="sm" className="text-xs h-8 gap-1.5">
                     <CalendarIcon className="h-3 w-3" />
                     {customRange
-                      ? `${format(customRange.from, 'dd.MM.yy', { locale: de })} – ${format(customRange.to, 'dd.MM.yy', { locale: de })}`
-                      : 'Zeitraum wählen'}
+                      ? `${format(customRange.from, 'dd.MM.yy', { locale: dateFnsLocale })} – ${format(customRange.to, 'dd.MM.yy', { locale: dateFnsLocale })}`
+                      : t('analytics.period')}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-4 space-y-3" align="end">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-1.5">
-                      <p className="text-xs font-medium text-muted-foreground">Von</p>
+                      <p className="text-xs font-medium text-muted-foreground">{t('analytics.from')}</p>
                       <Calendar
                         mode="single"
                         selected={customFrom}
@@ -476,7 +447,7 @@ export default function AnalyticsPage() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <p className="text-xs font-medium text-muted-foreground">Bis</p>
+                      <p className="text-xs font-medium text-muted-foreground">{t('analytics.to')}</p>
                       <Calendar
                         mode="single"
                         selected={customTo}
@@ -496,7 +467,7 @@ export default function AnalyticsPage() {
                       }
                     }}
                   >
-                    Anwenden
+                    {t('analytics.apply')}
                   </Button>
                 </PopoverContent>
               </Popover>
@@ -518,16 +489,16 @@ export default function AnalyticsPage() {
 
           {/* Performance Timeline */}
           <div className={cn(GLASS_CARD, 'p-6')}>
-            <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Performance Timeline</h2>
+            <h2 className="font-playfair text-base font-semibold text-foreground mb-4">{t('analytics.timeline')}</h2>
             <ResponsiveContainer width="100%" height={280}>
               <AreaChart data={timelineData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" tickFormatter={v => new Date(v).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} />
+                <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" tickFormatter={v => new Date(v).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', { day: '2-digit', month: '2-digit' })} />
                 <YAxis yAxisId="left" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
                 <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }} labelFormatter={v => new Date(v).toLocaleDateString('de-DE')} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }} labelFormatter={v => new Date(v).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US')} />
                 <Area yAxisId="left" type="monotone" dataKey="impressions" name="Impressions" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.1} strokeWidth={2} />
-                <Line yAxisId="right" type="monotone" dataKey="engagement" name="Engagement" stroke="hsl(var(--success))" strokeWidth={2} dot={{ r: 3, fill: 'hsl(var(--success))' }} />
+                <Line yAxisId="right" type="monotone" dataKey="engagement" name={t('analytics.engagement')} stroke="hsl(var(--success))" strokeWidth={2} dot={{ r: 3, fill: 'hsl(var(--success))' }} />
                 <Legend />
               </AreaChart>
             </ResponsiveContainer>
@@ -536,7 +507,7 @@ export default function AnalyticsPage() {
           {/* Content Type + Sentiment */}
           <div className="grid gap-5 lg:grid-cols-2">
             <div className={cn(GLASS_CARD, 'p-6')}>
-              <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Content Type Efficiency</h2>
+              <h2 className="font-playfair text-base font-semibold text-foreground mb-4">{t('analytics.content_type')}</h2>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={contentTypeData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -544,14 +515,14 @@ export default function AnalyticsPage() {
                   <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
                   <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', fontSize: '12px' }} itemStyle={{ color: 'hsl(var(--foreground))' }} labelStyle={{ color: 'hsl(var(--foreground))' }} cursor={{ fill: 'hsl(var(--muted))' }} />
                   <Bar dataKey="impressions" name="Impressions" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="engagement" name="Engagement" fill="hsl(var(--success))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="engagement" name={t('analytics.engagement')} fill="hsl(var(--success))" radius={[4, 4, 0, 0]} />
                   <Legend />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
             <div className={cn(GLASS_CARD, 'p-6')}>
-              <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Sentiment Analyse</h2>
+              <h2 className="font-playfair text-base font-semibold text-foreground mb-4">{t('analytics.sentiment')}</h2>
               <div className="flex items-center justify-center">
                 {sentimentData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={250}>
@@ -566,7 +537,7 @@ export default function AnalyticsPage() {
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <p className="text-sm text-muted-foreground py-12">Keine Sentiment-Daten vorhanden</p>
+                  <p className="text-sm text-muted-foreground py-12">{t('analytics.no_sentiment')}</p>
                 )}
               </div>
             </div>
@@ -575,21 +546,21 @@ export default function AnalyticsPage() {
           {/* Best Time to Post */}
           <div className={cn(GLASS_CARD, 'p-6')}>
             <h2 className="font-playfair text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Clock className="h-4 w-4" /> Beste Posting-Zeiten
+              <Clock className="h-4 w-4" /> {t('analytics.best_times')}
             </h2>
             <BestTimeHeatmap data={bestTimeData} />
           </div>
 
           {/* Top Posts Table */}
           <div className={cn(GLASS_CARD, 'p-6')}>
-            <h2 className="font-playfair text-base font-semibold text-foreground mb-4">Top Performing Posts</h2>
+            <h2 className="font-playfair text-base font-semibold text-foreground mb-4">{t('analytics.top_posts')}</h2>
             <TopPostsTable posts={posts} />
           </div>
 
           {/* Post Compare */}
           <div className={cn(GLASS_CARD, 'p-6')}>
             <h2 className="font-playfair text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Minus className="h-4 w-4 rotate-90" /> Post-Vergleich
+              <Minus className="h-4 w-4 rotate-90" /> {t('analytics.compare')}
             </h2>
             <PostCompare posts={posts} />
           </div>
@@ -597,14 +568,14 @@ export default function AnalyticsPage() {
           {/* AI Insights */}
           <div className={cn(GLASS_CARD, 'p-6')}>
             <h2 className="font-playfair text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Lightbulb className="h-4 w-4" /> KI-Optimierungsvorschläge
+              <Lightbulb className="h-4 w-4" /> {t('analytics.ai_tips')}
             </h2>
             <div className="space-y-3">
               {[
-                'Story-Posts erzielen 2.3× mehr Engagement als reine Tipps-Posts.',
-                'Ihre beste Posting-Zeit ist Dienstag zwischen 8:00 und 10:00 Uhr.',
-                'Posts mit einer provokanten Frage als Hook erhalten 45% mehr Kommentare.',
-                'Ihre Beiträge über Unternehmenskultur erhalten 40% mehr Shares von Entscheidern.',
+                t('analytics.tip1'),
+                t('analytics.tip2'),
+                t('analytics.tip3'),
+                t('analytics.tip4'),
               ].map((tip, i) => (
                 <div key={i} className="flex items-start gap-3 rounded-[12px] bg-muted/40 backdrop-blur-sm p-3">
                   <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -631,6 +602,7 @@ export default function AnalyticsPage() {
 // ──── Screenshot Analytics ────
 function ScreenshotAnalytics() {
   const { user } = useAuth();
+  const { t, lang } = useLang();
   const { posts: allPosts } = usePosts(user?.id);
   const [selectedPostId, setSelectedPostId] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -686,7 +658,7 @@ function ScreenshotAnalytics() {
       setExtractedMetrics(data);
       setEditableMetrics({ ...data });
     } catch (err: any) {
-      toast({ title: 'Analyse fehlgeschlagen', description: err.message, variant: 'destructive' });
+      toast({ title: t('analytics.import_failed'), description: err.message, variant: 'destructive' });
     } finally {
       setAnalyzing(false);
     }
@@ -701,14 +673,14 @@ function ScreenshotAnalytics() {
         status: 'analyzed',
       }).eq('id', selectedPostId);
       if (error) throw error;
-      toast({ title: 'Metriken gespeichert', description: 'Post wurde als analysiert markiert.' });
+      toast({ title: t('analytics.metrics_saved'), description: t('analytics.metrics_saved_desc') });
       setExtractedMetrics(null);
       setEditableMetrics(null);
       setImagePreview(null);
       setBase64Image(null);
       setSelectedPostId('');
     } catch (err: any) {
-      toast({ title: 'Fehler', description: err.message, variant: 'destructive' });
+      toast({ title: t('error'), description: err.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -720,14 +692,13 @@ function ScreenshotAnalytics() {
   return (
     <div id="import-section" className={cn(GLASS_CARD, 'p-6')}>
       <h2 className="font-playfair text-base font-semibold text-foreground mb-1 flex items-center gap-2">
-        <Upload className="h-4 w-4" /> Echte LinkedIn-Metriken importieren
+        <Upload className="h-4 w-4" /> {t('analytics.screenshot_title')}
       </h2>
       <p className="text-xs text-muted-foreground mb-4">
-        Laden Sie einen Screenshot Ihrer LinkedIn-Post-Analytik hoch. Unsere KI extrahiert die Zahlen automatisch.
+        {t('analytics.screenshot_desc')}
       </p>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Upload Area */}
         <div>
           <div
             className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-primary/50 transition-colors cursor-pointer"
@@ -740,7 +711,7 @@ function ScreenshotAnalytics() {
             ) : (
               <div className="space-y-2">
                 <ImageIcon className="h-8 w-8 text-muted-foreground mx-auto" />
-                <p className="text-sm text-muted-foreground">Bild hierher ziehen oder klicken</p>
+                <p className="text-sm text-muted-foreground">{t('analytics.drag_image')}</p>
                 <p className="text-xs text-muted-foreground">PNG, JPG, WebP</p>
               </div>
             )}
@@ -749,29 +720,28 @@ function ScreenshotAnalytics() {
 
           <div className="mt-3 space-y-2">
             <Select value={selectedPostId} onValueChange={setSelectedPostId}>
-              <SelectTrigger><SelectValue placeholder="Post auswählen..." /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={t('analytics.select_post')} /></SelectTrigger>
               <SelectContent>
                 {postedPosts.map(p => (
                   <SelectItem key={p.id} value={p.id}>
-                    {(p.content || '').substring(0, 50)}... {p.posted_at ? `(${new Date(p.posted_at).toLocaleDateString('de-DE')})` : ''}
+                    {(p.content || '').substring(0, 50)}... {p.posted_at ? `(${new Date(p.posted_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US')})` : ''}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Button onClick={handleAnalyze} disabled={!base64Image || !selectedPostId || analyzing} className="w-full">
-              {analyzing ? 'Analysiere...' : 'Screenshot analysieren'}
+              {analyzing ? t('analytics.analyzing') : t('analytics.analyze')}
             </Button>
           </div>
         </div>
 
-        {/* Extracted Metrics */}
         {editableMetrics && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-foreground">Extrahierte Metriken</p>
+              <p className="text-sm font-medium text-foreground">{t('analytics.extracted')}</p>
               {confidence != null && (
                 <Badge variant="outline" className={cn('text-xs rounded-full', confidenceColor)}>
-                  Konfidenz: {Math.round(confidence * 100)}%
+                  {t('analytics.confidence')}: {Math.round(confidence * 100)}%
                 </Badge>
               )}
             </div>
@@ -792,7 +762,7 @@ function ScreenshotAnalytics() {
               <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg p-2">{editableMetrics.notes}</p>
             )}
             <Button onClick={handleSaveMetrics} disabled={saving} className="w-full">
-              <Save className="h-3 w-3 mr-1" /> {saving ? 'Speichere...' : 'Metriken speichern'}
+              <Save className="h-3 w-3 mr-1" /> {saving ? t('analytics.saving') : t('analytics.save_metrics')}
             </Button>
           </div>
         )}
@@ -804,6 +774,7 @@ function ScreenshotAnalytics() {
 // ──── AI Learning Insights ────
 function AILearningInsights() {
   const { user } = useAuth();
+  const { t } = useLang();
   const { posts: allPosts } = usePosts(user?.id);
 
   const analyzed = useMemo(() =>
@@ -833,7 +804,7 @@ function AILearningInsights() {
     analyzed.forEach(p => {
       const m = p.metrics as any;
       const tags = m?.topic_tags || [];
-      if (Array.isArray(tags)) tags.forEach((t: string) => { tagCount[t] = (tagCount[t] || 0) + 1; });
+      if (Array.isArray(tags)) tags.forEach((tg: string) => { tagCount[tg] = (tagCount[tg] || 0) + 1; });
     });
     return Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
   }, [analyzed]);
@@ -873,19 +844,19 @@ function AILearningInsights() {
   return (
     <div className={cn(GLASS_CARD, 'p-6')}>
       <h2 className="font-playfair text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Brain className="h-4 w-4" /> Was Ihre KI gelernt hat
+        <Brain className="h-4 w-4" /> {t('analytics.ai_learned')}
       </h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {bestPattern && (
           <div className="rounded-[16px] bg-primary/5 p-4">
-            <p className="text-xs text-muted-foreground mb-1">Bester Content-Typ</p>
+            <p className="text-xs text-muted-foreground mb-1">{t('analytics.best_content')}</p>
             <p className="text-sm font-semibold text-foreground">{bestPattern}</p>
-            <p className="text-xs text-muted-foreground mt-1">Höchste durchschnittliche Engagement Rate</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('analytics.best_content_desc')}</p>
           </div>
         )}
         {topTags.length > 0 && (
           <div className="rounded-[16px] bg-success/5 p-4">
-            <p className="text-xs text-muted-foreground mb-2">Themen die ankommen</p>
+            <p className="text-xs text-muted-foreground mb-2">{t('analytics.topics_resonate')}</p>
             <div className="flex flex-wrap gap-1.5">
               {topTags.map(([tag, count]) => (
                 <Badge key={tag} variant="outline" className="text-[10px] rounded-full">{tag} ({count})</Badge>
@@ -895,23 +866,23 @@ function AILearningInsights() {
         )}
         {sentimentDist && (
           <div className="rounded-[16px] bg-warning/5 p-4">
-            <p className="text-xs text-muted-foreground mb-2">Sentiment-Verteilung</p>
+            <p className="text-xs text-muted-foreground mb-2">{t('analytics.sentiment_dist')}</p>
             <div className="flex gap-2 h-3 rounded-full overflow-hidden">
               <div className="bg-success rounded-full" style={{ width: `${sentimentDist.pos}%` }} />
               <div className="bg-muted rounded-full" style={{ width: `${sentimentDist.neu}%` }} />
               <div className="bg-destructive rounded-full" style={{ width: `${sentimentDist.neg}%` }} />
             </div>
             <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-              <span>Positiv {sentimentDist.pos}%</span>
-              <span>Neutral {sentimentDist.neu}%</span>
-              <span>Kritisch {sentimentDist.neg}%</span>
+              <span>{t('analytics.positive')} {sentimentDist.pos}%</span>
+              <span>{t('analytics.neutral')} {sentimentDist.neu}%</span>
+              <span>{t('analytics.critical')} {sentimentDist.neg}%</span>
             </div>
           </div>
         )}
       </div>
       {recommendations.length > 0 && (
         <div className="mt-4 space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">KI-Empfehlungen</p>
+          <p className="text-xs font-medium text-muted-foreground">{t('analytics.ai_recommendations')}</p>
           {recommendations.map((rec, i) => (
             <div key={i} className="flex items-start gap-2 rounded-xl bg-muted/30 p-3">
               <Zap className="h-3 w-3 mt-0.5 shrink-0 text-primary" />
@@ -927,6 +898,7 @@ function AILearningInsights() {
 // ──── Cycle Comparison ────
 function CycleComparison() {
   const { user } = useAuth();
+  const { t } = useLang();
   const { posts: allPosts } = usePosts(user?.id);
 
   const cycles = useMemo(() => {
@@ -975,16 +947,16 @@ function CycleComparison() {
     { label: 'Impressions', first: first.impressions, latest: latest.impressions },
     { label: 'Engagement Rate', first: Number(first.engagement_rate), latest: Number(latest.engagement_rate) },
     { label: 'Likes', first: first.likes, latest: latest.likes },
-    { label: 'Kommentare', first: first.comments, latest: latest.comments },
+    { label: t('analytics.comments'), first: first.comments, latest: latest.comments },
   ];
 
   return (
     <div className={cn(GLASS_CARD, 'p-6')}>
       <h2 className="font-playfair text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-        <ArrowRight className="h-4 w-4" /> Zyklen vergleichen
+        <ArrowRight className="h-4 w-4" /> {t('analytics.cycle_compare')}
       </h2>
       <p className="text-xs text-muted-foreground mb-4">
-        Durchschnittswerte: Zyklus {firstCycle} ({cycles[firstCycle].length} Posts) vs. Zyklus {latestCycle} ({cycles[latestCycle].length} Posts)
+        {t('analytics.cycle_desc')}: {t('analytics.cycle')} {firstCycle} ({cycles[firstCycle].length} {t('analytics.posts')}) vs. {t('analytics.cycle')} {latestCycle} ({cycles[latestCycle].length} {t('analytics.posts')})
       </p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {metrics.map(m => {
@@ -996,12 +968,12 @@ function CycleComparison() {
               <div className="flex items-center justify-center gap-3">
                 <div>
                   <p className="text-lg font-semibold text-foreground/60">{m.first}</p>
-                  <p className="text-[10px] text-muted-foreground">Zyklus {firstCycle}</p>
+                  <p className="text-[10px] text-muted-foreground">{t('analytics.cycle')} {firstCycle}</p>
                 </div>
                 <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="text-lg font-semibold text-foreground">{m.latest}</p>
-                  <p className="text-[10px] text-muted-foreground">Zyklus {latestCycle}</p>
+                  <p className="text-[10px] text-muted-foreground">{t('analytics.cycle')} {latestCycle}</p>
                 </div>
               </div>
               {d !== null && (

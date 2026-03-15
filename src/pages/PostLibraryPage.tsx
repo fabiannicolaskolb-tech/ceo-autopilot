@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isToday } from 'date-fns';
-import { de } from 'date-fns/locale';
+import { de, enUS } from 'date-fns/locale';
 import {
   FileText, Send, Check, Clock, BarChart3, Copy, Pencil, Trash2,
   CalendarDays, ChevronDown, ChevronUp, Inbox, Sparkles,
@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { useLang } from '@/hooks/useLang';
 import { usePosts } from '@/hooks/useRealtime';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
@@ -33,18 +34,20 @@ import { LinkedInPostPreview } from '@/components/LinkedInPostPreview';
 const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
 const GLASS_CARD_HOVER = `${GLASS_CARD} transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]`;
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType; dotClass: string }> = {
-  draft: { label: 'Entwurf', color: 'bg-muted text-muted-foreground', icon: FileText, dotClass: 'bg-[hsl(var(--status-draft))]' },
-  approved: { label: 'Freigegeben', color: 'bg-[hsl(var(--status-approved))]/15 text-[hsl(var(--status-approved))]', icon: Check, dotClass: 'bg-[hsl(var(--status-approved))]' },
-  scheduled: { label: 'Geplant', color: 'bg-[hsl(var(--status-scheduled))]/15 text-[hsl(var(--status-scheduled))]', icon: Clock, dotClass: 'bg-[hsl(var(--status-scheduled))]' },
-  posted: { label: 'Veröffentlicht', color: 'bg-[hsl(var(--status-posted))]/15 text-[hsl(var(--status-posted))]', icon: Send, dotClass: 'bg-[hsl(var(--status-posted))]' },
-  analyzed: { label: 'Analysiert', color: 'bg-warning/15 text-warning', icon: BarChart3, dotClass: 'bg-[hsl(var(--warning))]' },
-};
-
-const WEEKDAYS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+function useStatusConfig() {
+  const { t } = useLang();
+  return {
+    draft: { label: t('status.draft'), color: 'bg-muted text-muted-foreground', icon: FileText, dotClass: 'bg-[hsl(var(--status-draft))]' },
+    approved: { label: t('status.approved'), color: 'bg-[hsl(var(--status-approved))]/15 text-[hsl(var(--status-approved))]', icon: Check, dotClass: 'bg-[hsl(var(--status-approved))]' },
+    scheduled: { label: t('status.scheduled'), color: 'bg-[hsl(var(--status-scheduled))]/15 text-[hsl(var(--status-scheduled))]', icon: Clock, dotClass: 'bg-[hsl(var(--status-scheduled))]' },
+    posted: { label: t('status.posted'), color: 'bg-[hsl(var(--status-posted))]/15 text-[hsl(var(--status-posted))]', icon: Send, dotClass: 'bg-[hsl(var(--status-posted))]' },
+    analyzed: { label: t('status.analyzed'), color: 'bg-warning/15 text-warning', icon: BarChart3, dotClass: 'bg-[hsl(var(--warning))]' },
+  } as Record<string, { label: string; color: string; icon: React.ElementType; dotClass: string }>;
+}
 
 function StatusBadge({ status }: { status: string }) {
-  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.draft;
+  const statusConfig = useStatusConfig();
+  const cfg = statusConfig[status] || statusConfig.draft;
   const Icon = cfg.icon;
   return (
     <Badge variant="secondary" className={cn('text-xs rounded-full gap-1', cfg.color)}>
@@ -63,6 +66,14 @@ function getPostDate(post: any): Date | null {
 // ──── Calendar View ────
 function CalendarView({ posts, onPostClick }: { posts: any[]; onPostClick: (post: any) => void }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const { t, lang } = useLang();
+  const statusConfig = useStatusConfig();
+  const dateFnsLocale = lang === 'de' ? de : enUS;
+
+  const weekdays = [
+    t('weekday.mo'), t('weekday.di'), t('weekday.mi'), t('weekday.do'),
+    t('weekday.fr'), t('weekday.sa'), t('weekday.so'),
+  ];
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -89,7 +100,7 @@ function CalendarView({ posts, onPostClick }: { posts: any[]; onPostClick: (post
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <h3 className="font-playfair text-lg font-semibold text-foreground">
-          {format(currentMonth, 'MMMM yyyy', { locale: de })}
+          {format(currentMonth, 'MMMM yyyy', { locale: dateFnsLocale })}
         </h3>
         <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(prev => addMonths(prev, 1))}>
           <ChevronRight className="h-4 w-4" />
@@ -97,7 +108,7 @@ function CalendarView({ posts, onPostClick }: { posts: any[]; onPostClick: (post
       </div>
 
       <div className="flex flex-wrap gap-3 px-1">
-        {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+        {Object.entries(statusConfig).map(([key, cfg]) => (
           <div key={key} className="flex items-center gap-1.5">
             <div className={cn('h-2.5 w-2.5 rounded-full', cfg.dotClass)} />
             <span className="text-xs text-muted-foreground">{cfg.label}</span>
@@ -106,7 +117,7 @@ function CalendarView({ posts, onPostClick }: { posts: any[]; onPostClick: (post
       </div>
 
       <div className="grid grid-cols-7 gap-px rounded-xl overflow-hidden bg-border/50">
-        {WEEKDAYS.map(d => (
+        {weekdays.map(d => (
           <div key={d} className="bg-muted/60 py-2 text-center text-xs font-medium text-muted-foreground">{d}</div>
         ))}
         {Array.from({ length: startOffset }).map((_, i) => (
@@ -123,7 +134,7 @@ function CalendarView({ posts, onPostClick }: { posts: any[]; onPostClick: (post
               </div>
               <div className="space-y-0.5">
                 {dayPosts.slice(0, 3).map(post => {
-                  const cfg = STATUS_CONFIG[post.status] || STATUS_CONFIG.draft;
+                  const cfg = statusConfig[post.status] || statusConfig.draft;
                   return (
                     <Tooltip key={post.id}>
                       <TooltipTrigger asChild>
@@ -138,7 +149,7 @@ function CalendarView({ posts, onPostClick }: { posts: any[]; onPostClick: (post
                     </Tooltip>
                   );
                 })}
-                {dayPosts.length > 3 && <p className="text-[10px] text-muted-foreground pl-1">+{dayPosts.length - 3} mehr</p>}
+                {dayPosts.length > 3 && <p className="text-[10px] text-muted-foreground pl-1">+{dayPosts.length - 3} {t('postlib.more')}</p>}
               </div>
             </div>
           );
@@ -160,6 +171,8 @@ interface PostCardProps {
 
 function PostCard({ post, tab, onMutate }: PostCardProps) {
   const { profile } = useAuth();
+  const { t, lang } = useLang();
+  const dateFnsLocale = lang === 'de' ? de : enUS;
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content || '');
@@ -173,11 +186,10 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
 
   const handleApprove = async () => {
     const { error } = await supabase.from('posts').update({ status: 'approved' }).eq('id', post.id);
-    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
-    // Trigger n8n workflow
+    if (error) { toast({ title: t('error'), description: error.message, variant: 'destructive' }); return; }
     const { error: fnError } = await supabase.functions.invoke('trigger-n8n', { body: { postId: post.id } });
     if (fnError) console.error('n8n trigger error:', fnError);
-    toast({ title: 'Post freigegeben' });
+    toast({ title: t('postlib.approved') });
     onMutate();
   };
 
@@ -187,8 +199,8 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
     const dt = new Date(scheduleDate);
     dt.setHours(h, m, 0, 0);
     const { error } = await supabase.from('posts').update({ status: 'scheduled', scheduled_at: dt.toISOString() }).eq('id', post.id);
-    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
-    toast({ title: 'Post geplant', description: format(dt, 'dd.MM.yyyy HH:mm', { locale: de }) });
+    if (error) { toast({ title: t('error'), description: error.message, variant: 'destructive' }); return; }
+    toast({ title: t('postlib.scheduled'), description: format(dt, 'dd.MM.yyyy HH:mm', { locale: dateFnsLocale }) });
     onMutate();
   };
 
@@ -196,8 +208,8 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
     setSaving(true);
     const { error } = await supabase.from('posts').update({ content: editContent }).eq('id', post.id);
     setSaving(false);
-    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
-    toast({ title: 'Änderungen gespeichert' });
+    if (error) { toast({ title: t('error'), description: error.message, variant: 'destructive' }); return; }
+    toast({ title: t('postlib.saved') });
     setEditing(false);
     onMutate();
   };
@@ -205,7 +217,7 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
   const handleDelete = async () => {
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData?.session?.access_token;
-    if (!accessToken) { toast({ title: 'Fehler', description: 'Nicht eingeloggt', variant: 'destructive' }); return; }
+    if (!accessToken) { toast({ title: t('error'), description: 'Not logged in', variant: 'destructive' }); return; }
     const res = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/posts?id=eq.${post.id}`,
       {
@@ -217,15 +229,15 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
         },
       }
     );
-    if (!res.ok) { toast({ title: 'Fehler beim Löschen', variant: 'destructive' }); return; }
-    toast({ title: 'Post gelöscht' });
+    if (!res.ok) { toast({ title: t('postlib.deleted'), variant: 'destructive' }); return; }
+    toast({ title: t('postlib.deleted') });
     onMutate();
   };
 
   const handleCopy = () => {
     const text = `${post.content || ''}\n\n${hashtags.map(h => h.startsWith('#') ? h : `#${h}`).join(' ')}`.trim();
     navigator.clipboard.writeText(text);
-    toast({ title: 'In Zwischenablage kopiert' });
+    toast({ title: t('postlib.copied') });
   };
 
   const contentPreview = post.content || '';
@@ -251,7 +263,7 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
               <span className="text-sm font-semibold text-foreground truncate">{userName}</span>
               <span className="text-xs text-muted-foreground">·</span>
               <span className="text-xs text-muted-foreground">
-                {post.posted_at ? format(new Date(post.posted_at), 'dd. MMM', { locale: de }) : format(new Date(post.created_at), 'dd. MMM', { locale: de })}
+                {post.posted_at ? format(new Date(post.posted_at), 'dd. MMM', { locale: dateFnsLocale }) : format(new Date(post.created_at), 'dd. MMM', { locale: dateFnsLocale })}
               </span>
             </div>
             <p className="text-xs text-muted-foreground truncate">
@@ -266,8 +278,8 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
           <div className="space-y-2">
             <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} />
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleSaveEdit} disabled={saving}>Speichern</Button>
-              <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Abbrechen</Button>
+              <Button size="sm" onClick={handleSaveEdit} disabled={saving}>{t('postlib.save')}</Button>
+              <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>{t('postlib.cancel')}</Button>
             </div>
           </div>
         ) : (
@@ -277,7 +289,7 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
             </p>
             {isLong && (
               <button onClick={() => setExpanded(!expanded)} className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
-                {expanded ? <><ChevronUp className="h-3 w-3" /> Weniger anzeigen</> : <><ChevronDown className="h-3 w-3" /> Mehr anzeigen</>}
+                {expanded ? <><ChevronUp className="h-3 w-3" /> {t('postlib.show_less')}</> : <><ChevronDown className="h-3 w-3" /> {t('postlib.show_more')}</>}
               </button>
             )}
           </div>
@@ -298,7 +310,7 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
         <div className="mt-3 border-t border-border/30">
           <img
             src={post.image_url}
-            alt="Post Bild"
+            alt="Post"
             className="w-full object-cover max-h-[400px]"
             loading="lazy"
           />
@@ -332,13 +344,13 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
             )}
             {metrics.what_worked && (
               <div className="rounded-xl bg-success/5 p-3">
-                <p className="text-xs font-medium text-success mb-1">✓ Was funktioniert hat</p>
+                <p className="text-xs font-medium text-success mb-1">{t('analytics.what_worked')}</p>
                 <p className="text-xs text-muted-foreground">{metrics.what_worked}</p>
               </div>
             )}
             {metrics.what_to_improve && (
               <div className="rounded-xl bg-warning/5 p-3">
-                <p className="text-xs font-medium text-warning mb-1">↗ Verbesserungspotenzial</p>
+                <p className="text-xs font-medium text-warning mb-1">{t('analytics.improvement')}</p>
                 <p className="text-xs text-muted-foreground">{metrics.what_to_improve}</p>
               </div>
             )}
@@ -351,48 +363,48 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
             <>
               {post.status === 'draft' && (
                 <Button size="sm" variant="default" className="text-xs h-8" onClick={handleApprove}>
-                  <Check className="h-3 w-3 mr-1" /> Freigeben
+                  <Check className="h-3 w-3 mr-1" /> {t('postlib.approve')}
                 </Button>
               )}
               {post.status === 'approved' && (
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button size="sm" variant="default" className="text-xs h-8">
-                      <CalendarDays className="h-3 w-3 mr-1" /> Planen
+                      <CalendarDays className="h-3 w-3 mr-1" /> {t('postlib.schedule')}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-3 space-y-3" align="start">
                     <Calendar mode="single" selected={scheduleDate} onSelect={setScheduleDate} className="p-3 pointer-events-auto" />
                     <div className="flex items-center gap-2">
                       <Input type="time" value={scheduleTime} onChange={e => setScheduleTime(e.target.value)} className="w-28 h-8 text-xs" />
-                      <Button size="sm" className="text-xs h-8" onClick={handleSchedule} disabled={!scheduleDate}>Bestätigen</Button>
+                      <Button size="sm" className="text-xs h-8" onClick={handleSchedule} disabled={!scheduleDate}>{t('postlib.confirm')}</Button>
                     </div>
                   </PopoverContent>
                 </Popover>
               )}
               <Button size="sm" variant="ghost" className="text-xs h-8" onClick={() => { setEditing(true); setEditContent(post.content || ''); }}>
-                <Pencil className="h-3 w-3 mr-1" /> Bearbeiten
+                <Pencil className="h-3 w-3 mr-1" /> {t('postlib.edit')}
               </Button>
             </>
           )}
           <Button size="sm" variant="ghost" className="text-xs h-8" onClick={handleCopy}>
-            <Copy className="h-3 w-3 mr-1" /> Kopieren
+            <Copy className="h-3 w-3 mr-1" /> {t('postlib.copy')}
           </Button>
           {tab === 'drafts' && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
-                  <Trash2 className="h-3 w-3 mr-1" /> Löschen
+                  <Trash2 className="h-3 w-3 mr-1" /> {t('postlib.delete')}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Post löschen?</AlertDialogTitle>
-                  <AlertDialogDescription>Diese Aktion kann nicht rückgängig gemacht werden.</AlertDialogDescription>
+                  <AlertDialogTitle>{t('postlib.delete_confirm')}</AlertDialogTitle>
+                  <AlertDialogDescription>{t('postlib.delete_warning')}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDelete}>Löschen</AlertDialogAction>
+                  <AlertDialogCancel>{t('postlib.cancel')}</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>{t('postlib.delete')}</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
@@ -405,10 +417,14 @@ function PostCard({ post, tab, onMutate }: PostCardProps) {
 
 // ──── Gallery Grid View ────
 function GalleryGrid({ posts, onPostClick }: { posts: any[]; onPostClick?: (post: any) => void }) {
+  const { lang } = useLang();
+  const statusConfig = useStatusConfig();
+  const dateFnsLocale = lang === 'de' ? de : enUS;
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
       {posts.map(post => {
-        const cfg = STATUS_CONFIG[post.status] || STATUS_CONFIG.draft;
+        const cfg = statusConfig[post.status] || statusConfig.draft;
         return (
           <div
             key={post.id}
@@ -425,8 +441,8 @@ function GalleryGrid({ posts, onPostClick }: { posts: any[]; onPostClick?: (post
             </div>
             <p className="text-[10px] text-muted-foreground mt-2">
               {post.scheduled_at
-                ? format(new Date(post.scheduled_at), 'dd. MMM yyyy', { locale: de })
-                : format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}
+                ? format(new Date(post.scheduled_at), 'dd. MMM yyyy', { locale: dateFnsLocale })
+                : format(new Date(post.created_at), 'dd. MMM yyyy', { locale: dateFnsLocale })}
             </p>
           </div>
         );
@@ -437,6 +453,8 @@ function GalleryGrid({ posts, onPostClick }: { posts: any[]; onPostClick?: (post
 
 // ──── Approval Card (same style as PostCard) ────
 function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => void; profile: any }) {
+  const { t, lang } = useLang();
+  const dateFnsLocale = lang === 'de' ? de : enUS;
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content || '');
   const [expanded, setExpanded] = useState(false);
@@ -450,17 +468,17 @@ function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => 
 
   const handleApprove = async () => {
     const { error } = await supabase.from('posts').update({ status: 'approved' }).eq('id', post.id);
-    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: t('error'), description: error.message, variant: 'destructive' }); return; }
     const { error: fnError } = await supabase.functions.invoke('trigger-n8n', { body: { postId: post.id } });
     if (fnError) console.error('n8n trigger error:', fnError);
-    toast({ title: 'Post freigegeben ✓' });
+    toast({ title: t('postlib.approved') + ' ✓' });
     onMutate();
   };
 
   const handleReject = async () => {
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData?.session?.access_token;
-    if (!accessToken) { toast({ title: 'Fehler', description: 'Nicht eingeloggt', variant: 'destructive' }); return; }
+    if (!accessToken) { toast({ title: t('error'), description: 'Not logged in', variant: 'destructive' }); return; }
     const res = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/posts?id=eq.${post.id}`,
       {
@@ -472,8 +490,8 @@ function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => 
         },
       }
     );
-    if (!res.ok) { toast({ title: 'Fehler beim Löschen', variant: 'destructive' }); return; }
-    toast({ title: 'Post abgelehnt und gelöscht' });
+    if (!res.ok) { toast({ title: t('error'), variant: 'destructive' }); return; }
+    toast({ title: t('postlib.rejected') });
     onMutate();
   };
 
@@ -481,8 +499,8 @@ function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => 
     setSaving(true);
     const { error } = await supabase.from('posts').update({ content: editContent }).eq('id', post.id);
     setSaving(false);
-    if (error) { toast({ title: 'Fehler', description: error.message, variant: 'destructive' }); return; }
-    toast({ title: 'Änderungen gespeichert ✓' });
+    if (error) { toast({ title: t('error'), description: error.message, variant: 'destructive' }); return; }
+    toast({ title: t('postlib.saved') + ' ✓' });
     setEditing(false);
     onMutate();
   };
@@ -503,7 +521,7 @@ function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => 
               <span className="text-sm font-semibold text-foreground truncate">{userName}</span>
               <span className="text-xs text-muted-foreground">·</span>
               <span className="text-xs text-muted-foreground">
-                {format(new Date(post.created_at), 'dd. MMM', { locale: de })}
+                {format(new Date(post.created_at), 'dd. MMM', { locale: dateFnsLocale })}
               </span>
             </div>
             <p className="text-xs text-muted-foreground truncate">
@@ -518,9 +536,9 @@ function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => 
             <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} />
             <div className="flex gap-2">
               <Button size="sm" onClick={handleSaveEdit} disabled={saving}>
-                {saving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}Speichern
+                {saving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}{t('postlib.save')}
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => { setEditing(false); setEditContent(post.content || ''); }}>Abbrechen</Button>
+              <Button size="sm" variant="ghost" onClick={() => { setEditing(false); setEditContent(post.content || ''); }}>{t('postlib.cancel')}</Button>
             </div>
           </div>
         ) : (
@@ -530,7 +548,7 @@ function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => 
             </p>
             {isLong && (
               <button onClick={() => setExpanded(!expanded)} className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
-                {expanded ? <><ChevronUp className="h-3 w-3" /> Weniger anzeigen</> : <><ChevronDown className="h-3 w-3" /> Mehr anzeigen</>}
+                {expanded ? <><ChevronUp className="h-3 w-3" /> {t('postlib.show_less')}</> : <><ChevronDown className="h-3 w-3" /> {t('postlib.show_more')}</>}
               </button>
             )}
           </div>
@@ -554,25 +572,25 @@ function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => 
       <div className="p-5 pt-3 space-y-3">
         <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-border/30">
           <Button size="sm" variant="default" className="text-xs h-8" onClick={handleApprove}>
-            <Check className="h-3 w-3 mr-1" /> Freigeben
+            <Check className="h-3 w-3 mr-1" /> {t('postlib.approve')}
           </Button>
           <Button size="sm" variant="ghost" className="text-xs h-8" onClick={() => { setEditing(true); setEditContent(post.content || ''); }}>
-            <Pencil className="h-3 w-3 mr-1" /> Bearbeiten
+            <Pencil className="h-3 w-3 mr-1" /> {t('postlib.edit')}
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button size="sm" variant="ghost" className="text-xs h-8 text-destructive hover:text-destructive">
-                <Trash2 className="h-3 w-3 mr-1" /> Ablehnen
+                <Trash2 className="h-3 w-3 mr-1" /> {t('postlib.reject_confirm') === 'Reject post?' ? lang === 'de' ? 'Ablehnen' : 'Reject' : lang === 'de' ? 'Ablehnen' : 'Reject'}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Post ablehnen?</AlertDialogTitle>
-                <AlertDialogDescription>Der Post wird unwiderruflich gelöscht.</AlertDialogDescription>
+                <AlertDialogTitle>{t('postlib.reject_title')}</AlertDialogTitle>
+                <AlertDialogDescription>{t('postlib.reject_desc')}</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                <AlertDialogAction onClick={handleReject}>Ablehnen & Löschen</AlertDialogAction>
+                <AlertDialogCancel>{t('postlib.cancel')}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleReject}>{t('postlib.reject_confirm')}</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -584,6 +602,8 @@ function ApprovalCard({ post, onMutate, profile }: { post: any; onMutate: () => 
 
 // ──── Feed View (LinkedIn Preview) ────
 function FeedView({ posts, profile }: { posts: any[]; profile: any }) {
+  const { lang } = useLang();
+  const dateFnsLocale = lang === 'de' ? de : enUS;
   const authorName = profile?.name || 'LinkedIn Creator';
   const authorHeadline = [profile?.role, profile?.company].filter(Boolean).join(' at ') || 'Professional';
   const authorAvatar = profile?.avatar_url_1 || undefined;
@@ -595,9 +615,9 @@ function FeedView({ posts, profile }: { posts: any[]; profile: any }) {
       {posts.map(post => {
         const metrics = post.metrics && typeof post.metrics === 'object' ? post.metrics as any : undefined;
         const postedAt = post.posted_at
-          ? format(new Date(post.posted_at), 'dd. MMM yyyy', { locale: de })
+          ? format(new Date(post.posted_at), 'dd. MMM yyyy', { locale: dateFnsLocale })
           : post.scheduled_at
-            ? format(new Date(post.scheduled_at), 'dd. MMM yyyy', { locale: de })
+            ? format(new Date(post.scheduled_at), 'dd. MMM yyyy', { locale: dateFnsLocale })
             : 'Just now';
 
         return (
@@ -627,6 +647,7 @@ function FeedView({ posts, profile }: { posts: any[]; profile: any }) {
 // ──── Main Page ────
 export default function PostLibraryPage() {
   const { user, profile } = useAuth();
+  const { t } = useLang();
   const { posts, loading } = usePosts(user?.id);
   const [tab, setTab] = useState<'drafts' | 'published'>('drafts');
   const [viewMode, setViewMode] = useState<'list' | 'gallery' | 'calendar' | 'feed'>('list');
@@ -642,8 +663,6 @@ export default function PostLibraryPage() {
 
   const handleMutate = () => setRefreshKey(k => k + 1);
 
-
-  // Dummy handler for gallery/calendar clicks (scrolls to card view)
   const handlePostClick = (_post: any) => {
     setViewMode('list');
   };
@@ -656,41 +675,39 @@ export default function PostLibraryPage() {
       <div className={cn(GLASS_CARD, 'p-6 sm:p-8')}>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">Post Library</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">Verwalten, planen und visualisieren Sie Ihre LinkedIn-Posts</p>
+            <h1 className="font-playfair text-2xl font-bold text-foreground tracking-tight">{t('postlib.title')}</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">{t('postlib.subtitle')}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            {/* View mode toggle */}
             <Tabs value={viewMode} onValueChange={v => setViewMode(v as any)}>
               <TabsList className="h-9">
                 <TabsTrigger value="list" className="gap-1 text-xs px-2.5">
-                  <List className="h-3 w-3" /> Liste
+                  <List className="h-3 w-3" /> {t('postlib.list')}
                 </TabsTrigger>
                 <TabsTrigger value="gallery" className="gap-1 text-xs px-2.5">
-                  <FileText className="h-3 w-3" /> Galerie
+                  <FileText className="h-3 w-3" /> {t('postlib.gallery')}
                 </TabsTrigger>
                 <TabsTrigger value="calendar" className="gap-1 text-xs px-2.5">
-                  <CalendarDays className="h-3 w-3" /> Kalender
+                  <CalendarDays className="h-3 w-3" /> {t('postlib.calendar')}
                 </TabsTrigger>
                 <TabsTrigger value="feed" className="gap-1 text-xs px-2.5">
-                  <Newspaper className="h-3 w-3" /> Feed
+                  <Newspaper className="h-3 w-3" /> {t('postlib.feed')}
                 </TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
         </div>
 
-        {/* Content tabs (only for list view) */}
         {viewMode === 'list' && (
           <div className="mt-4">
             <Tabs value={tab} onValueChange={v => setTab(v as any)}>
               <TabsList>
                 <TabsTrigger value="drafts" className="gap-1.5">
-                  Entwürfe & Geplant
+                  {t('postlib.drafts_scheduled')}
                   <Badge variant="secondary" className="text-[10px] rounded-full h-5 min-w-5 px-1.5">{drafts.length}</Badge>
                 </TabsTrigger>
                 <TabsTrigger value="published" className="gap-1.5">
-                  Veröffentlicht
+                  {t('postlib.published')}
                   <Badge variant="secondary" className="text-[10px] rounded-full h-5 min-w-5 px-1.5">{published.length}</Badge>
                 </TabsTrigger>
               </TabsList>
@@ -699,14 +716,14 @@ export default function PostLibraryPage() {
         )}
       </div>
 
-      {/* Approval Queue (hidden in feed mode) */}
+      {/* Approval Queue */}
       {viewMode === 'list' && !loading && pendingApproval.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center h-6 w-6 rounded-full bg-warning/15">
               <Zap className="h-3.5 w-3.5 text-warning" />
             </div>
-            <h2 className="font-playfair text-lg font-semibold text-foreground">Zur Freigabe</h2>
+            <h2 className="font-playfair text-lg font-semibold text-foreground">{t('postlib.for_approval')}</h2>
             <Badge variant="secondary" className="text-[10px] rounded-full bg-warning/15 text-warning">{pendingApproval.length}</Badge>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -754,22 +771,21 @@ export default function PostLibraryPage() {
 }
 
 function EmptyState({ tab }: { tab: string }) {
+  const { t } = useLang();
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/60 py-16 px-6 text-center">
       <div className="rounded-xl bg-muted/50 p-4 mb-4">
         <Inbox className="h-8 w-8 text-muted-foreground" />
       </div>
       <h2 className="font-playfair text-lg font-semibold text-foreground mb-1">
-        {tab === 'drafts' ? 'Noch keine Entwürfe' : 'Noch keine veröffentlichten Posts'}
+        {tab === 'drafts' ? t('postlib.no_drafts') : t('postlib.no_published')}
       </h2>
       <p className="text-sm text-muted-foreground mb-6 max-w-sm">
-        {tab === 'drafts'
-          ? 'Starten Sie im Ideation Lab, um Ihre ersten Post-Ideen zu generieren.'
-          : 'Geben Sie einen Entwurf frei, um loszulegen.'}
+        {tab === 'drafts' ? t('postlib.start_ideation') : t('postlib.approve_draft')}
       </p>
       {tab === 'drafts' && (
         <Button asChild>
-          <Link to="/ideation">Erste Idee generieren</Link>
+          <Link to="/ideation">{t('postlib.first_idea')}</Link>
         </Button>
       )}
     </div>
