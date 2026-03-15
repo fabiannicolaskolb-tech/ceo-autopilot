@@ -178,11 +178,11 @@ export default function LandingPage() {
 
           <div className="grid gap-8 sm:grid-cols-3">
             {features.map((f) => {
-              const isExpandable = f.title === 'Analytics' || f.title === 'Planning';
+              const isExpandable = true;
               const isExpanded = expandedFeature === f.title;
               const isHidden = expandedFeature != null && expandedFeature !== f.title;
 
-              const previewImage = f.title === 'Analytics' ? calendarPreview : f.title === 'Planning' ? plannerPreview : null;
+              const previewImage = f.title === 'Analytics' ? calendarPreview : f.title === 'Planning' ? plannerPreview : ideationPreview;
 
               return (
                 <motion.div
