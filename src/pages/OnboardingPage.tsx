@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X } from 'lucide-react';
 import { Particles } from '@/components/ui/particles';
 import { useTheme } from '@/hooks/useTheme';
+import ShimmerText from '@/components/ui/shimmer-text';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import PhotoUpload from '@/components/PhotoUpload';
@@ -130,7 +131,7 @@ export default function OnboardingPage() {
         {step === 1 && (
           <div className="space-y-8">
             <div className="text-center">
-              <h1 className="font-playfair text-3xl font-bold text-foreground">Willkommen bei CEO Autopilot</h1>
+              <ShimmerText className="font-playfair text-3xl font-bold text-foreground">Willkommen bei CEO Autopilot</ShimmerText>
               <p className="mt-2 text-muted-foreground">Ihr LinkedIn-Autopilot für strategische Sichtbarkeit</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
