@@ -283,14 +283,17 @@ export default function OnboardingPage() {
             
               <Button
               type="button"
-              variant="outline"
-              className="gap-2"
-              disabled={parsingCv}
+              variant={cvUploaded ? "default" : "outline"}
+              className={cn("gap-2", cvUploaded && "bg-green-600 hover:bg-green-700 text-white")}
+              disabled={parsingCv || cvUploaded}
               onClick={() => cvInputRef.current?.click()}>
               
-                {parsingCv ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                {parsingCv ? 'CV wird analysiert...' : 'CV hochladen & automatisch ausfüllen'}
+                {parsingCv ? <Loader2 className="h-4 w-4 animate-spin" /> : cvUploaded ? <Check className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
+                {parsingCv ? 'CV wird analysiert...' : cvUploaded ? 'CV erfolgreich hochgeladen ✓' : 'CV hochladen & automatisch ausfüllen'}
               </Button>
+              {!cvUploaded && (
+                <p className="text-xs text-destructive mt-1">Bitte laden Sie Ihren CV hoch, um fortzufahren</p>
+              )}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
