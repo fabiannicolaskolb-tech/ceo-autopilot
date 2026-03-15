@@ -24,8 +24,6 @@ verify_jwt = false
 [functions.scrape-linkedin]
 verify_jwt = false
 
-[functions.generate-briefing]
-verify_jwt = false
 
 [functions.generate-templates]
 verify_jwt = false
