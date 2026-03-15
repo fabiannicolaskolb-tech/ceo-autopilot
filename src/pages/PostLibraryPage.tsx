@@ -453,8 +453,8 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
           </div>
         </div>
 
-        {/* Content (only when editing) */}
-        {editing && (
+        {/* Content */}
+        {editing ? (
           <div className="space-y-2">
             <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={6} className="text-xs" />
             <div className="flex gap-2">
@@ -464,6 +464,8 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
               <Button size="sm" variant="ghost" className="text-xs h-7" onClick={() => { setEditing(false); setEditContent(post.content || ''); }}>Abbrechen</Button>
             </div>
           </div>
+        ) : (
+          <p className="text-sm text-foreground line-clamp-4 whitespace-pre-line leading-relaxed">{post.content || '—'}</p>
         )}
 
         {/* Actions */}
