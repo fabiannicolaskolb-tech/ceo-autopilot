@@ -290,35 +290,7 @@
 }
 
 .glow {
-  --glow-translate-y: 0;
-  display: block;
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  animation: rotate var(--animation-speed) linear infinite;
-  transform: rotateZ(calc(var(--rotate) * var(--glow-rotate-unit)));
-  transform-origin: center;
-  border-radius: calc(var(--glow-radius) * 10vw);
-  z-index: 0;
-}
-
-.glow:after {
-  content: "";
-  display: block;
-  z-index: -2;
-  filter: blur(calc(var(--glow-blur) * 10px));
-  width: 130%;
-  height: 130%;
-  left: -15%;
-  top: -15%;
-  background: hsl(calc(var(--hue) * var(--hue-speed) * 1deg) 100% 60%);
-  position: relative;
-  border-radius: calc(var(--glow-radius) * 10vw);
-  animation: hue-animation var(--animation-speed) linear infinite;
-  transform: scaleY(calc(var(--glow-scale) * var(--scale-factor) / 1.1))
-             scaleX(calc(var(--glow-scale) * var(--scale-factor) * 1.2))
-             translateY(calc(var(--glow-translate-y) * 1%));
-  opacity: var(--glow-opacity);
+  display: none;
 }
 
 @keyframes shadow-pulse {
