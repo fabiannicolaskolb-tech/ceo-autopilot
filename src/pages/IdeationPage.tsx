@@ -398,9 +398,16 @@ export default function IdeationPage() {
                       </span>
                     </div>
                   ) : (
-                    <InteractiveHoverButton onClick={generatePost}>
-                      Post generieren
-                    </InteractiveHoverButton>
+                    <>
+                      <InteractiveHoverButton onClick={generatePost}>
+                        Post generieren
+                      </InteractiveHoverButton>
+                      {selectedInsights.length > 0 && (
+                        <p className="text-xs text-primary mt-2">
+                          {selectedInsights.length} Erkenntnis{selectedInsights.length > 1 ? 'se' : ''} als Grundlage ausgewählt
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
 
