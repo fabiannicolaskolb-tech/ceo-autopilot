@@ -35,12 +35,12 @@ function ProtectedLayout() {
   if (!profile.onboarding_completed) return <Navigate to="/onboarding" replace />;
 
   return (
-    <div className="relative min-h-screen bg-background">
+    <div className="relative h-screen overflow-hidden bg-background">
       <WaveMeshBackground />
       <Particles className="absolute inset-0 z-0" quantity={150} color={theme === 'dark' ? '#8899bb' : '#1a2740'} size={0.5} burst={burstKey} />
-      <div className="relative z-10">
+      <div className="relative z-10 flex h-full flex-col">
         <FloatingHeader />
-        <main className="mx-auto max-w-7xl px-4 py-6">
+        <main className="mx-auto w-full max-w-7xl flex-1 overflow-auto px-4 py-6">
           <Outlet />
         </main>
       </div>
