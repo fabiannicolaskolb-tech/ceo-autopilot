@@ -40,7 +40,7 @@ const plans = [
   },
   {
     name: 'Enterprise',
-    price: '$59',
+    price: null,
     popular: false,
     featureDetails: {
       'AI posts/month': 'Unlimited',
