@@ -194,7 +194,7 @@ export default function IdeationPage() {
       />
       {/* Split View: Actions + Sidebar */}
       <div className="hidden md:block">
-        <ResizablePanelGroup direction="horizontal" className="min-h-[380px] rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
+        <ResizablePanelGroup direction="horizontal" className="min-h-[380px] rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)]">
           {/* Left: Actions */}
           <ResizablePanel defaultSize={70} minSize={55}>
             <div className="p-8 h-full flex flex-col">
