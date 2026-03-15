@@ -315,7 +315,7 @@ export default function IdeationPage() {
               )}
             </CardContent>
           </Card>
-          <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
+          <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06)] border-primary/[0.08]">
             <CardContent className="p-6 flex flex-col items-center text-center gap-4">
               <MessageSquare className="h-7 w-7 text-primary" />
               <h3 className="font-playfair text-lg font-semibold text-foreground">Gespräch starten</h3>
