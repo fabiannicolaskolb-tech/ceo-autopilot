@@ -148,7 +148,7 @@ export default function LandingPage() {
             ].map((step, idx, arr) => (
               <React.Fragment key={step.label}>
                 <div className="flex flex-col items-center gap-3">
-                  <div className="flex h-24 w-32 items-center justify-center rounded-2xl bg-[hsl(var(--feature-card))] shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_28px_-4px_hsl(220_55%_20%/0.14)]">
+                  <div className="flex h-24 w-32 items-center justify-center rounded-2xl bg-[hsl(var(--feature-card))] shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_28px_-4px_hsl(263_50%_40%/0.14)]">
                     <step.icon className="h-8 w-8 text-foreground/70" />
                   </div>
                   <span className="text-sm font-medium text-muted-foreground">{step.label}</span>
