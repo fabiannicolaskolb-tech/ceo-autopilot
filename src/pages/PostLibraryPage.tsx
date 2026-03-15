@@ -713,7 +713,7 @@ export default function PostLibraryPage() {
           <CalendarView posts={posts} onPostClick={handlePostClick} />
         </div>
       ) : viewMode === 'feed' ? (
-        <FeedView posts={published.length > 0 ? published : posts} profile={profile} />
+        <FeedView posts={posts} profile={profile} />
       ) : viewMode === 'gallery' ? (
         posts.length === 0 ? (
           <EmptyState tab={tab} />
