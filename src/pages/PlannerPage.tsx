@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, isSameMonth, addMonths, subMonths, isToday } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, isSameMonth, addMonths, subMonths, isToday, setHours, setMinutes } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { CalendarIcon, Rocket, ChevronLeft, ChevronRight, List, CalendarDays, Send, Loader2, Zap } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -166,6 +166,7 @@ export default function PlannerPage() {
   const [editPost, setEditPost] = useState<any | null>(null);
   const [editContent, setEditContent] = useState('');
   const [editDate, setEditDate] = useState<Date | undefined>();
+  const [editTime, setEditTime] = useState('09:00');
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -243,15 +244,22 @@ export default function PlannerPage() {
   const openEdit = (post: any) => {
     setEditPost(post);
     setEditContent(post.content || '');
-    setEditDate(post.scheduled_at ? new Date(post.scheduled_at) : undefined);
+    const scheduled = post.scheduled_at ? new Date(post.scheduled_at) : undefined;
+    setEditDate(scheduled);
+    setEditTime(scheduled ? format(scheduled, 'HH:mm') : '09:00');
   };
 
   const saveEdit = () => {
     if (!editPost) return;
+    let scheduledDate = editDate;
+    if (scheduledDate) {
+      const [h, m] = editTime.split(':').map(Number);
+      scheduledDate = setMinutes(setHours(scheduledDate, h), m);
+    }
     updateMutation.mutate({
       id: editPost.id,
       content: editContent,
-      scheduled_at: editDate?.toISOString(),
+      scheduled_at: scheduledDate?.toISOString(),
     });
   };
 
@@ -347,7 +355,7 @@ export default function PlannerPage() {
                   </div>
                   <p className="text-[10px] text-muted-foreground mt-2">
                     {post.scheduled_at
-                      ? format(new Date(post.scheduled_at), 'dd. MMM yyyy', { locale: de })
+                      ? format(new Date(post.scheduled_at), "dd. MMM yyyy 'um' HH:mm 'Uhr'", { locale: de })
                       : format(new Date(post.created_at), 'dd. MMM yyyy', { locale: de })}
                   </p>
                 </div>
@@ -366,17 +374,30 @@ export default function PlannerPage() {
             <Textarea value={editContent} onChange={e => setEditContent(e.target.value)} className="min-h-[150px] bg-card" />
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Veröffentlichungsdatum</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !editDate && "text-muted-foreground")}>
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {editDate ? format(editDate, 'PPP', { locale: de }) : 'Datum wählen'}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={editDate} onSelect={setEditDate} locale={de} className="pointer-events-auto p-3" />
-                </PopoverContent>
-              </Popover>
+              <div className="flex gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("flex-1 justify-start text-left font-normal", !editDate && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {editDate ? format(editDate, 'PPP', { locale: de }) : 'Datum wählen'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={editDate} onSelect={setEditDate} locale={de} className="pointer-events-auto p-3" />
+                  </PopoverContent>
+                </Popover>
+                <input
+                  type="time"
+                  value={editTime}
+                  onChange={e => setEditTime(e.target.value)}
+                  className="h-10 rounded-md border border-input bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
+              {editDate && (
+                <p className="text-xs text-muted-foreground">
+                  Geplant für: {format(setMinutes(setHours(editDate, parseInt(editTime.split(':')[0])), parseInt(editTime.split(':')[1])), "dd. MMM yyyy 'um' HH:mm 'Uhr'", { locale: de })}
+                </p>
+              )}
             </div>
           </div>
           <DialogFooter className="flex-col sm:flex-row gap-2">
