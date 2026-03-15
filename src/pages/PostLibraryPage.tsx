@@ -431,7 +431,7 @@ function ApprovalCard({ post, onMutate }: { post: any; onMutate: () => void }) {
   };
 
   return (
-    <div className={cn(GLASS_CARD, 'p-4 border-l-4 border-l-warning space-y-3')}>
+    <div className={cn(GLASS_CARD, 'p-4 border-l-4 border-l-primary space-y-3')}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           {post.hook && (
