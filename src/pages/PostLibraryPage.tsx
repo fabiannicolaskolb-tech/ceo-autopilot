@@ -496,6 +496,9 @@ export default function PostLibraryPage() {
                 <TabsTrigger value="calendar" className="gap-1 text-xs px-2.5">
                   <CalendarDays className="h-3 w-3" /> Kalender
                 </TabsTrigger>
+                <TabsTrigger value="feed" className="gap-1 text-xs px-2.5">
+                  <Newspaper className="h-3 w-3" /> Feed
+                </TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
