@@ -174,69 +174,58 @@ export default function LandingPage() {
             </h2>
           </div>
 
-          <div className={`grid gap-8 transition-all duration-500 ${expandedFeature === 'Analytics' ? 'grid-cols-1' : 'sm:grid-cols-3'}`}>
-            <AnimatePresence mode="sync">
-              {features.map((f) => {
-                const isAnalytics = f.title === 'Analytics';
-                const isExpanded = expandedFeature === f.title;
-                const isHidden = expandedFeature === 'Analytics' && !isAnalytics;
+          <div className="grid gap-8 sm:grid-cols-3">
+            {features.map((f) => {
+              const isAnalytics = f.title === 'Analytics';
+              const isExpanded = expandedFeature === f.title;
+              const isHidden = expandedFeature === 'Analytics' && !isAnalytics;
 
-                if (isHidden) {
-                  return (
-                    <motion.div
-                      key={f.title}
-                      initial={{ opacity: 1, scale: 1, height: 'auto' }}
-                      animate={{ opacity: 0, scale: 0.9, height: 0, marginBottom: 0 }}
-                      exit={{ opacity: 1, scale: 1, height: 'auto' }}
-                      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-                      className="overflow-hidden"
-                    />
-                  );
-                }
-
-                return (
-                  <motion.div
-                    key={f.title}
-                    layout
-                    transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                    onClick={() => isAnalytics && setExpandedFeature(isExpanded ? null : f.title)}
-                    className={`group relative overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-shadow duration-300 hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] ${isAnalytics ? 'cursor-pointer' : ''}`}
-                  >
-                    <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
-                    <div className={`${isExpanded ? 'flex flex-col sm:flex-row sm:items-start gap-6' : ''}`}>
-                      <div className={`flex flex-col items-center p-8 pt-7 text-center ${isExpanded ? 'sm:items-start sm:text-left sm:w-1/3 sm:shrink-0' : ''}`}>
-                        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--feature-icon-bg))]">
-                          <f.icon className="h-7 w-7 text-[hsl(var(--feature-icon))]" />
-                        </div>
-                        <h3 className="font-playfair text-lg font-bold text-foreground">{f.headline}</h3>
-                        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
-                        <span className="mt-5 inline-block text-xs font-medium tracking-wide text-[hsl(var(--feature-accent))] transition-all group-hover:underline">
-                          {isAnalytics ? (isExpanded ? 'Schließen ↑' : 'Vorschau ansehen →') : 'Mehr erfahren →'}
-                        </span>
+              return (
+                <motion.div
+                  key={f.title}
+                  layout
+                  animate={isHidden
+                    ? { opacity: 0, scale: 0.9, height: 0, marginBottom: 0 }
+                    : { opacity: 1, scale: 1, height: 'auto', marginBottom: undefined }
+                  }
+                  transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                  onClick={() => isAnalytics && setExpandedFeature(isExpanded ? null : f.title)}
+                  className={`group relative overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-shadow duration-300 hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] ${isAnalytics ? 'cursor-pointer' : ''}`}
+                >
+                  <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
+                  <div className="flex flex-col items-center text-center">
+                    <div className="flex flex-col items-center p-8 pt-7 text-center">
+                      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--feature-icon-bg))]">
+                        <f.icon className="h-7 w-7 text-[hsl(var(--feature-icon))]" />
                       </div>
-                      <AnimatePresence>
-                        {isAnalytics && isExpanded && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                            transition={{ duration: 0.5, delay: 0.15, ease: [0.4, 0, 0.2, 1] }}
-                            className="flex-1 p-4 sm:py-6 sm:pr-6 sm:pl-0"
-                          >
-                            <img
-                              src={calendarPreview}
-                              alt="Analytics Kalender Vorschau"
-                              className="w-full rounded-xl border border-border shadow-lg brightness-[1.02] dark:brightness-[0.85] dark:contrast-[1.1] dark:border-border/50"
-                              draggable={false}
-                            />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      <h3 className="font-playfair text-lg font-bold text-foreground">{f.headline}</h3>
+                      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
+                      <span className="mt-5 inline-block text-xs font-medium tracking-wide text-[hsl(var(--feature-accent))] transition-all group-hover:underline">
+                        {isAnalytics ? (isExpanded ? 'Schließen ↑' : 'Vorschau ansehen →') : 'Mehr erfahren →'}
+                      </span>
                     </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
+                    <AnimatePresence>
+                      {isAnalytics && isExpanded && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                          transition={{ duration: 0.5, delay: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                          className="w-full max-w-3xl mx-auto px-6 pb-6"
+                        >
+                          <img
+                            src={calendarPreview}
+                            alt="Analytics Kalender Vorschau"
+                            className="w-full rounded-xl border border-border shadow-lg brightness-[1.02] dark:brightness-[0.85] dark:contrast-[1.1] dark:border-border/50"
+                            draggable={false}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
