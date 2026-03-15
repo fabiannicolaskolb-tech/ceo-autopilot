@@ -55,6 +55,7 @@ const plans = [
 
 export default function PricingPage() {
   const { theme, toggleTheme } = useTheme();
+  const { lang, toggleLang, t } = useLang();
   const navigate = useNavigate();
 
   return (
