@@ -64,7 +64,7 @@ export default function IdeationPage() {
     queryFn: async () => {
       if (!user) return [];
       const { data, error } = await supabase
-        .from('voice_insights' as any)
+        .from('voice_insights')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
