@@ -132,9 +132,9 @@ interface CompareMetric {
 
 const COMPARE_METRICS: CompareMetric[] = [
   { label: 'Impressions', icon: Eye, getValue: (p) => p.metrics.impressions || 0 },
-  { label: 'Likes', icon: Heart, getValue: (p) => p.metrics.interactions?.likes || 0 },
-  { label: 'Kommentare', icon: MessageCircle, getValue: (p) => p.metrics.interactions?.comments || 0 },
-  { label: 'Shares', icon: Share2, getValue: (p) => p.metrics.interactions?.shares || 0 },
+  { label: 'Likes', icon: Heart, getValue: (p) => p.metrics.likes || 0 },
+  { label: 'Kommentare', icon: MessageCircle, getValue: (p) => p.metrics.comments || 0 },
+  { label: 'Shares', icon: Share2, getValue: (p) => p.metrics.shares || 0 },
   { label: 'CTR', icon: TrendingUp, getValue: (p) => p.metrics.ctr || 0 },
 ];
 
