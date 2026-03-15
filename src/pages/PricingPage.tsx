@@ -16,7 +16,7 @@ const allFeatures = [
 const plans = [
   {
     name: 'Starter',
-    price: '$7',
+    price: '$4.99',
     popular: false,
     featureDetails: {
       'AI posts/month': '10',
@@ -28,7 +28,7 @@ const plans = [
   },
   {
     name: 'Pro',
-    price: '$18',
+    price: '$9.99',
     popular: true,
     featureDetails: {
       'AI posts/month': '30',
@@ -40,7 +40,7 @@ const plans = [
   },
   {
     name: 'Enterprise',
-    price: '$59',
+    price: null,
     popular: false,
     featureDetails: {
       'AI posts/month': 'Unlimited',
@@ -142,12 +142,19 @@ export default function PricingPage() {
                 </h3>
 
                 {/* Price */}
-                <div className="mt-5 flex items-baseline gap-1.5">
-                  <span className="font-playfair text-[3.25rem] font-bold leading-none tracking-tight text-foreground">
-                    {plan.price}
-                  </span>
-                  <span className="text-sm text-muted-foreground font-medium">/month</span>
-                </div>
+                {plan.price ? (
+                  <div className="mt-5 flex items-baseline gap-1.5">
+                    <span className="font-playfair text-[3.25rem] font-bold leading-none tracking-tight text-foreground">
+                      {plan.price}
+                    </span>
+                    <span className="text-sm text-muted-foreground font-medium">/month</span>
+                  </div>
+                ) : (
+                  <div className="mt-5">
+                    <span className="font-playfair text-2xl font-bold text-foreground">Custom</span>
+                    <p className="text-sm text-muted-foreground mt-1">Individuell nach Bedarf</p>
+                  </div>
+                )}
 
                 {/* Divider */}
                 <div className="my-7 h-px bg-border/60" />
@@ -180,16 +187,25 @@ export default function PricingPage() {
 
                 {/* CTA */}
                 <div className="mt-8">
-                  <Button
-                    onClick={() => navigate('/auth')}
-                    className={`w-full h-11 rounded-xl font-medium transition-all duration-300 ${
-                      plan.popular
-                        ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_4px_16px_-4px_hsl(217_71%_25%/0.4)]'
-                        : 'bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.1] border border-border/50'
-                    }`}
-                  >
-                    Get Started
-                  </Button>
+                  {plan.price ? (
+                    <Button
+                      onClick={() => navigate('/auth')}
+                      className={`w-full h-11 rounded-xl font-medium transition-all duration-300 ${
+                        plan.popular
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_4px_16px_-4px_hsl(217_71%_25%/0.4)]'
+                          : 'bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.1] border border-border/50'
+                      }`}
+                    >
+                      Get Started
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => window.location.href = 'mailto:sales@briefly.app'}
+                      className="w-full h-11 rounded-xl font-medium bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.1] border border-border/50 transition-all duration-300"
+                    >
+                      Contact Sales
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>
