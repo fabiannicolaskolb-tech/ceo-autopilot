@@ -213,7 +213,7 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-2xl px-4 py-10">
+      <div className="relative z-10 mx-auto max-w-2xl px-4 py-10 pb-28">
         {step === 1 && (
           <div className="space-y-8">
             <div className="text-center">
@@ -400,9 +400,9 @@ export default function OnboardingPage() {
         )}
       </div>
 
-      <div className="sticky bottom-0 z-10 border-t border-border bg-card px-6 py-4">
-        <div className="mx-auto flex max-w-2xl justify-between">
-          <Button variant="outline" onClick={() => setStep(s => s - 1)} disabled={step === 1}>
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-border bg-card/95 backdrop-blur-sm px-6 py-4">
+        <div className="mx-auto flex max-w-2xl items-center justify-end gap-3">
+          <Button variant="outline" className="mr-auto" onClick={() => setStep(s => s - 1)} disabled={step === 1}>
             Zurück
           </Button>
           {step < totalSteps ? (
