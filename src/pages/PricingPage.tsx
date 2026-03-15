@@ -1,9 +1,21 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Zap, Check, Sun, Moon, ArrowLeft, Sparkles } from 'lucide-react';
+import { Zap, Check, X, Sun, Moon, ArrowLeft, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/hooks/useTheme';
+
+const allFeatures = [
+  'AI posts/month',
+  'Voice learning',
+  'Basic analytics',
+  'AI image generation',
+  'Auto-scheduling',
+  'Performance insights',
+  'Multi-executive seats',
+  'White-label option',
+  'Dedicated support',
+];
 
 const plans = [
   {
