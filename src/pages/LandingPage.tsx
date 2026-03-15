@@ -185,12 +185,12 @@ export default function LandingPage() {
                   key={f.title}
                   layout
                   animate={isHidden
-                    ? { opacity: 0, scale: 0.9, height: 0, marginBottom: 0 }
+                    ? { opacity: 0, scale: 0.9, height: 0, marginBottom: 0, overflow: 'hidden', padding: 0 }
                     : { opacity: 1, scale: 1, height: 'auto', marginBottom: undefined }
                   }
                   transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
                   onClick={() => isAnalytics && setExpandedFeature(isExpanded ? null : f.title)}
-                  className={`group relative overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-shadow duration-300 hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] ${isAnalytics ? 'cursor-pointer' : ''}`}
+                  className={`group relative overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-shadow duration-300 hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] ${isAnalytics ? 'cursor-pointer' : ''} ${isExpanded ? 'sm:col-span-3' : ''}`}
                 >
                   <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
                   <div className="flex flex-col items-center text-center">
