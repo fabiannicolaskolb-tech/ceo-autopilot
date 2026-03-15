@@ -17,6 +17,8 @@ interface LinkedInPostPreviewProps {
     shares?: number;
     impressions?: number;
   };
+  showActions?: boolean;
+  defaultExpanded?: boolean;
   className?: string;
 }
 
