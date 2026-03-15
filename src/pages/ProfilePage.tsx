@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { MeshBackground } from '@/components/MeshBackground';
 import { cn } from '@/lib/utils';
 
-const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)]';
+const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
 
 const TONES = [
   { value: 'authoritative', label: 'Authoritative' },
@@ -202,7 +202,7 @@ export default function ProfilePage() {
       </div>
 
       <div className="fixed bottom-6 right-6 z-50">
-        <Button onClick={save} className="rounded-full shadow-[0_8px_32px_-4px_hsl(263_50%_40%/0.15)] px-6">Alle Änderungen speichern</Button>
+        <Button onClick={save} className="rounded-full shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.15)] px-6">Alle Änderungen speichern</Button>
       </div>
     </div>
   );

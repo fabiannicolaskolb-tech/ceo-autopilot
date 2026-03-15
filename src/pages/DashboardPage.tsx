@@ -74,7 +74,7 @@ export default function DashboardPage() {
       <MeshBackground />
 
       {/* Welcome Hero */}
-      <div className="rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)] overflow-hidden">
+      <div className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] overflow-hidden">
         <div className="p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -170,7 +170,7 @@ export default function DashboardPage() {
           <Link
             key={item.url}
             to={item.url}
-            className="group relative rounded-[20px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06)] border border-primary/[0.06] hover:border-primary/20 transition-all duration-200 hover:shadow-[0_12px_40px_-8px_hsl(263_50%_40%/0.15)] hover:-translate-y-1 overflow-hidden"
+            className="group relative rounded-[20px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-[0_12px_40px_-8px_hsl(220_55%_20%/0.15)] hover:-translate-y-1 overflow-hidden"
           >
             {/* Gradient accent line */}
             <div className="absolute top-0 left-0 right-0 h-1 rounded-t-[20px] opacity-60 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `linear-gradient(90deg, ${item.color}, color-mix(in srgb, ${item.color} 40%, transparent))` }} />
@@ -206,7 +206,7 @@ export default function DashboardPage() {
       {/* Stats */}
       <div className="grid gap-5 grid-cols-2 lg:grid-cols-4">
         {/* Drafts */}
-        <div className="rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] p-6 shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)]">
+        <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
           <div className="rounded-[12px] p-2.5 bg-muted/50 w-fit">
             <FileText className="h-5 w-5 text-primary" />
           </div>
@@ -215,7 +215,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Published */}
-        <div className="rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] p-6 shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)]">
+        <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
           <div className="rounded-[12px] bg-success/10 p-2.5 w-fit">
             <TrendingUp className="h-5 w-5 text-success" />
           </div>
@@ -224,7 +224,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Next Scheduled - spans 2 cols on lg */}
-        <div className="sm:col-span-2 rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] p-6 shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)] transition-all duration-200 hover:shadow-[0_8px_32px_-4px_hsl(263_50%_40%/0.1)]">
+        <div className="sm:col-span-2 rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]">
           <div className="flex items-center gap-2 mb-4">
             <div className="rounded-[12px] bg-[hsl(40_70%_48%/0.1)] p-2.5">
               <CalendarDays className="h-5 w-5 text-warning" />
@@ -323,7 +323,7 @@ function LearningProgressCard({ posts }: { posts: any[] }) {
   if (analyzedPosts.length === 0) return null;
 
   return (
-    <div className="rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] p-6 shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)]">
+    <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
       <div className="flex items-center gap-3 mb-4">
         <div className="rounded-[12px] bg-primary/10 p-2.5">
           <Brain className="h-5 w-5 text-primary" />

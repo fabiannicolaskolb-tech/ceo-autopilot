@@ -194,7 +194,7 @@ export default function IdeationPage() {
       />
       {/* Split View: Actions + Sidebar */}
       <div className="hidden md:block">
-        <ResizablePanelGroup direction="horizontal" className="min-h-[380px] rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)]">
+        <ResizablePanelGroup direction="horizontal" className="min-h-[380px] rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
           {/* Left: Actions */}
           <ResizablePanel defaultSize={70} minSize={55}>
             <div className="p-8 h-full flex flex-col">
@@ -301,7 +301,7 @@ export default function IdeationPage() {
           <p className="text-sm text-muted-foreground mt-1">Posts generieren oder per Sprache Ideen teilen.</p>
         </div>
         <div className="grid gap-4">
-          <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06)] border-primary/[0.08]">
+          <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
             <CardContent className="p-6 flex flex-col items-center text-center gap-4">
               <FileText className="h-7 w-7 text-primary" />
               <h3 className="font-playfair text-lg font-semibold text-foreground">Post generieren</h3>
@@ -315,7 +315,7 @@ export default function IdeationPage() {
               )}
             </CardContent>
           </Card>
-          <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06)] border-primary/[0.08]">
+          <Card className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border-primary/20">
             <CardContent className="p-6 flex flex-col items-center text-center gap-4">
               <MessageSquare className="h-7 w-7 text-primary" />
               <h3 className="font-playfair text-lg font-semibold text-foreground">Gespräch starten</h3>
@@ -335,7 +335,7 @@ export default function IdeationPage() {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {voiceInsights.flatMap((insight: any) =>
               (insight.key_points as string[])?.map((point: string, pi: number) => (
-                <Card key={`${insight.id}-${pi}`} className="rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06)]">
+                <Card key={`${insight.id}-${pi}`} className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)]">
                   <CardContent className="p-5 space-y-3">
                     <p className="text-sm text-foreground leading-relaxed">{point}</p>
                     <div className="flex items-center justify-between">
@@ -367,7 +367,7 @@ export default function IdeationPage() {
           <h2 className="font-playfair text-xl font-semibold text-foreground">Generierte Posts</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {concepts.map((c, i) => (
-              <Card key={i} className="rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)] hover:shadow-[0_8px_32px_-4px_hsl(263_50%_40%/0.1)] transition-all duration-200">
+              <Card key={i} className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)] transition-all duration-300">
                 <CardHeader className="pb-3 space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <Badge variant="secondary" className="text-xs rounded-sm">{c.type}</Badge>
