@@ -227,7 +227,7 @@ export default function PricingPage() {
           <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
             <Link to="/">
               <ArrowLeft className="h-4 w-4 mr-1.5" />
-              Zurück zur Startseite
+              {t('pricing.back')}
             </Link>
           </Button>
         </div>
