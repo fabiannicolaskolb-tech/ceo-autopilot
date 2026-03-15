@@ -177,5 +177,110 @@ export default function DashboardPage() {
 
       {/* Creator Score */}
       <CreatorScoreCard />
+
+      {/* AI Learning Progress */}
+      <LearningProgressCard posts={posts} />
     </div>);
+}
+
+function LearningProgressCard({ posts }: { posts: any[] }) {
+  const analyzedPosts = useMemo(() =>
+    posts.filter(p => p.status === 'analyzed' || (p.metrics && typeof p.metrics === 'object' && (p.metrics as any).impressions)),
+    [posts]
+  );
+
+  if (analyzedPosts.length === 0) return null;
+
+  const engagementRates = analyzedPosts
+    .filter(p => (p.metrics as any)?.engagement_rate != null)
+    .map(p => Number((p.metrics as any).engagement_rate));
+
+  const engagementTrend = useMemo(() => {
+    if (engagementRates.length < 2) return engagementRates;
+    return engagementRates.slice(-10);
+  }, [engagementRates]);
+
+  const trendDirection = useMemo(() => {
+    if (engagementRates.length < 4) return null;
+    const half = Math.floor(engagementRates.length / 2);
+    const firstHalf = engagementRates.slice(0, half);
+    const secondHalf = engagementRates.slice(half);
+    const avgFirst = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+    const avgSecond = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+    if (avgFirst === 0) return null;
+    return Math.round(((avgSecond - avgFirst) / avgFirst) * 100);
+  }, [engagementRates]);
+
+  const latestSummary = useMemo(() => {
+    for (const p of [...analyzedPosts].reverse()) {
+      const m = p.metrics as any;
+      if (m?.performance_summary) return m.performance_summary;
+    }
+    return null;
+  }, [analyzedPosts]);
+
+  const topPattern = useMemo(() => {
+    const patternScores: Record<string, { total: number; count: number }> = {};
+    analyzedPosts.forEach(p => {
+      const m = p.metrics as any;
+      const pattern = m?.content_pattern || p.type;
+      if (!pattern) return;
+      const score = Number(m?.score || m?.engagement_rate || 0);
+      if (!patternScores[pattern]) patternScores[pattern] = { total: 0, count: 0 };
+      patternScores[pattern].total += score;
+      patternScores[pattern].count += 1;
+    });
+    let best = '';
+    let bestAvg = 0;
+    Object.entries(patternScores).forEach(([pattern, { total, count }]) => {
+      const avg = total / count;
+      if (avg > bestAvg) { bestAvg = avg; best = pattern; }
+    });
+    return best || null;
+  }, [analyzedPosts]);
+
+  return (
+    <div className="rounded-[24px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="rounded-[12px] bg-primary/10 p-2.5">
+          <Brain className="h-5 w-5 text-primary" />
+        </div>
+        <div>
+          <h2 className="font-playfair text-base font-semibold text-foreground">KI-Lernfortschritt</h2>
+          <p className="text-xs text-muted-foreground">{analyzedPosts.length} Posts analysiert</p>
+        </div>
+        {trendDirection !== null && (
+          <Badge variant="secondary" className={`ml-auto text-xs rounded-full ${trendDirection >= 0 ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
+            {trendDirection >= 0 ? <ArrowUpRight className="mr-1 h-3 w-3" /> : <ArrowDownRight className="mr-1 h-3 w-3" />}
+            {Math.abs(trendDirection)}% Engagement-Trend
+          </Badge>
+        )}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {engagementTrend.length >= 2 && (
+          <div className="rounded-[16px] bg-muted/30 p-4">
+            <p className="text-xs text-muted-foreground mb-2">Engagement Rate Verlauf</p>
+            <div className="h-[60px]">
+              <Sparkline data={engagementTrend} color="hsl(160, 60%, 38%)" height={60} width={300} />
+            </div>
+          </div>
+        )}
+        <div className="space-y-3">
+          {topPattern && (
+            <div className="rounded-[16px] bg-primary/5 p-3">
+              <p className="text-xs text-muted-foreground">Top Content-Pattern</p>
+              <p className="text-sm font-medium text-foreground mt-0.5">{topPattern}</p>
+            </div>
+          )}
+          {latestSummary && (
+            <div className="rounded-[16px] bg-muted/30 p-3">
+              <p className="text-xs text-muted-foreground">Letzte Analyse</p>
+              <p className="text-xs text-foreground mt-0.5 line-clamp-2">{latestSummary}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
