@@ -348,7 +348,14 @@ export default function OnboardingPage() {
                     }}
                     placeholder="Fügen Sie hier einen LinkedIn-Post ein..."
                     className="min-h-[100px] bg-card"
+                    minLength={500}
+                    maxLength={3000}
                   />
+                  {sample.trim().length > 0 && (
+                    <p className={cn("text-xs", sample.trim().length < 500 ? "text-destructive" : "text-muted-foreground")}>
+                      {sample.trim().length} / 3.000 Zeichen {sample.trim().length < 500 && '(min. 500)'}
+                    </p>
+                  )}
                 </div>
               ))}
               {voiceSamples.length < 5 && (
