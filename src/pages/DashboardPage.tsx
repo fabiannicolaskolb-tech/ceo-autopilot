@@ -277,12 +277,13 @@ export default function DashboardPage() {
               </p>
             </div>
           }
+          </div>
         </div>
       </div>
 
       {/* Creator Score moved to welcome hero expand */}
 
-      {/* AI Learning Progress */}
+      {/* AI Learning Progress - Liquid Glass */}
       <LearningProgressCard posts={posts} />
     </div>);
 }
