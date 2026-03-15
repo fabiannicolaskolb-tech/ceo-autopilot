@@ -668,7 +668,7 @@ export default function PostLibraryPage() {
             <h2 className="font-playfair text-lg font-semibold text-foreground">Zur Freigabe</h2>
             <Badge variant="secondary" className="text-[10px] rounded-full bg-warning/15 text-warning">{pendingApproval.length}</Badge>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="flex flex-col items-center gap-4">
             {pendingApproval.map(post => (
               <ApprovalCard key={post.id} post={post} onMutate={handleMutate} profile={profile} />
             ))}
