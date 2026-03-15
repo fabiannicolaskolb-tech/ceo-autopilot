@@ -32,6 +32,7 @@ export function FloatingHeader() {
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const isDashboard = location.pathname === '/dashboard';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg">
