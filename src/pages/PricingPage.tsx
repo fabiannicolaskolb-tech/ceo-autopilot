@@ -1,33 +1,70 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Zap, Check, Sun, Moon, ArrowLeft, Sparkles } from 'lucide-react';
+import { Zap, Check, X, Sun, Moon, ArrowLeft, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/hooks/useTheme';
+
+const allFeatures = [
+  'AI posts/month',
+  'Voice learning',
+  'Basic analytics',
+  'AI image generation',
+  'Auto-scheduling',
+  'Performance insights',
+  'Multi-executive seats',
+  'White-label option',
+  'Dedicated support',
+];
 
 const plans = [
   {
     name: 'Starter',
     price: '$99',
     popular: false,
-    features: ['10 AI posts/month', 'Voice learning', 'Basic analytics', 'Manual posting'],
+    featureDetails: {
+      'AI posts/month': '10',
+      'Voice learning': true,
+      'Basic analytics': true,
+      'AI image generation': false,
+      'Auto-scheduling': false,
+      'Performance insights': false,
+      'Multi-executive seats': false,
+      'White-label option': false,
+      'Dedicated support': false,
+    } as Record<string, boolean | string>,
   },
   {
     name: 'Pro',
     price: '$249',
     popular: true,
-    features: [
-      '30 AI posts/month',
-      'AI image generation',
-      'Auto-scheduling',
-      'Performance insights',
-    ],
+    featureDetails: {
+      'AI posts/month': '30',
+      'Voice learning': true,
+      'Basic analytics': true,
+      'AI image generation': true,
+      'Auto-scheduling': true,
+      'Performance insights': true,
+      'Multi-executive seats': false,
+      'White-label option': false,
+      'Dedicated support': false,
+    } as Record<string, boolean | string>,
   },
   {
     name: 'Enterprise',
     price: '$499',
     popular: false,
-    features: ['Unlimited posts', 'Multi-executive seats', 'White-label option', 'Dedicated support'],
+    featureDetails: {
+      'AI posts/month': 'Unlimited',
+      'Voice learning': true,
+      'Basic analytics': true,
+      'AI image generation': true,
+      'Auto-scheduling': true,
+      'Performance insights': true,
+      'Multi-executive seats': true,
+      'White-label option': true,
+      'Dedicated support': true,
+    } as Record<string, boolean | string>,
   },
 ];
 
@@ -132,15 +169,29 @@ export default function PricingPage() {
                 <div className="my-7 h-px bg-border/60" />
 
                 {/* Features */}
-                <ul className="flex-1 space-y-4">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
-                        <Check className="h-3 w-3 text-emerald-500" strokeWidth={3} />
-                      </div>
-                      <span className="text-sm leading-snug text-foreground/80">{feature}</span>
-                    </li>
-                  ))}
+                <ul className="flex-1 space-y-3.5">
+                  {allFeatures.map((feature) => {
+                    const value = plan.featureDetails[feature];
+                    const included = value === true || (typeof value === 'string');
+                    const label = typeof value === 'string' ? `${value} ${feature}` : feature;
+
+                    return (
+                      <li key={feature} className="flex items-start gap-3">
+                        {included ? (
+                          <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
+                            <Check className="h-3 w-3 text-emerald-500" strokeWidth={3} />
+                          </div>
+                        ) : (
+                          <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-destructive/10">
+                            <X className="h-3 w-3 text-destructive/70" strokeWidth={3} />
+                          </div>
+                        )}
+                        <span className={`text-sm leading-snug ${included ? 'text-foreground/80' : 'text-muted-foreground/50 line-through'}`}>
+                          {label}
+                        </span>
+                      </li>
+                    );
+                  })}
                 </ul>
 
                 {/* CTA */}
