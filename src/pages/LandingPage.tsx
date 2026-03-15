@@ -177,61 +177,64 @@ export default function LandingPage() {
           </div>
 
           <div className="grid gap-8 sm:grid-cols-3">
-            {features.map((f) => {
-              const isExpandable = true;
-              const isExpanded = expandedFeature === f.title;
-              const isHidden = expandedFeature != null && expandedFeature !== f.title;
+            <AnimatePresence mode="sync">
+              {features.map((f) => {
+                const isExpanded = expandedFeature === f.title;
+                const isHidden = expandedFeature != null && expandedFeature !== f.title;
+                const previewImage = f.title === 'Analytics' ? calendarPreview : f.title === 'Planning' ? plannerPreview : ideationPreview;
 
-              const previewImage = f.title === 'Analytics' ? calendarPreview : f.title === 'Planning' ? plannerPreview : ideationPreview;
+                if (isHidden) return null;
 
-              return (
-                <motion.div
-                  key={f.title}
-                  layout
-                  animate={isHidden
-                    ? { opacity: 0, scale: 0.9, height: 0, marginBottom: 0, overflow: 'hidden', padding: 0 }
-                    : { opacity: 1, scale: 1, height: 'auto', marginBottom: undefined }
-                  }
-                  transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-                  onClick={() => isExpandable && setExpandedFeature(isExpanded ? null : f.title)}
-                  className={`group relative overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-shadow duration-300 hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] ${isExpandable ? 'cursor-pointer' : ''} ${isExpanded ? 'sm:col-span-3' : ''}`}
-                >
-                  <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
-                  <div className="flex flex-col items-center text-center h-full">
-                    <div className="flex flex-1 flex-col items-center justify-between p-8 pt-7 text-center">
-                      <div>
-                        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--feature-icon-bg))] mx-auto">
-                          <f.icon className="h-7 w-7 text-[hsl(var(--feature-icon))]" />
+                return (
+                  <motion.div
+                    key={f.title}
+                    layout="position"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                    onClick={() => setExpandedFeature(isExpanded ? null : f.title)}
+                    className={`group relative cursor-pointer overflow-hidden rounded-xl bg-card shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.08)] transition-shadow duration-300 hover:shadow-[0_12px_32px_-4px_hsl(220_55%_20%/0.16)] ${isExpanded ? 'sm:col-span-3' : ''}`}
+                  >
+                    <div className="h-[3px] w-full bg-[hsl(var(--feature-accent))]" />
+                    <div className="flex flex-col items-center text-center h-full">
+                      <div className="flex flex-1 flex-col items-center justify-between p-8 pt-7 text-center">
+                        <div>
+                          <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--feature-icon-bg))] mx-auto">
+                            <f.icon className="h-7 w-7 text-[hsl(var(--feature-icon))]" />
+                          </div>
+                          <h3 className="font-playfair text-lg font-bold text-foreground">{f.headline}</h3>
+                          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
                         </div>
-                        <h3 className="font-playfair text-lg font-bold text-foreground">{f.headline}</h3>
-                        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
+                        <span className="mt-5 inline-block text-xs font-medium tracking-wide text-[hsl(var(--feature-accent))] transition-all group-hover:underline">
+                          {isExpanded ? 'Schließen ↑' : 'Vorschau ansehen →'}
+                        </span>
                       </div>
-                      <span className="mt-5 inline-block text-xs font-medium tracking-wide text-[hsl(var(--feature-accent))] transition-all group-hover:underline">
-                        {isExpanded ? 'Schließen ↑' : 'Vorschau ansehen →'}
-                      </span>
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                            className="w-full max-w-3xl mx-auto overflow-hidden"
+                          >
+                            <div className="px-6 pb-6">
+                              <img
+                                src={previewImage}
+                                alt={`${f.title} Vorschau`}
+                                className="w-full rounded-xl border border-border shadow-lg brightness-[1.02] dark:brightness-[0.85] dark:contrast-[1.1] dark:border-border/50"
+                                draggable={false}
+                              />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
-                    <AnimatePresence>
-                      {isExpandable && isExpanded && previewImage && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                          transition={{ duration: 0.5, delay: 0.15, ease: [0.4, 0, 0.2, 1] }}
-                          className="w-full max-w-3xl mx-auto px-6 pb-6"
-                        >
-                          <img
-                            src={previewImage}
-                            alt={`${f.title} Vorschau`}
-                            className="w-full rounded-xl border border-border shadow-lg brightness-[1.02] dark:brightness-[0.85] dark:contrast-[1.1] dark:border-border/50"
-                            draggable={false}
-                          />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </motion.div>
-              );
-            })}
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
         </div>
       </section>
