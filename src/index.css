@@ -321,37 +321,6 @@
   opacity: var(--glow-opacity);
 }
 
-.glow-container:hover .glow-content {
-  mix-blend-mode: darken;
-  box-shadow: 0 0 calc(var(--white-shadow) * 1vw) calc(var(--white-shadow) * 0.15vw) rgb(255 255 255 / 20%);
-  animation: shadow-pulse calc(var(--animation-speed) * 2) linear infinite;
-}
-
-.glow-container:hover .glow-content:before {
-  --bg-size: 15;
-  animation-play-state: paused;
-  transition: --bg-size var(--interaction-speed) ease;
-}
-
-.glow-container:hover .glow {
-  --glow-blur: 1.5;
-  --glow-opacity: 0.6;
-  --glow-scale: 2.5;
-  --glow-radius: 0;
-  --rotate: 900;
-  --glow-rotate-unit: 0;
-  --scale-factor: 1.25;
-  animation-play-state: paused;
-}
-
-.glow-container:hover .glow:after {
-  --glow-translate-y: 0;
-  animation-play-state: paused;
-  transition: --glow-translate-y 0s ease, --glow-blur 0.05s ease,
-              --glow-opacity 0.05s ease, --glow-scale 0.05s ease,
-              --glow-radius 0.05s ease;
-}
-
 @keyframes shadow-pulse {
   0%, 24%, 46%, 73%, 96% { --white-shadow: 0.5; }
   12%, 28%, 41%, 63%, 75%, 82%, 98% { --white-shadow: 2.5; }
