@@ -30,8 +30,8 @@ import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { LinkedInPostPreview } from '@/components/LinkedInPostPreview';
 
-const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)]';
-const GLASS_CARD_HOVER = `${GLASS_CARD} transition-all duration-300 hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)]`;
+const GLASS_CARD = 'rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)]';
+const GLASS_CARD_HOVER = `${GLASS_CARD} transition-all duration-200 hover:shadow-[0_8px_32px_-4px_hsl(263_50%_40%/0.1)]`;
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType; dotClass: string }> = {
   draft: { label: 'Entwurf', color: 'bg-muted text-muted-foreground', icon: FileText, dotClass: 'bg-[hsl(var(--status-draft))]' },
