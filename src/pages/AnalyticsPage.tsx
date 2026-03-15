@@ -430,8 +430,7 @@ export default function AnalyticsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={handleLinkedInImport}
-              disabled={importLoading}
+              onClick={() => document.getElementById('import-section')?.scrollIntoView({ behavior: 'smooth' })}
               className="gap-2"
             >
               {importLoading ? (
