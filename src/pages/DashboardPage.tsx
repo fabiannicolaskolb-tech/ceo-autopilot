@@ -170,7 +170,7 @@ export default function DashboardPage() {
           <Link
             key={item.url}
             to={item.url}
-            className="group relative rounded-[20px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06)] border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-[0_12px_40px_-8px_hsl(220_55%_20%/0.15)] hover:-translate-y-1 overflow-hidden"
+            className="group relative rounded-[20px] bg-card/80 backdrop-blur-xl p-6 shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06)] border border-primary/[0.06] hover:border-primary/20 transition-all duration-200 hover:shadow-[0_12px_40px_-8px_hsl(263_50%_40%/0.15)] hover:-translate-y-1 overflow-hidden"
           >
             {/* Gradient accent line */}
             <div className="absolute top-0 left-0 right-0 h-1 rounded-t-[20px] opacity-60 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `linear-gradient(90deg, ${item.color}, color-mix(in srgb, ${item.color} 40%, transparent))` }} />
