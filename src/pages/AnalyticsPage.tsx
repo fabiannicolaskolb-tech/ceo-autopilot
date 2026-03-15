@@ -3,6 +3,7 @@ import {
   Eye, TrendingUp, TrendingDown, Users, ArrowUpRight, ArrowDownRight,
   BarChart3, Clock, MessageCircle, Heart, Share2, Lightbulb, Minus, Rocket,
   Upload, Image as ImageIcon, Save, Brain, Zap, ArrowRight, CalendarIcon,
+  RefreshCw, Linkedin,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
