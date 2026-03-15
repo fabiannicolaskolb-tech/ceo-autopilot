@@ -316,7 +316,3 @@
   to { --rotate: calc(360 - 70); --glow-translate-y: -65; }
 }
 
-@keyframes hue-animation {
-  0% { --hue: 0; }
-  100% { --hue: 360; }
-}
