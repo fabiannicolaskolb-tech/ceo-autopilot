@@ -224,7 +224,7 @@ export default function IdeationPage() {
     queryKey: ['topics', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data, error } = await supabase.from('topics').select('*').eq('user_id', user.id);
+      const { data, error } = await supabase.from('topics').select('*').eq('user_id', user.id).eq('type', 'focus');
       if (error) throw error;
       return data ?? [];
     },
