@@ -367,7 +367,7 @@ export default function IdeationPage() {
           <h2 className="font-playfair text-xl font-semibold text-foreground">Generierte Posts</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {concepts.map((c, i) => (
-              <Card key={i} className="rounded-[24px] bg-card/80 backdrop-blur-xl shadow-[0_4px_24px_-4px_hsl(220_55%_20%/0.06),0_12px_48px_-8px_hsl(220_55%_20%/0.04)] hover:shadow-[0_8px_32px_-4px_hsl(220_55%_20%/0.1)] transition-all duration-300">
+              <Card key={i} className="rounded-[24px] bg-card/80 backdrop-blur-xl border border-primary/[0.06] shadow-[0_4px_24px_-4px_hsl(263_50%_40%/0.06),0_12px_48px_-8px_hsl(263_50%_40%/0.04)] hover:shadow-[0_8px_32px_-4px_hsl(263_50%_40%/0.1)] transition-all duration-200">
                 <CardHeader className="pb-3 space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <Badge variant="secondary" className="text-xs rounded-sm">{c.type}</Badge>
