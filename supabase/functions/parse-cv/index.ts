@@ -37,7 +37,15 @@ serve(async (req) => {
       textContent = new TextDecoder().decode(bytes);
     } else {
       // For PDF/DOCX, encode as base64 and use as context
-      const base64 = btoa(String.fromCharCode(...bytes));
+      let binary = "";
+      const chunkSize = 8192;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+        for (let j = 0; j < chunk.length; j++) {
+          binary += String.fromCharCode(chunk[j]);
+        }
+      }
+      const base64 = btoa(binary);
       // We'll pass raw text extraction attempt + base64 hint
       try {
         textContent = new TextDecoder().decode(bytes);
