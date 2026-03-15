@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X, Upload, Loader2 } from 'lucide-react';
+import { Zap, Lightbulb, CalendarDays, BarChart3, Plus, X, Upload, Loader2, AlertTriangle } from 'lucide-react';
 import { Particles } from '@/components/ui/particles';
 import { useTheme } from '@/hooks/useTheme';
 import ShimmerText from '@/components/ui/shimmer-text';
@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
@@ -45,6 +46,7 @@ export default function OnboardingPage() {
   const [voiceSamples, setVoiceSamples] = useState<string[]>(['', '', '']);
   const [avatarUrls, setAvatarUrls] = useState<(string | null)[]>([null, null, null]);
   const [saving, setSaving] = useState(false);
+  const [showVoiceWarning, setShowVoiceWarning] = useState(false);
   const [parsingCv, setParsingCv] = useState(false);
   const cvInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -94,7 +96,7 @@ export default function OnboardingPage() {
       case 3: return avatarUrls.every(url => url !== null);
       case 4: return targetAudience.trim() !== '' && tone.trim() !== '';
       case 5: return focusTopics.length > 0;
-      case 6: return voiceSamples.filter(s => s.trim().length >= 500 && s.trim().length <= 3000).length >= 3;
+      case 6: return true;
       default: return true;
     }
   })();
@@ -400,12 +402,43 @@ export default function OnboardingPage() {
           {step < totalSteps ? (
             <InteractiveHoverButton onClick={() => setStep(s => s + 1)} disabled={!isStepValid}>Weiter</InteractiveHoverButton>
           ) : (
-            <InteractiveHoverButton onClick={handleComplete} disabled={saving || !isStepValid}>
+            <InteractiveHoverButton onClick={() => {
+              const validSamples = voiceSamples.filter(s => s.trim().length >= 500 && s.trim().length <= 3000).length;
+              if (validSamples < 3) {
+                setShowVoiceWarning(true);
+              } else {
+                handleComplete();
+              }
+            }} disabled={saving || !isStepValid}>
               {saving ? 'Wird gespeichert...' : 'Abschließen'}
             </InteractiveHoverButton>
           )}
         </div>
       </div>
+
+      <Dialog open={showVoiceWarning} onOpenChange={setShowVoiceWarning}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              Voice Samples unvollständig
+            </DialogTitle>
+            <DialogDescription className="pt-2 text-sm leading-relaxed">
+              Ohne mindestens 3 ausgefüllte Voice Samples (je 500–3.000 Zeichen) kann die KI Ihren Schreibstil nicht optimal erfassen. Die Qualität Ihrer generierten Inhalte könnte darunter leiden.
+              <br /><br />
+              Sie können die Voice Samples jederzeit nachträglich in den <strong>Profileinstellungen</strong> ergänzen.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setShowVoiceWarning(false)}>
+              Zurück zum Ausfüllen
+            </Button>
+            <Button variant="default" onClick={() => { setShowVoiceWarning(false); handleComplete(); }}>
+              Trotzdem abschließen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
